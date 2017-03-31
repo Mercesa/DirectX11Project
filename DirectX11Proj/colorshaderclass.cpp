@@ -90,7 +90,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 		return result;
 	}
 
-	result = LoadShaderWithErrorChecking(psFilename, "ColorPixelShader", "ps_5_0", vertexShaderBuffer, hwnd);
+	result = LoadShaderWithErrorChecking(psFilename, "ColorPixelShader", "ps_5_0", pixelShaderBuffer, hwnd);
 
 	if (!result)
 	{
@@ -106,6 +106,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 
     // Create the pixel shader from the buffer.
     result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pixelShader);
+	
 	if(FAILED(result))
 	{
 		return false;
