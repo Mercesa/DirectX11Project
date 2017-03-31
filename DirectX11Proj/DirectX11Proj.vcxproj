@@ -164,6 +164,7 @@
     <ClInclude Include="graphicsclass.h" />
     <ClInclude Include="inputclass.h" />
     <ClInclude Include="modelclass.h" />
+    <ClInclude Include="ShaderHelperFunctions.h" />
     <ClInclude Include="systemclass.h" />
   </ItemGroup>
   <ItemGroup>

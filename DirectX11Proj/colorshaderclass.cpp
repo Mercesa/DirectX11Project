@@ -165,7 +165,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 	return true;
 }
 
-
+ 
 void ColorShaderClass::ShutdownShader()
 {
 	// Release the matrix constant buffer.
