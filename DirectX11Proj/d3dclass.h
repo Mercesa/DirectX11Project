@@ -1,4 +1,3 @@
-
 #ifndef _D3DCLASS_H_
 #define _D3DCLASS_H_
 
@@ -9,6 +8,7 @@
 #pragma comment(lib, "d3dx10.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
+//#define _XM_NO_INTRINSICS_
 
 #include <d3d11.h>	
 #include <directxmath.h>

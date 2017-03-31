@@ -1,6 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: graphicsclass.cpp
-////////////////////////////////////////////////////////////////////////////////
+
 #include "graphicsclass.h"
 
 
@@ -29,7 +27,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 
 	// Create the Direct3D object.
-	m_Direct3D = new D3DClass;
+	m_Direct3D = std::make_unique<D3DClass>();
 	if(!m_Direct3D)
 	{
 		return false;
@@ -44,7 +42,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Create the camera object.
-	m_Camera = new CameraClass;
+	m_Camera = std::make_unique<CameraClass>();
 	if (!m_Camera)
 	{
 		return false;
@@ -54,7 +52,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
 
 	// Create the model object.
-	m_Model = new ModelClass;
+	m_Model = std::make_unique<ModelClass>();
 	if (!m_Model)
 	{
 		return false;
@@ -69,7 +67,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Create the color shader object.
-	m_ColorShader = new ColorShaderClass;
+	m_ColorShader = std::make_unique<ColorShaderClass>();
 	if (!m_ColorShader)
 	{
 		return false;
@@ -89,37 +87,11 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
-	// Release the color shader object.
-	if (m_ColorShader)
-	{
-		m_ColorShader->Shutdown();
-		delete m_ColorShader;
-		m_ColorShader = 0;
-	}
-
-	// Release the model object.
-	if (m_Model)
-	{
-		m_Model->Shutdown();
-		delete m_Model;
-		m_Model = 0;
-	}
-
-	// Release the camera object.
-	if (m_Camera)
-	{
-		delete m_Camera;
-		m_Camera = 0;
-	}
-
-	// Release the D3D object.
-	if(m_Direct3D)
-	{
-		m_Direct3D->Shutdown();
-		delete m_Direct3D;
-		m_Direct3D = 0;
-	}
-
+	
+	m_ColorShader->Shutdown();	
+	m_Model->Shutdown();
+	m_Direct3D->Shutdown();
+	
 	return;
 }
 

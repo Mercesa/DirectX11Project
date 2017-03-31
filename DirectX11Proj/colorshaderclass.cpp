@@ -1,6 +1,4 @@
-
 #include "colorshaderclass.h"
-
 #include "ShaderHelperFunctions.h"
 
 
@@ -66,6 +64,7 @@ bool ColorShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount
 
 	return true;
 }
+
 
 bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
 {
@@ -166,7 +165,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 	return true;
 }
 
- 
+
 void ColorShaderClass::ShutdownShader()
 {
 	// Release the matrix constant buffer.
@@ -208,8 +207,6 @@ bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, c
     D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	unsigned int bufferNumber;
-
-
 	
 	// Transpose the matrices to prepare them for the shader.
 	XMMATRIX worldMatrix2 = XMMatrixTranspose(worldMatrix);
@@ -217,6 +214,7 @@ bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, c
 	XMMATRIX projectionMatrix2 = XMMatrixTranspose(projectionMatrix);
 
 	// Lock the constant buffer so it can be written to.
+	
 	result = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if(FAILED(result))
 	{

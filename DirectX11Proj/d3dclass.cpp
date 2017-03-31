@@ -1,19 +1,8 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: d3dclass.cpp
-////////////////////////////////////////////////////////////////////////////////
 #include "d3dclass.h"
 
 
 D3DClass::D3DClass()
 {
-	//m_swapChain = 0;
-	//m_device = 0;
-	//m_deviceContext = 0;
-	//m_renderTargetView = 0;
-	//m_depthStencilBuffer = 0;
-	//m_depthStencilState = 0;
-	//m_depthStencilView = 0;
-	//m_rasterState = 0;
 }
 
 
@@ -26,7 +15,7 @@ D3DClass::~D3DClass()
 {
 }
 
-
+#include <iostream>
 bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen,
 	float screenDepth, float screenNear)
 {
@@ -48,7 +37,12 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	D3D11_RASTERIZER_DESC rasterDesc;
 	D3D11_VIEWPORT viewport;
 	float fieldOfView, screenAspect;
+	UINT creationFlags = D3D11_CREATE_DEVICE_BGRA_SUPPORT;
 
+#if defined(_DEBUG)
+	// If the project is in a debug build, enable the debug layer.
+	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
 
 	// Store the vsync setting.
 	m_vsync_enabled = vsync;
@@ -80,6 +74,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	{
 		return false;
 	}
+
 
 	// Create a list to hold all the possible display modes for this monitor/video card combination.
 	displayModeList = new DXGI_MODE_DESC[numModes];
@@ -119,6 +114,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	// Store the dedicated video card memory in megabytes.
 	m_videoCardMemory = (int)(adapterDesc.DedicatedVideoMemory / 1024 / 1024);
 
+	printf("%i", m_videoCardMemory);
 	stringLength = 0;
 	size_t lValue = (size_t)stringLength;
 
@@ -204,7 +200,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	featureLevel = D3D_FEATURE_LEVEL_11_0;
 
 	// Create the swap chain, Direct3D device, and Direct3D device context.
-	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &featureLevel, 1,
+	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE,NULL, creationFlags, &featureLevel, 1,
 		D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL, &m_deviceContext);
 	if (FAILED(result))
 	{
@@ -228,7 +224,6 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	// Release pointer to the back buffer as we no longer need it.
 	backBufferPtr->Release();
 	backBufferPtr = 0;
-
 	// Initialize the description of the depth buffer.
 	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
 
@@ -361,6 +356,15 @@ void D3DClass::Shutdown()
 	{
 		m_swapChain->SetFullscreenState(false, NULL);
 	}
+
+	m_rasterState.Reset();
+	m_depthStencilView.Reset();
+	m_depthStencilState.Reset();
+	m_depthStencilBuffer.Reset();
+	m_renderTargetView.Reset();
+	m_deviceContext.Reset();
+	m_device.Reset();
+	m_swapChain.Reset();
 
 	
 	return;

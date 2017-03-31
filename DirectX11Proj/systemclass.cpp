@@ -1,8 +1,6 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: systemclass.cpp
-////////////////////////////////////////////////////////////////////////////////
 #include "systemclass.h"
 
+#include <fcntl.h>
 
 SystemClass::SystemClass()
 {
@@ -23,6 +21,16 @@ SystemClass::~SystemClass()
 
 bool SystemClass::Initialize()
 {
+	// This is for the console window
+	AllocConsole();
+	freopen("conin$", "r", stdin);
+	freopen("conout$", "w", stdout);
+	freopen("conout$", "w", stderr);
+
+	#if defined(DEBUG) | defined(_DEBUG)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
 	int screenWidth, screenHeight;
 	bool result;
 
