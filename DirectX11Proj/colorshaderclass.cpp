@@ -1,6 +1,8 @@
 
 #include "colorshaderclass.h"
 
+#include "ShaderHelperFunctions.h"
+
 
 ColorShaderClass::ColorShaderClass()
 {
@@ -65,7 +67,6 @@ bool ColorShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount
 	return true;
 }
 
-
 bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
 {
 	HRESULT result;
@@ -82,42 +83,18 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 	vertexShaderBuffer = 0;
 	pixelShaderBuffer = 0;
 
-	result = D3DX11CompileFromFile(vsFilename, NULL, NULL, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
-		&vertexShaderBuffer, &errorMessage, NULL);
+	result = LoadShaderWithErrorChecking(vsFilename, "ColorVertexShader", "vs_5_0", vertexShaderBuffer, hwnd);
 
-	if(FAILED(result))
+	if (!result)
 	{
-		// If the shader failed to compile it should have writen something to the error message.
-		if(errorMessage)
-		{
-			OutputShaderErrorMessage(errorMessage, hwnd, vsFilename);
-		}
-		// If there was  nothing in the error message then it simply could not find the shader file itself.
-		else
-		{
-			MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK);
-		}
-
-		return false;
+		return result;
 	}
 
-	// Compile the pixel shader code.
-	result = D3DX11CompileFromFile(psFilename, NULL, NULL, "ColorPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
-		&pixelShaderBuffer, &errorMessage, NULL);
-	if(FAILED(result))
-	{
-		// If the shader failed to compile it should have writen something to the error message.
-		if(errorMessage)
-		{
-			OutputShaderErrorMessage(errorMessage, hwnd, psFilename);
-		}
-		// If there was nothing in the error message then it simply could not find the file itself.
-		else
-		{
-			MessageBox(hwnd, psFilename, L"Missing Shader File", MB_OK);
-		}
+	result = LoadShaderWithErrorChecking(psFilename, "ColorPixelShader", "ps_5_0", vertexShaderBuffer, hwnd);
 
-		return false;
+	if (!result)
+	{
+		return result;
 	}
 
     // Create the vertex shader from the buffer.
@@ -218,42 +195,6 @@ void ColorShaderClass::ShutdownShader()
 		m_vertexShader->Release();
 		m_vertexShader = 0;
 	}
-
-	return;
-}
-
-
-void ColorShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename)
-{
-	char* compileErrors;
-	unsigned long long bufferSize, i;
-	ofstream fout;
-
-
-	// Get a pointer to the error message text buffer.
-	compileErrors = (char*)(errorMessage->GetBufferPointer());
-
-	// Get the length of the message.
-	bufferSize = errorMessage->GetBufferSize();
-
-	// Open a file to write the error message to.
-	fout.open("shader-error.txt");
-
-	// Write out the error message.
-	for(i=0; i<bufferSize; i++)
-	{
-		fout << compileErrors[i];
-	}
-
-	// Close the file.
-	fout.close();
-
-	// Release the error message.
-	errorMessage->Release();
-	errorMessage = 0;
-
-	// Pop a message up on the screen to notify the user to check the text file for compile errors.
-	MessageBox(hwnd, L"Error compiling shader.  Check shader-error.txt for message.", shaderFilename, MB_OK);
 
 	return;
 }
