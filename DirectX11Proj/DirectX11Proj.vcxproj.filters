@@ -62,6 +62,9 @@
     <ClInclude Include="modelclass.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="ShaderHelperFunctions.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="color.ps">

@@ -1,4 +1,4 @@
-﻿  colorshaderclass.cpp
+﻿  d3dclass.cpp
 c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
   c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51693): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
 c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
@@ -55,5 +55,4 @@ c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): w
   c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52073): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
 c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
   c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52082): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
-  DirectX11Proj.vcxproj -> D:\Github Projects\DirectX11Project\DirectX11PROJ\Debug\DirectX11Proj.exe
-  DirectX11Proj.vcxproj -> D:\Github Projects\DirectX11Project\DirectX11PROJ\Debug\DirectX11Proj.pdb (Full PDB)
+  DirectX11Proj.vcxproj -> E:\Github Projects\DirectX11Project\DirectX11Proj\Debug\DirectX11Proj.exe

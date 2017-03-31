@@ -3,15 +3,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "systemclass.h"
 
-
+#include <memory>
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
-	SystemClass* System;
+	std::unique_ptr<SystemClass> System;
 	bool result;
 	
 	
 	// Create the system object.
-	System = new SystemClass;
+	System = std::make_unique<SystemClass>();
 	if(!System)
 	{
 		return 0;
@@ -26,8 +26,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 	// Shutdown and release the system object.
 	System->Shutdown();
-	delete System;
-	System = 0;
 
 	return 0;
 }
