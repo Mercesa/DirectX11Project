@@ -43,7 +43,7 @@ bool SystemClass::Initialize()
 	InitializeWindows(screenWidth, screenHeight);
 
 	// Create the input object.  This object will be used to handle reading the keyboard input from the user.
-	m_Input = new InputClass;
+	m_Input = std::make_unique<InputClass>();
 	if(!m_Input)
 	{
 		return false;
@@ -53,11 +53,18 @@ bool SystemClass::Initialize()
 	m_Input->Initialize();
 
 	// Create the graphics object.  This object will handle rendering all the graphics for this application.
-	m_Graphics = new GraphicsClass;
+	m_Graphics = std::make_unique<GraphicsClass>();
 	if(!m_Graphics)
 	{
 		return false;
 	}
+
+	mApplication = std::make_unique<Application>();
+	if (!mApplication)
+	{
+		return false;
+	}
+	mApplication->Init();
 
 	// Initialize the graphics object.
 	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
@@ -73,20 +80,9 @@ bool SystemClass::Initialize()
 void SystemClass::Shutdown()
 {
 	// Release the graphics object.
-	if(m_Graphics)
-	{
-		m_Graphics->Shutdown();
-		delete m_Graphics;
-		m_Graphics = 0;
-	}
-
-	// Release the input object.
-	if(m_Input)
-	{
-		delete m_Input;
-		m_Input = 0;
-	}
-
+	m_Graphics->Shutdown();
+	mApplication->Destroy();
+	
 	// Shutdown the window.
 	ShutdownWindows();
 	
@@ -135,6 +131,7 @@ void SystemClass::Run()
 }
 
 
+// Engine tick in a sense, what goes on in one frame
 bool SystemClass::Frame()
 {
 	bool result;
@@ -146,6 +143,8 @@ bool SystemClass::Frame()
 		return false;
 	}
 
+	mApplication->SceneTick();
+	mApplication->Tick();
 	// Do the frame processing for the graphics object.
 	result = m_Graphics->Frame();
 	if(!result)
@@ -253,7 +252,7 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 
 	// Create the window with the screen settings and get the handle to it.
 	m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, m_applicationName, m_applicationName, 
-						    WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
+						    WS_OVERLAPPEDWINDOW,
 						    posX, posY, screenWidth, screenHeight, NULL, NULL, m_hinstance, NULL);
 
 	// Bring the window up on the screen and set it as main focus.

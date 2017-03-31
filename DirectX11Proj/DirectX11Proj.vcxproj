@@ -150,21 +150,28 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="cameraclass.cpp" />
     <ClCompile Include="colorshaderclass.cpp" />
     <ClCompile Include="d3dclass.cpp" />
     <ClCompile Include="graphicsclass.cpp" />
+    <ClCompile Include="IApplication.cpp" />
     <ClCompile Include="inputclass.cpp" />
+    <ClCompile Include="IScene.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="modelclass.cpp" />
     <ClCompile Include="systemclass.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application.h" />
     <ClInclude Include="cameraclass.h" />
     <ClInclude Include="colorshaderclass.h" />
+    <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="d3dclass.h" />
     <ClInclude Include="graphicsclass.h" />
+    <ClInclude Include="IApplication.h" />
     <ClInclude Include="inputclass.h" />
+    <ClInclude Include="IScene.h" />
     <ClInclude Include="modelclass.h" />
     <ClInclude Include="ShaderHelperFunctions.h" />
     <ClInclude Include="systemclass.h" />

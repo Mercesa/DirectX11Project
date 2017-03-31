@@ -10,7 +10,7 @@
 
 #include "inputclass.h"
 #include "graphicsclass.h"
-
+#include "Application.h"
 
 class SystemClass
 {
@@ -35,8 +35,9 @@ private:
 	HINSTANCE m_hinstance;
 	HWND m_hwnd;
 
-	InputClass* m_Input;
-	GraphicsClass* m_Graphics;
+	std::unique_ptr<InputClass> m_Input;
+	std::unique_ptr<GraphicsClass> m_Graphics;
+	std::unique_ptr<Application> mApplication;
 };
 
 

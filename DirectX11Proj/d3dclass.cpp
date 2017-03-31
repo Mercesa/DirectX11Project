@@ -114,7 +114,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	// Store the dedicated video card memory in megabytes.
 	m_videoCardMemory = (int)(adapterDesc.DedicatedVideoMemory / 1024 / 1024);
 
-	printf("%i", m_videoCardMemory);
+	
 	stringLength = 0;
 	size_t lValue = (size_t)stringLength;
 
