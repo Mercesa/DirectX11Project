@@ -154,12 +154,15 @@
     <ClCompile Include="cameraclass.cpp" />
     <ClCompile Include="colorshaderclass.cpp" />
     <ClCompile Include="d3dclass.cpp" />
+    <ClCompile Include="d3dDXGIManager.cpp" />
+    <ClCompile Include="d3dmodel.cpp" />
     <ClCompile Include="graphicsclass.cpp" />
     <ClCompile Include="IApplication.cpp" />
     <ClCompile Include="inputclass.cpp" />
     <ClCompile Include="IScene.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="modelclass.cpp" />
+    <ClCompile Include="MyCustomScene.cpp" />
     <ClCompile Include="systemclass.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -168,16 +171,19 @@
     <ClInclude Include="colorshaderclass.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="d3dclass.h" />
+    <ClInclude Include="d3dDXGIManager.h" />
+    <ClInclude Include="d3dmodel.h" />
     <ClInclude Include="graphicsclass.h" />
     <ClInclude Include="IApplication.h" />
     <ClInclude Include="inputclass.h" />
     <ClInclude Include="IScene.h" />
     <ClInclude Include="modelclass.h" />
+    <ClInclude Include="ModelData.h" />
+    <ClInclude Include="MyCustomScene.h" />
     <ClInclude Include="ShaderHelperFunctions.h" />
     <ClInclude Include="systemclass.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="color.ps" />
     <None Include="color.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

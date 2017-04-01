@@ -11,7 +11,7 @@ public:
 	~Application();
 
 	virtual void Init() {}
-	virtual void Tick() { std::cout << "User their application working" << std::endl; }
+	virtual void Tick() { /*std::cout << "User their application working" << std::endl;*/ }
 	virtual void Destroy() {}
 };
 

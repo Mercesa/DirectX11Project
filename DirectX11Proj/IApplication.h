@@ -17,8 +17,6 @@ public:
 	virtual void Tick() = 0;
 	virtual void Destroy() = 0;
 
-
-
 private:
 	void SceneTick();
 	void SetCurrentScene(IScene* aScene);

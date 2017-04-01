@@ -27,7 +27,7 @@ bool ColorShaderClass::Initialize(ID3D11Device* device, HWND hwnd)
 
 
 	// Initialize the vertex and pixel shaders.
-	result = InitializeShader(device, hwnd, L"color.vs", L"color.ps");
+	result = InitializeShader(device, hwnd, L"color.vs");
 	if(!result)
 	{
 		return false;
@@ -66,7 +66,7 @@ bool ColorShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount
 }
 
 
-bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
+bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename)
 {
 	HRESULT result;
 	ID3D10Blob* errorMessage;
@@ -89,7 +89,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 		return result;
 	}
 
-	result = LoadShaderWithErrorChecking(psFilename, "ColorPixelShader", "ps_5_0", pixelShaderBuffer, hwnd);
+	result = LoadShaderWithErrorChecking(vsFilename, "ColorPixelShader", "ps_5_0", pixelShaderBuffer, hwnd);
 
 	if (!result)
 	{
