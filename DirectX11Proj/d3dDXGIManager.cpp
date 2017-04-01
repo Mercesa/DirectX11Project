@@ -1,16 +1,5 @@
 #include "d3dDXGIManager.h"
 
-
-
-d3dDXGIManager::d3dDXGIManager()
-{
-}
-
-
-d3dDXGIManager::~d3dDXGIManager()
-{
-}
-
 bool d3dDXGIManager::Create(int aWidth, int aHeight, int &aNumerator, int &aDenominator)
 {
 	HRESULT result;

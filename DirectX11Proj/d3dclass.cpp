@@ -47,6 +47,15 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	std::unique_ptr<d3dDXGIManager> md3dDXGIManager = std::make_unique<d3dDXGIManager>();
 	md3dDXGIManager->Create(screenWidth, screenHeight, numerator, denominator);
 
+	featureLevel = D3D_FEATURE_LEVEL_11_0;
+	result = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, creationFlags, 0, 0, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_deviceContext);
+
+	if (FAILED(result))
+	{
+		std::cout << "device failed creation" << std::endl;
+		return false;
+	}
+
 	mSwapChain = std::make_unique<d3dSwapchain>(md3dDXGIManager->GetFactory(), this->m_device.Get());
 	
 	bool swapChainCreationResult = mSwapChain->Create(screenWidth, screenHeight, numerator, screenHeight, m_vsync_enabled, fullscreen, hwnd);
@@ -56,21 +65,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 		std::cout << "swapchain failed creation" << std::endl;
 		return false;
 	}
-	// Set the feature level to DirectX 11.
-	featureLevel = D3D_FEATURE_LEVEL_11_0;
-
-
-	// Create the swap chain, Direct3D device, and Direct3D device context.
-
-	result = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, creationFlags, &featureLevel, 1, D3D11_SDK_VERSION, &m_device, NULL, &m_deviceContext);
-	//result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE,NULL, creationFlags, &featureLevel, 1,
-	//	D3D11_SDK_VERSION, &(mSwapChain->Create(screenWidth, screenHeight, numerator, denominator,vsync, fullscreen, hwnd)), &mSwapChain->mSwapChain, &m_device, NULL, &m_deviceContext);
-	//if (FAILED(result))
-	if (FAILED(result))
-	{
-		return false;
-	}
-
+	
 	// Get the pointer to the back buffer.
 	result = mSwapChain->GetSwapChainPtr()->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
@@ -252,19 +247,7 @@ void D3DClass::BeginScene(float red, float green, float blue, float alpha)
 
 void D3DClass::EndScene()
 {
-	// Present the back buffer to the screen since rendering is complete.
-	if (m_vsync_enabled)
-	{
-		// Lock to screen refresh rate.
-		mSwapChain->GetSwapChainPtr()->Present(1, 0);
-	}
-	else
-	{
-		// Present as fast as possible.
-		mSwapChain->GetSwapChainPtr()->Present(0, 0);
-	}
-
-	return;
+	mSwapChain->Swap(m_vsync_enabled);
 }
 
 

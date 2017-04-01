@@ -6,8 +6,8 @@
 class d3dDXGIManager
 {
 public:
-	d3dDXGIManager();
-	~d3dDXGIManager();
+	d3dDXGIManager() = default;
+	~d3dDXGIManager() = default;
 
 	bool Create(int aWidth, int aHeight, int &numerator, int &denominator);
 	void GetVideoCardInfo(char* cardName, int& memory);
@@ -21,7 +21,5 @@ private:
 	Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;
 	Microsoft::WRL::ComPtr<IDXGIAdapter> mAdapter;
 	Microsoft::WRL::ComPtr<IDXGIOutput> mAdapterOutput;
-
-
 };
 

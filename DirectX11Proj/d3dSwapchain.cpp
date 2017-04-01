@@ -2,9 +2,13 @@
 
 #include <minwinbase.h>
 #include <cassert>
+#include <iostream>
 
-d3dSwapchain::d3dSwapchain(IDXGIFactory* const aFactory, ID3D11Device* const aDevice) : hasBeenCreated(false), mPFactory(aFactory), mDevice(aDevice)
+
+d3dSwapchain::d3dSwapchain(IDXGIFactory* const aFactory, ID3D11Device* const aDevice) : mPFactory(aFactory), mDevice(aDevice)
 {
+	assert(aFactory != nullptr);
+	assert(aDevice != nullptr);
 }
 
 
@@ -25,12 +29,13 @@ void d3dSwapchain::Shutdown()
 IDXGISwapChain* const d3dSwapchain::GetSwapChainPtr()
 {
 	// Can't return a swapchain that has no
-	if (!hasBeenCreated)
+	if (mSwapChain.Get() == nullptr)
 	{
 		assert(false | "TRYING TO OBTAIN EMPTY SWAPCHAIN");
 		return nullptr;
 	}
 
+	return mSwapChain.Get();
 }
 
 // Just creates a description for now
@@ -96,17 +101,19 @@ bool d3dSwapchain::Create(int aWidth, int aHeight, int aNumerator, int aDenomina
 	return CreateSwapChainWithDesc(swapChainDesc);
 }
 
+
 bool d3dSwapchain::Create(DXGI_SWAP_CHAIN_DESC aSwapChainDesc)
 {
 	return CreateSwapChainWithDesc(aSwapChainDesc);
 }
 
-#include <iostream>
+
 bool d3dSwapchain::CreateSwapChainWithDesc(DXGI_SWAP_CHAIN_DESC aDesc)
 {
 	HRESULT result;
-	if (!hasBeenCreated)
+	if (mSwapChain.Get() == nullptr)
 	{
+		IDXGISwapChain* tSC = mSwapChain.Get();
 		result = mPFactory->CreateSwapChain(mDevice, &aDesc, &mSwapChain);
 		if (FAILED(result))
 		{
@@ -126,4 +133,20 @@ bool d3dSwapchain::CreateSwapChainWithDesc(DXGI_SWAP_CHAIN_DESC aDesc)
 	}
 	// Should never reach this but if it does we have a fail-safe
 	return false;
+}
+
+
+void d3dSwapchain::Swap(bool aIsVsync)
+{
+	// Present the back buffer to the screen since rendering is complete.
+	if (aIsVsync)
+	{
+		// Lock to screen refresh rate.
+		mSwapChain->Present(1, 0);
+	}
+	else
+	{
+		// Present as fast as possible.
+		mSwapChain->Present(0, 0);
+	}
 }

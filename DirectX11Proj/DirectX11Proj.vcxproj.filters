@@ -27,9 +27,6 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="graphicsclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="inputclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -69,11 +66,11 @@
     <ClCompile Include="d3dSwapchain.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
+    <ClCompile Include="graphicsclass.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="graphicsclass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="inputclass.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -120,6 +117,9 @@
       <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="d3dSwapchain.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="graphicsclass.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
   </ItemGroup>
