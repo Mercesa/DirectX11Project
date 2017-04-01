@@ -156,6 +156,7 @@
     <ClCompile Include="d3dclass.cpp" />
     <ClCompile Include="d3dDXGIManager.cpp" />
     <ClCompile Include="d3dmodel.cpp" />
+    <ClCompile Include="d3dSwapchain.cpp" />
     <ClCompile Include="graphicsclass.cpp" />
     <ClCompile Include="IApplication.cpp" />
     <ClCompile Include="inputclass.cpp" />
@@ -173,6 +174,7 @@
     <ClInclude Include="d3dclass.h" />
     <ClInclude Include="d3dDXGIManager.h" />
     <ClInclude Include="d3dmodel.h" />
+    <ClInclude Include="d3dSwapchain.h" />
     <ClInclude Include="graphicsclass.h" />
     <ClInclude Include="IApplication.h" />
     <ClInclude Include="inputclass.h" />

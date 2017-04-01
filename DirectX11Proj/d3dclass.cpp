@@ -4,6 +4,7 @@
 #include <memory>
 
 #include "d3dDXGIManager.h"
+#include "d3dSwapchain.h"
 
 D3DClass::D3DClass()
 {
@@ -19,13 +20,12 @@ D3DClass::~D3DClass()
 {
 }
 
+
 bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen,
 	float screenDepth, float screenNear)
 {
 	HRESULT result;
 	int numerator, denominator;
-	int error;
-	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	D3D_FEATURE_LEVEL featureLevel;
 	ID3D11Texture2D* backBufferPtr;
 	D3D11_TEXTURE2D_DESC depthBufferDesc;
@@ -47,74 +47,32 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	std::unique_ptr<d3dDXGIManager> md3dDXGIManager = std::make_unique<d3dDXGIManager>();
 	md3dDXGIManager->Create(screenWidth, screenHeight, numerator, denominator);
 
-	// Initialize the swap chain description.
-	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
+	mSwapChain = std::make_unique<d3dSwapchain>(md3dDXGIManager->GetFactory(), this->m_device.Get());
+	
+	bool swapChainCreationResult = mSwapChain->Create(screenWidth, screenHeight, numerator, screenHeight, m_vsync_enabled, fullscreen, hwnd);
 
-	// Set to a single back buffer.
-	swapChainDesc.BufferCount = 1;
-
-	// Set the width and height of the back buffer.
-	swapChainDesc.BufferDesc.Width = screenWidth;
-	swapChainDesc.BufferDesc.Height = screenHeight;
-
-	// Set regular 32-bit surface for the back buffer.
-	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-
-	// Set the refresh rate of the back buffer.
-	if (m_vsync_enabled)
+	if (!swapChainCreationResult)
 	{
-		swapChainDesc.BufferDesc.RefreshRate.Numerator = numerator;
-		swapChainDesc.BufferDesc.RefreshRate.Denominator = denominator;
+		std::cout << "swapchain failed creation" << std::endl;
+		return false;
 	}
-	else
-	{
-		swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
-		swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
-	}
-
-	// Set the usage of the back buffer.
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-
-	// Set the handle for the window to render to.
-	swapChainDesc.OutputWindow = hwnd;
-
-	// Turn multisampling off.
-	swapChainDesc.SampleDesc.Count = 1;
-	swapChainDesc.SampleDesc.Quality = 0;
-
-	// Set to full screen or windowed mode.
-	if (fullscreen)
-	{
-		swapChainDesc.Windowed = false;
-	}
-	else
-	{
-		swapChainDesc.Windowed = true;
-	}
-
-	// Set the scan line ordering and scaling to unspecified.
-	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-
-	// Discard the back buffer contents after presenting.
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-
-	// Don't set the advanced flags.
-	swapChainDesc.Flags = 0;
-
 	// Set the feature level to DirectX 11.
 	featureLevel = D3D_FEATURE_LEVEL_11_0;
 
+
 	// Create the swap chain, Direct3D device, and Direct3D device context.
-	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE,NULL, creationFlags, &featureLevel, 1,
-		D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL, &m_deviceContext);
+
+	result = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, creationFlags, &featureLevel, 1, D3D11_SDK_VERSION, &m_device, NULL, &m_deviceContext);
+	//result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE,NULL, creationFlags, &featureLevel, 1,
+	//	D3D11_SDK_VERSION, &(mSwapChain->Create(screenWidth, screenHeight, numerator, denominator,vsync, fullscreen, hwnd)), &mSwapChain->mSwapChain, &m_device, NULL, &m_deviceContext);
+	//if (FAILED(result))
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Get the pointer to the back buffer.
-	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
+	result = mSwapChain->GetSwapChainPtr()->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
 	{
 		return false;
@@ -258,10 +216,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 void D3DClass::Shutdown()
 {
 	// Before shutting down set to windowed mode or when you release the swap chain it will throw an exception.
-	if (m_swapChain)
-	{
-		m_swapChain->SetFullscreenState(false, NULL);
-	}
+	mSwapChain->Shutdown();
 
 	m_rasterState.Reset();
 	m_depthStencilView.Reset();
@@ -270,7 +225,6 @@ void D3DClass::Shutdown()
 	m_renderTargetView.Reset();
 	m_deviceContext.Reset();
 	m_device.Reset();
-	m_swapChain.Reset();
 
 	return;
 }
@@ -302,12 +256,12 @@ void D3DClass::EndScene()
 	if (m_vsync_enabled)
 	{
 		// Lock to screen refresh rate.
-		m_swapChain->Present(1, 0);
+		mSwapChain->GetSwapChainPtr()->Present(1, 0);
 	}
 	else
 	{
 		// Present as fast as possible.
-		m_swapChain->Present(0, 0);
+		mSwapChain->GetSwapChainPtr()->Present(0, 0);
 	}
 
 	return;
@@ -343,13 +297,5 @@ void D3DClass::GetWorldMatrix(XMMATRIX& worldMatrix)
 void D3DClass::GetOrthoMatrix(XMMATRIX& orthoMatrix)
 {
 	orthoMatrix = m_orthoMatrix;
-	return;
-}
-
-
-void D3DClass::GetVideoCardInfo(char* cardName, int& memory)
-{
-	strcpy_s(cardName, 128, m_videoCardDescription);
-	memory = m_videoCardMemory;
 	return;
 }

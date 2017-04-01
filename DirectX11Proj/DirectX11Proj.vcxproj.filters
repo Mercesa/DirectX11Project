@@ -66,6 +66,9 @@
     <ClCompile Include="d3dDXGIManager.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
+    <ClCompile Include="d3dSwapchain.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="graphicsclass.h">
@@ -114,6 +117,9 @@
       <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="d3dDXGIManager.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dSwapchain.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
   </ItemGroup>

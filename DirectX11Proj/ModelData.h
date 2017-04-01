@@ -3,7 +3,7 @@
 #include <DirectXMath.h>
 using namespace DirectX;
 
-#include <vector>>
+#include <vector>
 
 struct VertexData
 {
@@ -17,6 +17,6 @@ struct VertexData
 struct ModelData
 {
 	// Vertices, indices
-	std::vector<VertexData> mVertices;
-	std::vector<uint32_t> mIndices;
+	std::vector<VertexData> vertices;
+	std::vector<uint32_t> indices;
 };
