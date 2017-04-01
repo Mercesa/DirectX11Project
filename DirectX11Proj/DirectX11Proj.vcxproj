@@ -154,8 +154,10 @@
     <ClCompile Include="cameraclass.cpp" />
     <ClCompile Include="colorshaderclass.cpp" />
     <ClCompile Include="d3dclass.cpp" />
+    <ClCompile Include="d3dDepthStencil.cpp" />
     <ClCompile Include="d3dDXGIManager.cpp" />
     <ClCompile Include="d3dmodel.cpp" />
+    <ClCompile Include="d3dRasterizerState.cpp" />
     <ClCompile Include="d3dSwapchain.cpp" />
     <ClCompile Include="graphicsclass.cpp" />
     <ClCompile Include="IApplication.cpp" />
@@ -172,8 +174,10 @@
     <ClInclude Include="colorshaderclass.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="d3dclass.h" />
+    <ClInclude Include="d3dDepthStencil.h" />
     <ClInclude Include="d3dDXGIManager.h" />
     <ClInclude Include="d3dmodel.h" />
+    <ClInclude Include="d3dRasterizerState.h" />
     <ClInclude Include="d3dSwapchain.h" />
     <ClInclude Include="graphicsclass.h" />
     <ClInclude Include="IApplication.h" />

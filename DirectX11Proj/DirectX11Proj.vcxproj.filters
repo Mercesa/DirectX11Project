@@ -33,9 +33,6 @@
     <ClCompile Include="systemclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="colorshaderclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cameraclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -69,15 +66,21 @@
     <ClCompile Include="graphicsclass.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
+    <ClCompile Include="colorshaderclass.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dDepthStencil.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dRasterizerState.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inputclass.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="systemclass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="colorshaderclass.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="cameraclass.h">
@@ -120,6 +123,15 @@
       <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="graphicsclass.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="colorshaderclass.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dDepthStencil.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dRasterizerState.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
   </ItemGroup>
