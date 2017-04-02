@@ -1,4 +1,3 @@
-
 #ifndef _COLORSHADERCLASS_H_
 #define _COLORSHADERCLASS_H_
 
@@ -35,7 +34,7 @@ public:
 	bool Render(ID3D11DeviceContext*, int, const XMMATRIX&, const XMMATRIX& , const XMMATRIX&);
 
 private:
-	bool InitializeShader(ID3D11Device*, HWND, WCHAR*, WCHAR*);
+	bool InitializeShader(ID3D11Device*, HWND, WCHAR*);
 	void ShutdownShader();
 
 	bool SetShaderParameters(ID3D11DeviceContext*, const XMMATRIX&, const XMMATRIX&, const XMMATRIX&) const;

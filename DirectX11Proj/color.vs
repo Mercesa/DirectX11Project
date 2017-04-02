@@ -35,3 +35,8 @@ PixelInputType ColorVertexShader(VertexInputType input)
     
     return output;
 }
+
+float4 ColorPixelShader(PixelInputType input) : SV_TARGET
+{
+    return input.color;
+}

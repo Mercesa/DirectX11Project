@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="NonFramework">
+      <UniqueIdentifier>{4e955b5b-fc21-4d4c-a79d-eb2dd2a0b945}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{b2b50b26-a570-4f6b-b7bd-7a2109b2496d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3DSetup">
+      <UniqueIdentifier>{98f7d22c-5811-4874-b94a-917adcac9a36}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -27,9 +36,6 @@
     <ClCompile Include="systemclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="d3dclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="colorshaderclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -38,6 +44,27 @@
     </ClCompile>
     <ClCompile Include="modelclass.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>NonFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="IApplication.cpp">
+      <Filter>NonFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="IScene.cpp">
+      <Filter>NonFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dmodel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyCustomScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dclass.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dDXGIManager.cpp">
+      <Filter>D3DSetup</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -48,9 +75,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="systemclass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dclass.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="colorshaderclass.h">
@@ -65,13 +89,37 @@
     <ClInclude Include="ShaderHelperFunctions.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>NonFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="IApplication.h">
+      <Filter>NonFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="IScene.h">
+      <Filter>NonFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelData.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dmodel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyCustomScene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dclass.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dDXGIManager.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="color.ps">
-      <Filter>Source Files</Filter>
-    </None>
     <None Include="color.vs">
-      <Filter>Source Files</Filter>
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

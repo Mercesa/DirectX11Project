@@ -11,7 +11,6 @@ static void OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR*
 	unsigned long long bufferSize, i;
 	std::ofstream fout;
 
-
 	// Get a pointer to the error message text buffer.
 	compileErrors = (char*)(errorMessage->GetBufferPointer());
 
@@ -44,7 +43,6 @@ static void OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR*
 static bool LoadShaderWithErrorChecking(LPCWSTR aFileName, LPCSTR aFunctionName, LPCSTR shaderProfile, ID3D10Blob*& aContainer, HWND hwnd)
 {
 	HRESULT result;
-
 
 	ID3D10Blob* errorMessage;
 	errorMessage = 0;
