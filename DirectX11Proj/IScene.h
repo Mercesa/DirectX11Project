@@ -1,12 +1,14 @@
 #pragma once
 
-#include <vector>
+#include <list>
+#include <memory>
 
 class IObject;
 
 class IScene
 {
 public:
+	friend class IApplication;
 	IScene();
 	~IScene();
 
@@ -14,6 +16,11 @@ public:
 	virtual void Init() = 0;
 	virtual void Destroy() = 0;
 
-	std::vector<IObject> mObjects;
+	std::list <std::shared_ptr<IObject>> mObjects;
+	
+	bool HasBeenInitialized() { return mInitialized; }
+
+private:
+	bool mInitialized = false;
 };
 

@@ -5,6 +5,12 @@
 #include <directxmath.h>
 using namespace DirectX;
 
+#include <memory>
+
+class d3dVertexBuffer;
+
+struct MeshData;
+
 class ModelClass
 {
 private:
@@ -20,6 +26,8 @@ public:
 	~ModelClass();
 
 	bool Initialize(ID3D11Device*);
+	bool Initialize(ID3D11Device*, const MeshData&);
+
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 
@@ -27,12 +35,18 @@ public:
 
 private:
 	bool InitializeBuffers(ID3D11Device*);
+	bool InitializeBuffers(ID3D11Device*, const MeshData&);
+
+	// Initialize buffers using previously loaded data
+
+
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
 
 private:
-	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
-	int m_vertexCount, m_indexCount;
+	std::unique_ptr<d3dVertexBuffer> mVertexBuffer;
+	std::unique_ptr<d3dVertexBuffer> mIndexBuffer;
+
 };
 
 #endif

@@ -17,14 +17,14 @@ public:
 	virtual void Tick() = 0;
 	virtual void Destroy() = 0;
 
-	bool GetShouldQuit();
+	bool ShouldQuit();
 
 private:
 	void SceneTick();
-	void SetCurrentScene(IScene* aScene);
+	void LoadScene(IScene* aScene);
 
-	IScene* currentScene;
+	IScene* mCurrentScene;
 
-	bool shouldQuit = false;
+	bool mShouldQuit = false;
 };
 

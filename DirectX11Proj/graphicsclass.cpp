@@ -1,6 +1,8 @@
-
 #include "graphicsclass.h"
 
+#include "IScene.h"
+#include "ModelLoader.h"
+#include "ModelData.h"
 
 GraphicsClass::GraphicsClass()
 {
@@ -49,7 +51,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 0.0f, -5.0f);
+	m_Camera->SetPosition(0.0f, 100.0, 150.0f);
 
 	// Create the model object.
 	m_Model = std::make_unique<ModelClass>();
@@ -64,6 +66,23 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
+	}
+
+	std::unique_ptr<ModelLoader> tMLoader = std::make_unique<ModelLoader>();
+	tMLoader->LoadModel("Models\\Sponza\\Sponza.obj");
+
+	std::unique_ptr<ModelClass> tD3DModel;
+	for (auto &e : tMLoader->GetMeshesToBeProcessed())
+	{
+		tD3DModel = std::make_unique<ModelClass>();
+
+		tD3DModel->Initialize(m_Direct3D->GetDevice(), e);
+		if (!result)
+		{
+			MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
+			return false;
+		}
+		this->mModels.push_back(std::move(tD3DModel));
 	}
 
 	// Create the color shader object.
@@ -95,14 +114,17 @@ void GraphicsClass::Shutdown()
 	return;
 }
 
-
-bool GraphicsClass::Frame()
+// Do culling
+// Perform depth pre-pass
+// Render objects to g-buffer
+// Create ambient occlussion
+// Render lighting on objects using the g-buffer
+// Apply post processing effects
+bool GraphicsClass::Frame(IScene *const aScene)
 {
 	bool result;
 
-
-	// Render the graphics scene.
-	result = Render();
+	result = Render(aScene);
 	if(!result)
 	{
 		return false;
@@ -111,8 +133,8 @@ bool GraphicsClass::Frame()
 	return true;
 }
 
-
-bool GraphicsClass::Render()
+#include <iostream>
+bool GraphicsClass::Render(IScene *const aScene)
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;
@@ -130,10 +152,14 @@ bool GraphicsClass::Render()
 	m_Direct3D->GetProjectionMatrix(projectionMatrix);
 
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	m_Model->Render(m_Direct3D->GetDeviceContext());
 
+	for (int i = 0; i < this->mModels.size(); ++i)
+	{
+		//std::cout << i << std::endl;
+		mModels[i]->Render(m_Direct3D->GetDeviceContext());
+		result = m_ColorShader->Render(m_Direct3D->GetDeviceContext(), mModels[i]->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+	}
 	// Render the model using the color shader.
-	result = m_ColorShader->Render(m_Direct3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	if (!result)
 	{
 		return false;

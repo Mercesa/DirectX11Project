@@ -48,9 +48,6 @@
     <ClCompile Include="IScene.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
-    <ClCompile Include="d3dmodel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MyCustomScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -75,8 +72,14 @@
     <ClCompile Include="d3dRasterizerState.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
+    <ClCompile Include="d3dVertexBuffer.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
     <ClCompile Include="IObject.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>NonFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>NonFramework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,12 +95,6 @@
     <ClInclude Include="modelclass.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderHelperFunctions.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ConstantBuffer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Application.h">
       <Filter>NonFramework</Filter>
     </ClInclude>
@@ -109,9 +106,6 @@
     </ClInclude>
     <ClInclude Include="ModelData.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dmodel.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MyCustomScene.h">
       <Filter>Header Files</Filter>
@@ -137,8 +131,17 @@
     <ClInclude Include="d3dRasterizerState.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
+    <ClInclude Include="d3dVertexBuffer.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderHelperFunctions.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
     <ClInclude Include="IObject.h">
-      <Filter>Header Files</Filter>
+      <Filter>NonFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>NonFramework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -2,6 +2,7 @@
 #define _GRAPHICSCLASS_H_
 
 #include <memory> 
+#include <vector>
 
 #include "d3dclass.h"
 #include "cameraclass.h"
@@ -13,6 +14,7 @@ const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
 
+class IScene;
 
 class GraphicsClass
 {
@@ -23,15 +25,17 @@ public:
 
 	bool Initialize(int, int, HWND);
 	void Shutdown();
-	bool Frame();
+	bool Frame(IScene *const);
 
 private:
-	bool Render();
+	bool Render(IScene* const);
 
 private:
 	std::unique_ptr<D3DClass> m_Direct3D;
 	std::unique_ptr<CameraClass> m_Camera;
 	std::unique_ptr<ModelClass> m_Model;
+	// Just temporarily here
+	std::vector<std::unique_ptr<ModelClass>> mModels;
 	std::unique_ptr<ColorShaderClass> m_ColorShader;
 };
 

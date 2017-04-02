@@ -1,9 +1,13 @@
 #include "IApplication.h"
 
+#include <iostream>
+
+
 #include "IScene.h"
 #include "systemclass.h"
 
-IApplication::IApplication() : currentScene(nullptr), shouldQuit(false)
+
+IApplication::IApplication() : mCurrentScene(nullptr), mShouldQuit(false)
 {
 }
 
@@ -12,23 +16,35 @@ IApplication::~IApplication()
 {
 }
 
-
-void IApplication::SetCurrentScene(IScene* aScene)
+// Setting the current scene also initializes it
+void IApplication::LoadScene(IScene* aScene)
 {
+	assert(aScene != nullptr);
 
+	if (aScene == nullptr)
+	{
+		std::cout << "Can not set a nullptr as current scene!" << std::endl;
+	}
+
+	this->mCurrentScene = aScene;
+	if (!mCurrentScene->HasBeenInitialized())
+	{
+		aScene->Init();
+		aScene->mInitialized = true;
+	}
 }
 
 
 void IApplication::SceneTick()
 {
-	if (currentScene != nullptr)
+	if (mCurrentScene != nullptr)
 	{
-		currentScene->Tick();
+		mCurrentScene->Tick();
 	}
 }
 
 
-bool IApplication::GetShouldQuit()
+bool IApplication::ShouldQuit()
 {
-	return shouldQuit;
+	return mShouldQuit;
 }

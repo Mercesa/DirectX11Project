@@ -26,15 +26,17 @@ void SystemClass::InitializeConsoleWindow()
 	freopen("conin$", "r", stdin);
 	freopen("conout$", "w", stdout);
 	freopen("conout$", "w", stderr);
+
+	// Also define a debug flag here, just for now. Its all right, dont worry about it. shhhhh
+#if defined(DEBUG) | defined(_DEBUG)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 }
+
 
 bool SystemClass::Initialize()
 {
 	InitializeConsoleWindow();
-
-	#if defined(DEBUG) | defined(_DEBUG)
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
 
 	int screenWidth, screenHeight;
 	bool result;
@@ -151,14 +153,14 @@ bool SystemClass::Frame()
 		return false;
 	}
 
-	if (mApplication->GetShouldQuit())
+	if (mApplication->ShouldQuit())
 	{
 		return false;
 	}
 
 
 	// Do the frame processing for the graphics object.
-	result = m_Graphics->Frame();
+	result = m_Graphics->Frame(mApplication->mCurrentScene);
 	if(!result)
 	{
 		return false;
@@ -274,7 +276,7 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	SetFocus(m_hwnd);
 
 	// Hide the mouse cursor.
-	ShowCursor(false);
+	ShowCursor(true);
 
 	return;
 }
@@ -323,6 +325,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 			PostQuitMessage(0);		
 			return 0;
 		}
+
 
 		// All other messages pass to the message handler in the system class.
 		default:

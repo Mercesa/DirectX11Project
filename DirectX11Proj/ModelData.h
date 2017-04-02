@@ -14,7 +14,7 @@ struct VertexData
 	XMFLOAT3 tangent;
 };
 
-struct ModelData
+struct MeshData
 {
 	// Vertices, indices
 	std::vector<VertexData> vertices;
