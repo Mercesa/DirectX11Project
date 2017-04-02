@@ -19,13 +19,18 @@ SystemClass::~SystemClass()
 }
 
 
-bool SystemClass::Initialize()
+void SystemClass::InitializeConsoleWindow()
 {
 	// This is for the console window
 	AllocConsole();
 	freopen("conin$", "r", stdin);
 	freopen("conout$", "w", stdout);
 	freopen("conout$", "w", stderr);
+}
+
+bool SystemClass::Initialize()
+{
+	InitializeConsoleWindow();
 
 	#if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
@@ -117,6 +122,9 @@ void SystemClass::Run()
 		}
 		else
 		{
+			mApplication->Tick();
+			mApplication->SceneTick();
+
 			// Otherwise do the frame processing.
 			result = Frame();
 			if(!result)
@@ -143,8 +151,12 @@ bool SystemClass::Frame()
 		return false;
 	}
 
-	mApplication->SceneTick();
-	mApplication->Tick();
+	if (mApplication->GetShouldQuit())
+	{
+		return false;
+	}
+
+
 	// Do the frame processing for the graphics object.
 	result = m_Graphics->Frame();
 	if(!result)
@@ -175,6 +187,7 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam
 			m_Input->KeyUp((unsigned int)wparam);
 			return 0;
 		}
+
 
 		// Any other messages send to the default message handler as our application won't make use of them.
 		default:

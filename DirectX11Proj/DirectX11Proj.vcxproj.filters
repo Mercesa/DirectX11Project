@@ -75,6 +75,9 @@
     <ClCompile Include="d3dRasterizerState.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
+    <ClCompile Include="IObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inputclass.h">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="d3dRasterizerState.h">
       <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

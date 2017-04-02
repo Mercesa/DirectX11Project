@@ -162,6 +162,7 @@
     <ClCompile Include="graphicsclass.cpp" />
     <ClCompile Include="IApplication.cpp" />
     <ClCompile Include="inputclass.cpp" />
+    <ClCompile Include="IObject.cpp" />
     <ClCompile Include="IScene.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="modelclass.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="graphicsclass.h" />
     <ClInclude Include="IApplication.h" />
     <ClInclude Include="inputclass.h" />
+    <ClInclude Include="IObject.h" />
     <ClInclude Include="IScene.h" />
     <ClInclude Include="modelclass.h" />
     <ClInclude Include="ModelData.h" />

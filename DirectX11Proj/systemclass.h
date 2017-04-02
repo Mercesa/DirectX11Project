@@ -19,6 +19,7 @@ public:
 	SystemClass(const SystemClass&);
 	~SystemClass();
 
+	void InitializeConsoleWindow();
 	bool Initialize();
 	void Shutdown();
 	void Run();
