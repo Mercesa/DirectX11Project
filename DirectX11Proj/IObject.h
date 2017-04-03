@@ -9,6 +9,8 @@ public:
 	virtual void OnInit() = 0;
 	virtual void OnUpdate() = 0;
 	
+
+private:
 	// premature initialization just so I dont forget in general
 	bool mIsActive = false;
 };

@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-d3dSwapchain::d3dSwapchain(IDXGIFactory* const aFactory, ID3D11Device* const aDevice) : mPFactory(aFactory), mDevice(aDevice)
+d3dSwapchain::d3dSwapchain(IDXGIFactory* const aFactory, ID3D11Device* const aDevice) : mpFactory(aFactory), mpDevice(aDevice)
 {
 	assert(aFactory != nullptr);
 	assert(aDevice != nullptr);
@@ -18,24 +18,24 @@ d3dSwapchain::~d3dSwapchain()
 
 void d3dSwapchain::Shutdown()
 {
-	if (mSwapChain)
+	if (mpSwapchain)
 	{
-		mSwapChain->SetFullscreenState(false, NULL);
+		mpSwapchain->SetFullscreenState(false, NULL);
 	}
-	mSwapChain.Reset();
+	mpSwapchain.Reset();
 }
 
 
-IDXGISwapChain* const d3dSwapchain::GetSwapChainPtr()
+IDXGISwapChain* const d3dSwapchain::GetSwapChain()
 {
 	// Can't return a swapchain that has no
-	if (mSwapChain.Get() == nullptr)
+	if (mpSwapchain.Get() == nullptr)
 	{
 		assert(false | "TRYING TO OBTAIN EMPTY SWAPCHAIN");
 		return nullptr;
 	}
 
-	return mSwapChain.Get();
+	return mpSwapchain.Get();
 }
 
 // Just creates a description for now
@@ -111,10 +111,10 @@ bool d3dSwapchain::Create(DXGI_SWAP_CHAIN_DESC aSwapChainDesc)
 bool d3dSwapchain::CreateSwapChainWithDesc(DXGI_SWAP_CHAIN_DESC aDesc)
 {
 	HRESULT result;
-	if (mSwapChain.Get() == nullptr)
+	if (mpSwapchain.Get() == nullptr)
 	{
-		IDXGISwapChain* tSC = mSwapChain.Get();
-		result = mPFactory->CreateSwapChain(mDevice, &aDesc, &mSwapChain);
+		IDXGISwapChain* tSC = mpSwapchain.Get();
+		result = mpFactory->CreateSwapChain(mpDevice, &aDesc, &mpSwapchain);
 		if (FAILED(result))
 		{
 			return false;
@@ -138,15 +138,5 @@ bool d3dSwapchain::CreateSwapChainWithDesc(DXGI_SWAP_CHAIN_DESC aDesc)
 
 void d3dSwapchain::Swap(bool aIsVsync)
 {
-	// Present the back buffer to the screen since rendering is complete.
-	if (aIsVsync)
-	{
-		// Lock to screen refresh rate.
-		mSwapChain->Present(1, 0);
-	}
-	else
-	{
-		// Present as fast as possible.
-		mSwapChain->Present(0, 0);
-	}
+	mpSwapchain->Present((aIsVsync ? 1 : 0), 0);
 }

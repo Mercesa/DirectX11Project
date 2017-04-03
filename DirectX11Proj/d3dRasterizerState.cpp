@@ -3,7 +3,7 @@
 #include <cassert>
 
 
-d3dRasterizerState::d3dRasterizerState(ID3D11Device* const aPDevice, ID3D11DeviceContext* const aContext) : mPDevice(aPDevice), mPDeviceContext(aContext)
+d3dRasterizerState::d3dRasterizerState(ID3D11Device* const aPDevice, ID3D11DeviceContext* const aContext) : mpDevice(aPDevice), mpDeviceContext(aContext)
 {
 }
 
@@ -14,8 +14,8 @@ d3dRasterizerState::~d3dRasterizerState()
 
 bool d3dRasterizerState::Create()
 {
-	assert(mPDevice != nullptr);
-	assert(mPDeviceContext != nullptr);
+	assert(mpDevice != nullptr);
+	assert(mpDeviceContext != nullptr);
 
 	HRESULT result;
 	D3D11_RASTERIZER_DESC rasterDesc;
@@ -32,7 +32,7 @@ bool d3dRasterizerState::Create()
 	rasterDesc.ScissorEnable = false;
 	rasterDesc.SlopeScaledDepthBias = 0.0f;
 
-	result = mPDevice->CreateRasterizerState(&rasterDesc, &m_rasterState);
+	result = mpDevice->CreateRasterizerState(&rasterDesc, &m_rasterState);
 	if (FAILED(result))
 	{
 		return false;
