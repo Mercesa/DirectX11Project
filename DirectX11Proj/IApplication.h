@@ -19,11 +19,12 @@ public:
 
 	bool ShouldQuit();
 
-private:
-	void SceneTick();
 	void LoadScene(IScene* aScene);
 
-	IScene* mCurrentScene;
+private:
+	void SceneTick();
+
+	IScene* mpCurrentScene;
 
 	bool mShouldQuit = false;
 };

@@ -3,6 +3,7 @@
 #include <list>
 #include <memory>
 
+#include "cameraclass.h"
 class IObject;
 
 class IScene
@@ -19,6 +20,11 @@ public:
 	std::list <std::shared_ptr<IObject>> mObjects;
 	
 	bool HasBeenInitialized() { return mInitialized; }
+
+	CameraClass* const GetCamera() { return mCamera.get(); }
+
+protected:
+	std::shared_ptr<CameraClass> mCamera;
 
 private:
 	bool mInitialized = false;

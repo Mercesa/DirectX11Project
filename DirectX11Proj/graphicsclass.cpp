@@ -6,9 +6,8 @@
 
 GraphicsClass::GraphicsClass()
 {
-	m_Direct3D = 0;
-	m_Camera = 0;
-	m_Model = 0;
+	mpDirect3D = 0;
+	mpModel = 0;
 	m_ColorShader = 0;
 }
 
@@ -29,39 +28,43 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 
 	// Create the Direct3D object.
-	m_Direct3D = std::make_unique<D3DClass>();
-	if(!m_Direct3D)
+	mpDirect3D = std::make_unique<D3DClass>();
+	if(!mpDirect3D)
 	{
 		return false;
 	}
 
 	// Initialize the Direct3D object.
-	result = m_Direct3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	result = mpDirect3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 	if(!result)
 	{
 		MessageBox(hwnd, L"Could not initialize Direct3D.", L"Error", MB_OK);
 		return false;
 	}
-
-	// Create the camera object.
-	m_Camera = std::make_unique<CameraClass>();
-	if (!m_Camera)
+	// Create the color shader object.
+	m_ColorShader = std::make_unique<ColorShaderClass>();
+	if (!m_ColorShader)
 	{
 		return false;
 	}
 
-	// Set the initial position of the camera.
-	m_Camera->SetPosition(0.0f, 100.0, 150.0f);
+	// Initialize the color shader object.
+	result = m_ColorShader->Initialize(mpDirect3D->GetDevice(), hwnd);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
+		return false;
+	}
 
 	// Create the model object.
-	m_Model = std::make_unique<ModelClass>();
-	if (!m_Model)
+	mpModel = std::make_unique<ModelClass>();
+	if (!mpModel)
 	{
 		return false;
 	}
 
 	// Initialize the model object.
-	result = m_Model->Initialize(m_Direct3D->GetDevice());
+	result = mpModel->Initialize(mpDirect3D->GetDevice());
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
@@ -76,7 +79,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	{
 		tD3DModel = std::make_unique<ModelClass>();
 
-		tD3DModel->Initialize(m_Direct3D->GetDevice(), e);
+		tD3DModel->Initialize(mpDirect3D->GetDevice(), e);
 		if (!result)
 		{
 			MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
@@ -85,20 +88,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		this->mModels.push_back(std::move(tD3DModel));
 	}
 
-	// Create the color shader object.
-	m_ColorShader = std::make_unique<ColorShaderClass>();
-	if (!m_ColorShader)
-	{
-		return false;
-	}
 
-	// Initialize the color shader object.
-	result = m_ColorShader->Initialize(m_Direct3D->GetDevice(), hwnd);
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
-		return false;
-	}
 
 	return true;
 }
@@ -108,8 +98,8 @@ void GraphicsClass::Shutdown()
 {
 	
 	m_ColorShader->Shutdown();	
-	m_Model->Shutdown();
-	m_Direct3D->Shutdown();
+	mpModel->Shutdown();
+	mpDirect3D->Shutdown();
 	
 	return;
 }
@@ -123,7 +113,7 @@ void GraphicsClass::Shutdown()
 bool GraphicsClass::Frame(IScene *const aScene)
 {
 	bool result;
-
+	static float f = 0.0f;
 	result = Render(aScene);
 	if(!result)
 	{
@@ -141,23 +131,23 @@ bool GraphicsClass::Render(IScene *const aScene)
 
 
 	// Clear the buffers to begin the scene.
-	m_Direct3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+	mpDirect3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
 	// Generate the view matrix based on the camera's position.
-	m_Camera->Render();
+	 aScene->GetCamera()->Render();
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
-	m_Direct3D->GetWorldMatrix(worldMatrix);
-	m_Camera->GetViewMatrix(viewMatrix);
-	m_Direct3D->GetProjectionMatrix(projectionMatrix);
+	mpDirect3D->GetWorldMatrix(worldMatrix);
+	aScene->GetCamera()->GetViewMatrix(viewMatrix);
+	mpDirect3D->GetProjectionMatrix(projectionMatrix);
 
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 
 	for (int i = 0; i < this->mModels.size(); ++i)
 	{
 		//std::cout << i << std::endl;
-		mModels[i]->Render(m_Direct3D->GetDeviceContext());
-		result = m_ColorShader->Render(m_Direct3D->GetDeviceContext(), mModels[i]->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		mModels[i]->Render(mpDirect3D->GetDeviceContext());
+		result = m_ColorShader->Render(mpDirect3D->GetDeviceContext(), mModels[i]->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	}
 	// Render the model using the color shader.
 	if (!result)
@@ -166,7 +156,7 @@ bool GraphicsClass::Render(IScene *const aScene)
 	}
 
 	// Present the rendered scene to the screen.
-	m_Direct3D->EndScene();
+	mpDirect3D->EndScene();
 
 	return true;
 }

@@ -170,6 +170,7 @@
     <ClCompile Include="modelclass.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="MyCustomScene.cpp" />
+    <ClCompile Include="PlayerSceneExample.cpp" />
     <ClCompile Include="systemclass.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -191,6 +192,7 @@
     <ClInclude Include="ModelData.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="MyCustomScene.h" />
+    <ClInclude Include="PlayerSceneExample.h" />
     <ClInclude Include="ShaderHelperFunctions.h" />
     <ClInclude Include="systemclass.h" />
   </ItemGroup>

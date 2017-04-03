@@ -31,9 +31,8 @@ private:
 	bool Render(IScene* const);
 
 private:
-	std::unique_ptr<D3DClass> m_Direct3D;
-	std::unique_ptr<CameraClass> m_Camera;
-	std::unique_ptr<ModelClass> m_Model;
+	std::unique_ptr<D3DClass> mpDirect3D;
+	std::unique_ptr<ModelClass> mpModel;
 	// Just temporarily here
 	std::vector<std::unique_ptr<ModelClass>> mModels;
 	std::unique_ptr<ColorShaderClass> m_ColorShader;

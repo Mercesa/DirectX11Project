@@ -7,13 +7,18 @@
 #include "systemclass.h"
 
 
-IApplication::IApplication() : mCurrentScene(nullptr), mShouldQuit(false)
+IApplication::IApplication() : mpCurrentScene(nullptr), mShouldQuit(false)
 {
 }
 
 
 IApplication::~IApplication()
 {
+	if (mpCurrentScene)
+	{
+		// fucking evil (wow). should really fix something about this (and think of a decent scene management system)
+		delete mpCurrentScene;
+	}
 }
 
 // Setting the current scene also initializes it
@@ -24,10 +29,17 @@ void IApplication::LoadScene(IScene* aScene)
 	if (aScene == nullptr)
 	{
 		std::cout << "Can not set a nullptr as current scene!" << std::endl;
+		return;
 	}
 
-	this->mCurrentScene = aScene;
-	if (!mCurrentScene->HasBeenInitialized())
+	if (mpCurrentScene != nullptr)
+	{
+		std::cout << "There is already a scene loaded!" << std::endl;
+		return;
+	}
+
+	this->mpCurrentScene = aScene;
+	if (!mpCurrentScene->HasBeenInitialized())
 	{
 		aScene->Init();
 		aScene->mInitialized = true;
@@ -37,9 +49,9 @@ void IApplication::LoadScene(IScene* aScene)
 
 void IApplication::SceneTick()
 {
-	if (mCurrentScene != nullptr)
+	if (mpCurrentScene != nullptr)
 	{
-		mCurrentScene->Tick();
+		mpCurrentScene->Tick();
 	}
 }
 

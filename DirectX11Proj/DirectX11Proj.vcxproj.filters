@@ -81,6 +81,9 @@
     <ClCompile Include="ModelLoader.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerSceneExample.cpp">
+      <Filter>NonFramework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inputclass.h">
@@ -141,6 +144,9 @@
       <Filter>NonFramework</Filter>
     </ClInclude>
     <ClInclude Include="ModelLoader.h">
+      <Filter>NonFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerSceneExample.h">
       <Filter>NonFramework</Filter>
     </ClInclude>
   </ItemGroup>

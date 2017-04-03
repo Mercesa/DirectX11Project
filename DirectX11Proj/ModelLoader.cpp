@@ -4,7 +4,7 @@
 #include <Exporter.hpp>
 #include <postprocess.h>
 #include <scene.h>
-
+#include <iostream>
 
 #include "ModelData.h"
 
