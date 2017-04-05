@@ -1,13 +1,14 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: inputclass.h
-////////////////////////////////////////////////////////////////////////////////
 #ifndef _INPUTCLASS_H_
 #define _INPUTCLASS_H_
 
+#define DIRECTINPUT_VERSION 0x0800
 
-////////////////////////////////////////////////////////////////////////////////
-// Class name: InputClass
-////////////////////////////////////////////////////////////////////////////////
+#pragma comment(lib, "dinput8.lib")
+#pragma comment(lib, "dxguid.lib")
+
+#include <dinput.h>
+
+
 class InputClass
 {
 public:
@@ -15,15 +16,28 @@ public:
 	InputClass(const InputClass&);
 	~InputClass();
 
-	void Initialize();
+	bool Initialize(HINSTANCE, HWND, int, int);
+	void Shutdown();
+	bool Frame();
 
-	void KeyDown(unsigned int);
-	void KeyUp(unsigned int);
-
-	bool IsKeyDown(unsigned int);
+	bool IsEscapePressed();
+	void GetMouseLocation(int&, int&);
 
 private:
-	bool m_keys[256];
+	bool ReadKeyboard();
+	bool ReadMouse();
+	void ProcessInput();
+
+	IDirectInput8* mpDirectInput;
+	IDirectInputDevice8* mpKeyboard;
+	IDirectInputDevice8* mpMouse;
+
+	unsigned char mKeyboardState[256];
+	DIMOUSESTATE mMouseState;
+
+	int mScreenWidth, mScreenHeight;
+	int mMouseX, mMouseY;
+
 };
 
 #endif

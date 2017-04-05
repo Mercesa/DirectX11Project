@@ -26,7 +26,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
 	bool result;
 
-
 	// Create the Direct3D object.
 	mpDirect3D = std::make_unique<D3DClass>();
 	if(!mpDirect3D)
