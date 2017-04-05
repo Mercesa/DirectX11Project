@@ -22,6 +22,9 @@
     <Filter Include="D3DSetup">
       <UniqueIdentifier>{98f7d22c-5811-4874-b94a-917adcac9a36}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libs">
+      <UniqueIdentifier>{b5c942b3-b9a3-4ea9-91e2-dfe1d138626c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -83,6 +86,9 @@
     </ClCompile>
     <ClCompile Include="PlayerSceneExample.cpp">
       <Filter>NonFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="Libs\easyloggingpp-master\src\easylogging++.cc">
+      <Filter>Libs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,6 @@
 #include "inputclass.h"
 
+#include "easylogging++.h"
 // This class is taken from rastertek, possibly some changes are made but this is work not of my own design.
 // http://www.rastertek.com/dx11tut13.html
 InputClass::InputClass()
@@ -30,21 +31,27 @@ bool InputClass::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int
 	mMouseX = 0;
 	mMouseY = 0;
 
+	mMouseRelX = 0;
+	mMouseRelY = 0;
+
 	result = DirectInput8Create(hinstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&mpDirectInput, NULL);
 	if (FAILED(result))
 	{
+		LOG(ERROR) << "FAILED to create directInput";
 		return false;
 	}
 	
 	result = mpDirectInput->CreateDevice(GUID_SysKeyboard, &mpKeyboard, NULL);
 	if (FAILED(result))
 	{
+		LOG(ERROR) << "FAILED to create keyboard";
 		return false;
 	}
 
 	result = mpKeyboard->SetDataFormat(&c_dfDIKeyboard);
 	if (FAILED(result))
 	{
+		LOG(ERROR) << "FAILED to set data format of keyboard";
 		return false;
 	}
 
@@ -94,6 +101,7 @@ bool InputClass::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int
 	return true;
 }
 
+
 void InputClass::Shutdown()
 {
 	// Release the mouse.
@@ -121,6 +129,7 @@ void InputClass::Shutdown()
 
 	return;
 }
+
 
 bool InputClass::Frame()
 {
@@ -170,6 +179,7 @@ bool InputClass::ReadKeyboard()
 	return true;
 }
 
+
 bool InputClass::ReadMouse()
 {
 	HRESULT result;
@@ -193,11 +203,16 @@ bool InputClass::ReadMouse()
 	return true;
 }
 
+
 void InputClass::ProcessInput()
 {
 	// Update the location of the mouse cursor based on the change of the mouse location during the frame.
 	mMouseX += mMouseState.lX;
 	mMouseY	+= mMouseState.lY;
+
+	mMouseRelX = mMouseState.lX;
+	mMouseRelY = mMouseState.lY;
+
 
 	// Ensure the mouse location doesn't exceed the screen width or height.
 	if (mMouseX < 0) { mMouseX = 0; }
@@ -209,6 +224,7 @@ void InputClass::ProcessInput()
 	return;
 }
 
+
 bool InputClass::IsEscapePressed()
 {
 	// Do a bitwise and on the keyboard state to check if the escape key is currently being pressed.
@@ -219,6 +235,7 @@ bool InputClass::IsEscapePressed()
 
 	return false;
 }
+
 
 void InputClass::GetMouseLocation(int& mouseX, int& mouseY)
 {

@@ -7,7 +7,7 @@ public:
 	PlayerSceneExample();
 	virtual ~PlayerSceneExample();
 
-	virtual void Tick() override;
+	virtual void Tick(InputClass* const aInput) override;
 
 	virtual void Init() override;
 

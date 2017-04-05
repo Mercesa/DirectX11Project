@@ -58,7 +58,6 @@ XMFLOAT3 CameraClass::GetRotation()
 
 void CameraClass::Render()
 {
-	XMFLOAT3 up, position, lookAt;
 	XMVECTOR upVector, positionVector, lookAtVector;
 	float yaw, pitch, roll;
 	XMMATRIX rotationMatrix;

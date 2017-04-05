@@ -3,6 +3,8 @@
 class IScene;
 class SystemClass;
 
+#include "inputclass.h"
+
 // Application context struct maybe
 // information about the application(size of window, name of window etc)
 class IApplication
@@ -22,8 +24,7 @@ public:
 	void LoadScene(IScene* aScene);
 
 private:
-	void SceneTick();
-
+	void SceneTick(InputClass* const aInput);
 	IScene* mpCurrentScene;
 
 	bool mShouldQuit = false;

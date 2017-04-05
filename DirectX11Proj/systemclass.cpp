@@ -2,6 +2,9 @@
 
 #include <fcntl.h>
 
+#include "easylogging++.h"
+
+
 SystemClass::SystemClass()
 {
 	m_Input = 0;
@@ -64,6 +67,8 @@ bool SystemClass::Initialize()
 		MessageBox(m_hwnd, L"Could not initialize the input object.", L"error", MB_OK);
 	}
 
+	LOG(INFO) << "Created input class";
+
 	// Create the graphics object.  This object will handle rendering all the graphics for this application.
 	m_Graphics = std::make_unique<GraphicsClass>();
 	if(!m_Graphics)
@@ -84,7 +89,9 @@ bool SystemClass::Initialize()
 	{
 		return false;
 	}
-	
+	LOG(INFO) << "Intialized graphics class";
+
+	LOG(INFO) << "System finished initilization";
 	return true;
 }
 
@@ -98,7 +105,7 @@ void SystemClass::Shutdown()
 	// Shutdown the window.
 	ShutdownWindows();
 	
-	return;
+	LOG(INFO) << "System finished shutdown";
 }
 
 
@@ -163,16 +170,18 @@ bool SystemClass::Frame()
 	// Check if the user pressed escape and wants to exit the application.
 	if(m_Input->IsEscapePressed())
 	{
+		LOG(INFO) << "User pressed escape. Exiting application";
 		return false;
 	}
 
 	if (mApplication->ShouldQuit())
 	{
+		LOG(INFO) << "Application requested quit. Exiting application";
 		return false;
 	}
 	
 	mApplication->Tick();
-	mApplication->SceneTick();
+	mApplication->SceneTick(m_Input.get());
 
 
 	// Do the frame processing for the graphics object.

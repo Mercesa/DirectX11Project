@@ -47,11 +47,11 @@ void IApplication::LoadScene(IScene* aScene)
 }
 
 
-void IApplication::SceneTick()
+void IApplication::SceneTick(InputClass* const aInput)
 {
 	if (mpCurrentScene != nullptr)
 	{
-		mpCurrentScene->Tick();
+		mpCurrentScene->Tick(aInput);
 	}
 }
 
