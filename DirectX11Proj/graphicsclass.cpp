@@ -4,6 +4,8 @@
 #include "ModelLoader.h"
 #include "ModelData.h"
 
+
+
 GraphicsClass::GraphicsClass()
 {
 	mpDirect3D = 0;
@@ -122,7 +124,7 @@ bool GraphicsClass::Frame(IScene *const aScene)
 	return true;
 }
 
-#include <iostream>
+
 bool GraphicsClass::Render(IScene *const aScene)
 {
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;

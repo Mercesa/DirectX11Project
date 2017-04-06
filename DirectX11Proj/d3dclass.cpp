@@ -7,6 +7,9 @@
 #include "d3dSwapchain.h"
 #include "d3dDepthStencil.h"
 #include "d3dRasterizerState.h"
+
+#include "easylogging++.h"
+
 D3DClass::D3DClass()
 {
 }
@@ -50,7 +53,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 
 	if (FAILED(result))
 	{
-		std::cout << "device failed creation" << std::endl;
+		LOG(ERROR) << "device failed creation";
 		return false;
 	}
 
@@ -60,7 +63,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 
 	if (!swapChainCreationResult)
 	{
-		std::cout << "swapchain failed creation" << std::endl;
+		LOG(ERROR) << "swapchain failed creation";
 		return false;
 	}
 	
@@ -68,6 +71,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	result = mpSwapChain->GetSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
 	{
+		LOG(ERROR) << "failed to get back buffer ptr from swapchain";
 		return false;
 	}
 
@@ -75,6 +79,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	result = mpDevice->CreateRenderTargetView(backBufferPtr, NULL, &mpRenderTargetView);
 	if (FAILED(result))
 	{
+		LOG(ERROR) << "failed to create render target view";
 		return false;
 	}
 
@@ -123,7 +128,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	mProjectionmatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
 
 	// Initialize the world matrix to the identity matrix.
-	mWorldMatrix = XMMatrixIdentity();
+	mWorldMatrix = XMMatrixMultiply(XMMatrixIdentity(), XMMatrixScaling(0.1f, 0.1f, 0.1f));
 
 	// Create an orthographic projection matrix for 2D rendering.
 	mOrthoMatrix = XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);

@@ -9,6 +9,9 @@ struct VertexInputType
 {
     float4 position : POSITION;
     float2 uv : TEXCOORD0;
+	float3 normal : NORMAL;
+	float3 bitang : BITANGENT;
+	float3 tangent : TANGENT;
 };
 
 struct PixelInputType

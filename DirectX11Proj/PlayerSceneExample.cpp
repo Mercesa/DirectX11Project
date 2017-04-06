@@ -16,11 +16,14 @@ void PlayerSceneExample::Tick(InputClass* const aInput)
 	//throw std::logic_error("The method or operation is not implemented.");
 	static int x = 0;
 	static int y = 0;
-	x += aInput->mMouseRelX;
-	y += aInput->mMouseRelY;
 
-	std::cout << "xderp: " << x << std::endl;
-	std::cout << "yderp: " << y << std::endl;
+	int mouseRelX = 0;
+	int mouseRelY = 0;
+	aInput->GetMouseRelLocation(mouseRelX, mouseRelY);
+
+	x += mouseRelX;
+	y += mouseRelY;
+
 	mCamera->SetRotation(y, x, 0);
 
 	if (aInput->mKeyboardState[DIK_W] & 0x80)
@@ -41,7 +44,7 @@ void PlayerSceneExample::Tick(InputClass* const aInput)
 
 void PlayerSceneExample::Init()
 {
-	mCamera->SetPosition(0.0f, 9.0f, 0.0f);
+	mCamera->SetPosition(0.0f, 15.0f, 0.0f);
 	
 	//throw std::logic_error("The method or operation is not implemented.");
 }

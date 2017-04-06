@@ -51,9 +51,6 @@
     <ClCompile Include="IScene.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
-    <ClCompile Include="MyCustomScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="d3dclass.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
@@ -115,9 +112,6 @@
     </ClInclude>
     <ClInclude Include="ModelData.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MyCustomScene.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="d3dclass.h">
       <Filter>D3DSetup</Filter>

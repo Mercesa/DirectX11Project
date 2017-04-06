@@ -44,6 +44,7 @@ private:
 	void RenderBuffers(ID3D11DeviceContext*);
 
 private:
+	int tIndiceSize = 0;
 	std::unique_ptr<d3dVertexBuffer> mVertexBuffer;
 	std::unique_ptr<d3dVertexBuffer> mIndexBuffer;
 

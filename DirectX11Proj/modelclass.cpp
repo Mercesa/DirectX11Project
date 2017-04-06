@@ -8,6 +8,8 @@ ModelClass::ModelClass()
 	mIndexBuffer = std::make_unique<d3dVertexBuffer>();
 }
 
+Microsoft::WRL::ComPtr<ID3D11Buffer> mVertexBufferB;
+Microsoft::WRL::ComPtr<ID3D11Buffer> mIndexBufferB;
 
 ModelClass::ModelClass(const ModelClass& other)
 {
@@ -78,7 +80,6 @@ bool ModelClass::InitializeBuffers(ID3D11Device* aDevice)
 {
 	VertexType* vertices;
 	unsigned long* indices;
-	HRESULT result;
 	
 
 	// Set the number of vertices in the vertex array.
@@ -147,19 +148,17 @@ void ModelClass::ShutdownBuffers()
 
 // Function for if we have any modeldata
 bool ModelClass::InitializeBuffers(ID3D11Device* aDevice, const MeshData& aData)
-{
-	HRESULT result;
-	
+{	
 	
 	size_t vertSize = aData.vertices.size();
 	size_t indicesSize = aData.indices.size();
 
-	if (!mVertexBuffer->Initialize(aDevice, (void*)aData.vertices.data(), sizeof(VertexType) * vertSize, vertSize, D3D11_BIND_VERTEX_BUFFER))
+	if (!mVertexBuffer->Initialize(aDevice, (void*)(aData.vertices.data()), sizeof(VertexData) * vertSize, vertSize, D3D11_BIND_VERTEX_BUFFER))
 	{
 		return false;
 	}
 
-	if (!mIndexBuffer->Initialize(aDevice, (void*)aData.indices.data(), sizeof(unsigned long) * indicesSize, indicesSize, D3D11_BIND_INDEX_BUFFER))
+	if (!mIndexBuffer->Initialize(aDevice, (void*)(aData.indices.data()), sizeof(unsigned long) * indicesSize, indicesSize, D3D11_BIND_INDEX_BUFFER))
 	{
 		return false;
 	}
@@ -175,7 +174,7 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 
 
 	// Set vertex buffer stride and offset.
-	stride = sizeof(VertexType); 
+	stride = sizeof(VertexData);
 	offset = 0;
     
 	// Set the vertex buffer to active in the input assembler so it can be rendered.

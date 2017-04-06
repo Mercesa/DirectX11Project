@@ -22,7 +22,8 @@ public:
 
 	bool IsEscapePressed();
 	void GetMouseLocation(int&, int&);
-	int mMouseRelX, mMouseRelY;
+	void GetMouseRelLocation(int& aX, int& aY);
+
 
 	unsigned char mKeyboardState[256];
 
@@ -39,6 +40,7 @@ private:
 
 	int mScreenWidth, mScreenHeight;
 	int mMouseX, mMouseY;
+	int mMouseRelX, mMouseRelY;
 
 };
 
