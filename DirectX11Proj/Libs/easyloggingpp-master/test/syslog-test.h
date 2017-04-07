@@ -6,7 +6,6 @@
 #include "test.h"
 
 static const char* kSysLogFile = "/var/log/syslog";
-static const char* s_currentHost = el::base::utils::OS::currentHost().c_str();
 
 TEST(SysLogTest, WriteLog) {
     if (!fileExists(kSysLogFile)) {

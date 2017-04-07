@@ -2,6 +2,8 @@
 
 #include <list>
 #include <memory>
+#include <vector>
+
 
 #include "cameraclass.h"
 #include "inputclass.h"
@@ -19,7 +21,8 @@ public:
 	virtual void Init() = 0;
 	virtual void Destroy() = 0;
 
-	std::list <std::shared_ptr<IObject>> mObjects;
+	// Just a bit lazy and turn it into a vector, will convert back to a list later
+	std::vector <std::shared_ptr<IObject>> mObjects;
 	
 	bool HasBeenInitialized() { return mInitialized; }
 

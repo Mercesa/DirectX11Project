@@ -4,8 +4,7 @@ FILE=$1
 
 macro="$macro -DELPP_THREAD_SAFE"
 macro="$macro -DELPP_STL_LOGGING"
-macro="$macro -DELPP_FEATURE_CRASH_LOG"
-macro="$macro -DELPP_FEATURE_ALL"
+macro="$macro -DELPP_STACKTRACE_ON_CRASH"
 
 if [ "$2" = "" ];then
   COMPILER=g++
@@ -22,7 +21,7 @@ fi
 
 echo "Compiling... [$FILE]"
 
-COMPILE_LINE="$COMPILER $FILE easylogging++.cc `pkg-config --libs --cflags gtkmm-2.4 sigc++-2.0` -o bin/$FILE.bin $macro $CXX_STD -Wall -Wextra -Wundef"
+COMPILE_LINE="$COMPILER $FILE `pkg-config --libs --cflags gtkmm-2.4 sigc++-2.0` -o bin/$FILE.bin $macro $CXX_STD -Wall -Wextra -Wundef"
 echo "    $COMPILE_LINE"
 
 $($COMPILE_LINE)

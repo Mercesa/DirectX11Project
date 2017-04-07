@@ -1,3 +1,6 @@
+Texture2D shaderTexture;
+SamplerState SampleType;
+
 cbuffer MatrixBuffer
 {
 	matrix worldMatrix;

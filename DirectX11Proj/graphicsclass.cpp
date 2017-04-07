@@ -1,9 +1,10 @@
 #include "graphicsclass.h"
 
 #include "IScene.h"
+#include "IObject.h"
 #include "ModelLoader.h"
 #include "ModelData.h"
-
+#include "ResourceManager.h"
 
 
 GraphicsClass::GraphicsClass()
@@ -42,6 +43,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		MessageBox(hwnd, L"Could not initialize Direct3D.", L"Error", MB_OK);
 		return false;
 	}
+
+	ResourceManager::getInstance().mpDevice = mpDirect3D->GetDevice();
+
+
 	// Create the color shader object.
 	m_ColorShader = std::make_unique<ColorShaderClass>();
 	if (!m_ColorShader)
@@ -70,23 +75,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	{
 		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
 		return false;
-	}
-
-	std::unique_ptr<ModelLoader> tMLoader = std::make_unique<ModelLoader>();
-	tMLoader->LoadModel("Models\\Sponza\\Sponza.obj");
-
-	std::unique_ptr<ModelClass> tD3DModel;
-	for (auto &e : tMLoader->GetMeshesToBeProcessed())
-	{
-		tD3DModel = std::make_unique<ModelClass>();
-
-		tD3DModel->Initialize(mpDirect3D->GetDevice(), e);
-		if (!result)
-		{
-			MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
-			return false;
-		}
-		this->mModels.push_back(std::move(tD3DModel));
 	}
 
 
@@ -144,11 +132,11 @@ bool GraphicsClass::Render(IScene *const aScene)
 
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 
-	for (int i = 0; i < this->mModels.size(); ++i)
+	for (int i = 0; i < aScene->mObjects.size(); ++i)
 	{
 		//std::cout << i << std::endl;
-		mModels[i]->Render(mpDirect3D->GetDeviceContext());
-		result = m_ColorShader->Render(mpDirect3D->GetDeviceContext(), mModels[i]->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		aScene->mObjects[i]->mpModel->Render(mpDirect3D->GetDeviceContext());
+		result = m_ColorShader->Render(mpDirect3D->GetDeviceContext(), aScene->mObjects[i]->mpModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 	}
 	// Render the model using the color shader.
 	if (!result)

@@ -76,6 +76,13 @@ bool SystemClass::Initialize()
 		return false;
 	}
 
+	// Initialize the graphics object.
+	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
+	if(!result)
+	{
+		return false;
+	}
+
 	mApplication = std::make_unique<Application>();
 	if (!mApplication)
 	{
@@ -83,12 +90,6 @@ bool SystemClass::Initialize()
 	}
 	mApplication->Init();
 
-	// Initialize the graphics object.
-	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
-	if(!result)
-	{
-		return false;
-	}
 	LOG(INFO) << "Intialized graphics class";
 
 	LOG(INFO) << "System finished initilization";
@@ -148,14 +149,17 @@ void SystemClass::Run()
 
 	return;
 }
-
-
+using namespace el;
 // Engine tick in a sense, what goes on in one frame
 bool SystemClass::Frame()
 {
+	TIMED_FUNC(Derp);
 	bool result;
 
+
+	TIMED_SCOPE(inputBlkObj, "input time spend");
 	result = m_Input->Frame();
+	
 	if (!result)
 	{
 		return false;
@@ -179,6 +183,9 @@ bool SystemClass::Frame()
 		LOG(INFO) << "Application requested quit. Exiting application";
 		return false;
 	}
+	
+	//PERFORMANCE_CHECKPOINT(inputBlkObj);
+
 	
 	mApplication->Tick();
 	mApplication->SceneTick(m_Input.get());

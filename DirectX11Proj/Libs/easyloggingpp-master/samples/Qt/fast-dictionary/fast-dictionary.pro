@@ -1,3 +1,9 @@
+#-------------------------------------------------
+#
+# Project created by QtCreator 2013-03-19T22:31:41
+#
+#-------------------------------------------------
+
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -10,21 +16,16 @@ QMAKE_CC = $$COMPILER
 QMAKE_CXX = $$COMPILER
 QMAKE_LINK = $$COMPILER
 
-QMAKE_CXXFLAGS += -std=c++11
-DEFINES += ELPP_FEATURE_ALL \
-    ELPP_MULTI_LOGGER_SUPPORT \
-    ELPP_THREAD_SAFE
-
+QMAKE_CXXFLAGS += -std=c++0x
+DEFINES += ELPP_STACKTRACE_ON_CRASH \
+    ELPP_MULTI_LOGGER_SUPPORT
+    
 SOURCES += main.cc\
         mainwindow.cc \
-    listwithsearch.cc \
-    ../../../src/easylogging++.cc
+    listwithsearch.cc
 
 HEADERS  += mainwindow.hh \
     listwithsearch.hh \
-    ../../../src/easylogging++.h
+    easylogging++.h
 
 FORMS    += mainwindow.ui
-
-DISTFILES += \
-    words.txt

@@ -34,7 +34,6 @@ private:
 	std::unique_ptr<D3DClass> mpDirect3D;
 	std::unique_ptr<ModelClass> mpModel;
 	// Just temporarily here
-	std::vector<std::unique_ptr<ModelClass>> mModels;
 	std::unique_ptr<ColorShaderClass> m_ColorShader;
 };
 

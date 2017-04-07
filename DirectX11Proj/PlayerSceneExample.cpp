@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+#include "ResourceManager.h"
+#include "ObjectExample.h"
+
 PlayerSceneExample::PlayerSceneExample()
 {
 }
@@ -39,13 +42,22 @@ void PlayerSceneExample::Tick(InputClass* const aInput)
 		mCamera->m_positionY -= mCamera->lookAt.y;
 		mCamera->m_positionZ -= mCamera->lookAt.z;
 	}
-
 }
 
 void PlayerSceneExample::Init()
 {
 	mCamera->SetPosition(0.0f, 15.0f, 0.0f);
 	
+	std::vector<ModelClass*> tModels = ResourceManager::getInstance().LoadModels("Models\\Sponza\\Sponza.obj");
+
+	for (int i = 0; i < tModels.size(); ++i)
+	{
+		std::shared_ptr<ObjectExample> tObject = std::make_shared<ObjectExample>();
+		tObject->mpModel = tModels[i];
+		this->mObjects.push_back(tObject);
+		std::cout << "Going through models" << std::endl;
+	}
+
 	//throw std::logic_error("The method or operation is not implemented.");
 }
 

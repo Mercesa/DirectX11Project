@@ -12,10 +12,9 @@ TARGET = file-splitter-and-joiner
 TEMPLATE = app
 
 DEFINES += ELPP_QT_LOGGING    \
-          ELPP_FEATURE_ALL \
           ELPP_STL_LOGGING   \
           ELPP_STRICT_SIZE_CHECK \
-          ELPP_FEATURE_CRASH_LOG \
+          ELPP_STACKTRACE_ON_CRASH \
           ELPP_THREAD_SAFE
 
 COMPILER = g++
@@ -34,8 +33,7 @@ SOURCES += main.cpp\
     partprocessor.cpp \
     addsplittedfiledialog.cpp \
     joinercore.cpp \
-    about.cpp \
-    ../../../src/easylogging++.cc
+    about.cpp
 
 HEADERS  += mainwindow.h \
     easylogging++.h \

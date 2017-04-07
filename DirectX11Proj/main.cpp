@@ -6,13 +6,13 @@
 // And its nice to have a central place for the logging library
 #include "easylogging++.h"
 INITIALIZE_EASYLOGGINGPP
-#define ELPP_COMPILER_MSVC
+
+
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
 	std::unique_ptr<SystemClass> System;
 	bool result;
-	
 	
 	// Create the system object.
 	System = std::make_unique<SystemClass>();

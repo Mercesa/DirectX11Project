@@ -92,7 +92,7 @@ void *write(void* thrId){
 }
 
 // If you wish you can define your own way to get thread ID
-const char* getThreadId_CustomVersion(const el::LogMessage*) {
+const char* getThreadId_CustomVersion(void) {
     std::stringstream ss;
     ss << pthread_self();
     return ss.str().c_str();

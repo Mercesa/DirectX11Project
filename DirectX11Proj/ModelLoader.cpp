@@ -99,44 +99,47 @@ const std::vector<MeshData>& ModelLoader::GetMeshesToBeProcessed()
 }
 
 
-//std::string GetTextureLocation(aiMaterial* const a_Mat, aiTextureType a_Type)
-//{
-//	int count = 0;
-//	// Check the amount of textures of a specific type
-//	if ((count = a_Mat->GetTextureCount(a_Type)) <= 0)
-//	{
-//		return "";
-//	}
-//
-//	// Get texture filename
-//	aiString str;
-//	a_Mat->GetTexture(a_Type, 0, &str);
-//	std::string filename = std::string(str.C_Str());
-//
-//	// directory can be removed
-//	filename = mDirectory + '\\' + filename;
-//
-//	return filename;
-//}
+std::string GetTextureLocation(aiMaterial* const a_Mat, aiTextureType a_Type)
+{
+	int count = 0;
+	// Check the amount of textures of a specific type
+	if ((count = a_Mat->GetTextureCount(a_Type)) <= 0)
+	{
+		return "";
+	}
 
+
+	aiString str;
+	a_Mat->GetTexture(a_Type, 0, &str);
+
+	std::string stString = std::string(str.C_Str());
+
+
+	std::size_t dotPos = stString.find_last_of(".");
+	stString.erase(dotPos, stString.size());
+
+	stString.append(".DDS");
+
+	std::cout << stString << std::endl;
+	return stString;
+}
 
 // Goes through the material
-//TextureData ProcessMaterial(aiMesh* a_Mesh, const aiScene* a_Scene)
-//{
-//	TextureData texDat;
-//	if (a_Mesh->mMaterialIndex > 0)
-//	{
-//		aiMaterial* material = a_Scene->mMaterials[a_Mesh->mMaterialIndex];
-//
-//		texDat.mTextureFilePath = GetTextureLocation(material, aiTextureType_DIFFUSE);
-//
-//		bool textureSuccess = false;
-//	}
-//	return texDat;
-//}
+TextureData ProcessMaterial(aiMesh* a_Mesh, const aiScene* a_Scene)
+{
+	TextureData texDat;
+	if (a_Mesh->mMaterialIndex > 0)
+	{
+		aiMaterial* material = a_Scene->mMaterials[a_Mesh->mMaterialIndex];
+
+		texDat.filepath = GetTextureLocation(material, aiTextureType_DIFFUSE);
+
+		bool textureSuccess = false;
+	}
+	return texDat;
+}
 
 
-#include <iostream>
 // Process mesh
 void ModelLoader::ProcessMesh(aiMesh* const a_Mesh, const aiScene* const a_Scene)
 {
@@ -148,13 +151,13 @@ void ModelLoader::ProcessMesh(aiMesh* const a_Mesh, const aiScene* const a_Scene
 	ProcessIndices(a_Mesh, indices);
 
 
-	//TextureData textData = ProcessMaterial(a_Mesh, a_Scene);
+	TextureData textData = ProcessMaterial(a_Mesh, a_Scene);
 
 
 	MeshData meshData;
 	meshData.vertices = vertices;
 	meshData.indices = indices;
-	//meshData.materialData.mTextures.push_back(textData);
+	meshData.textureFilePath = textData.filepath;
 
 
 	this->mMeshesToBeProcessed.push_back(meshData);

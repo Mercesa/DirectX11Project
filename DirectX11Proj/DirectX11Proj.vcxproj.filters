@@ -84,8 +84,14 @@
     <ClCompile Include="PlayerSceneExample.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
-    <ClCompile Include="Libs\easyloggingpp-master\src\easylogging++.cc">
-      <Filter>Libs</Filter>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectExample.cpp">
+      <Filter>NonFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dTexture.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -148,6 +154,18 @@
     </ClInclude>
     <ClInclude Include="PlayerSceneExample.h">
       <Filter>NonFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectExample.h">
+      <Filter>NonFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="easylogging++.h">
+      <Filter>Libs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
