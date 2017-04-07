@@ -15,6 +15,12 @@
 using namespace DirectX;
 
 #include <wrl.h>
+#include <memory>
+
+
+class d3dSwapchain;
+class d3dDepthStencil;
+class d3dRasterizerState;
 
 class D3DClass
 {
@@ -36,22 +42,19 @@ public:
 	void GetWorldMatrix(XMMATRIX&);
 	void GetOrthoMatrix(XMMATRIX&);
 
-	void GetVideoCardInfo(char*, int&);
 private:
 	bool m_vsync_enabled;
-	int m_videoCardMemory;
-	char m_videoCardDescription[128];
-	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
 	Microsoft::WRL::ComPtr<ID3D11Device> m_device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTargetView;
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> m_depthStencilBuffer;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilState;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_depthStencilView;
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterState;
+
 	XMMATRIX m_projectionMatrix;
 	XMMATRIX m_worldMatrix;
 	XMMATRIX m_orthoMatrix;
+
+	std::unique_ptr<d3dSwapchain> mSwapChain;
+	std::unique_ptr<d3dDepthStencil> mDepthStencil;
+	std::unique_ptr<d3dRasterizerState> mRasterizerState;
 };
 
 #endif

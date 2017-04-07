@@ -3,7 +3,7 @@
 #include "IScene.h"
 #include "systemclass.h"
 
-IApplication::IApplication() : currentScene(nullptr)
+IApplication::IApplication() : currentScene(nullptr), shouldQuit(false)
 {
 }
 
@@ -12,10 +12,12 @@ IApplication::~IApplication()
 {
 }
 
+
 void IApplication::SetCurrentScene(IScene* aScene)
 {
 
 }
+
 
 void IApplication::SceneTick()
 {
@@ -23,4 +25,10 @@ void IApplication::SceneTick()
 	{
 		currentScene->Tick();
 	}
+}
+
+
+bool IApplication::GetShouldQuit()
+{
+	return shouldQuit;
 }
