@@ -175,6 +175,7 @@
     <ClCompile Include="PlayerSceneExample.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="systemclass.cpp" />
+    <ClCompile Include="textureshaderclass.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -201,6 +202,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ShaderHelperFunctions.h" />
     <ClInclude Include="systemclass.h" />
+    <ClInclude Include="textureshaderclass.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="color.vs" />

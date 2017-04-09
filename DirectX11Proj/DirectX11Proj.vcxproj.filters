@@ -84,14 +84,17 @@
     <ClCompile Include="PlayerSceneExample.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ObjectExample.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
     <ClCompile Include="d3dTexture.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="textureshaderclass.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -161,11 +164,14 @@
     <ClInclude Include="ObjectExample.h">
       <Filter>NonFramework</Filter>
     </ClInclude>
-    <ClInclude Include="d3dTexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="easylogging++.h">
       <Filter>Libs</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dTexture.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="textureshaderclass.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

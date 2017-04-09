@@ -1,8 +1,11 @@
 #include "modelclass.h"
 
 #include "d3dVertexBuffer.h"
+#include "d3dclass.h"
 #include "ModelData.h"
-ModelClass::ModelClass()
+
+
+ModelClass::ModelClass() : mpTexture(nullptr)
 {
 	mVertexBuffer = std::make_unique<d3dVertexBuffer>();
 	mIndexBuffer = std::make_unique<d3dVertexBuffer>();
@@ -21,25 +24,10 @@ ModelClass::~ModelClass()
 }
 
 
-bool ModelClass::Initialize(ID3D11Device* aDevice)
-{
-	bool result;
-
-
-	// Initialize the vertex and index buffers.
-	result = InitializeBuffers(aDevice);
-	if(!result)
-	{
-		return false;
-	}
-
-	return true;
-}
 
 bool ModelClass::Initialize(ID3D11Device* aDevice, const MeshData& aMesh)
 {
 	bool result;
-
 
 	// Initialize the vertex and index buffers.
 	result = InitializeBuffers(aDevice, aMesh);
@@ -74,70 +62,6 @@ int ModelClass::GetIndexCount()
 {
 	return mIndexBuffer->GetAmountOfElements();
 }
-
-
-bool ModelClass::InitializeBuffers(ID3D11Device* aDevice)
-{
-	VertexType* vertices;
-	unsigned long* indices;
-	
-
-	// Set the number of vertices in the vertex array.
-	int m_vertexCount = 3;
-
-	// Set the number of indices in the index array.
-	int m_indexCount = 3;
-
-	// Create the vertex array.
-	vertices = new VertexType[m_vertexCount];
-	if(!vertices)
-	{
-		return false;
-	}
-
-	// Create the index array.
-	indices = new unsigned long[m_indexCount];
-	if(!indices)
-	{
-		return false;
-	}
-
-	// Load the vertex array with data.
-	vertices[0].position = XMFLOAT3(-1.0f, -1.0f, 0.0f);  // Bottom left.
-	vertices[0].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-
-	vertices[1].position = XMFLOAT3(0.0f, 1.0f, 0.0f);  // Top middle.
-	vertices[1].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-
-	vertices[2].position = XMFLOAT3(1.0f, -1.0f, 0.0f);  // Bottom right.
-	vertices[2].color = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
-
-	// Load the index array with data.
-	indices[0] = 0;  // Bottom left.
-	indices[1] = 1;  // Top middle.
-	indices[2] = 2;  // Bottom right.
-
-
-	if (!mVertexBuffer->Initialize(aDevice, (void*)vertices, sizeof(VertexType) * m_vertexCount, m_vertexCount, D3D11_BIND_VERTEX_BUFFER))
-	{
-		return false;
-	}
-
-	if (!mIndexBuffer->Initialize(aDevice, (void*)indices, sizeof(unsigned long) * m_indexCount, m_indexCount, D3D11_BIND_INDEX_BUFFER))
-	{
-		return false;
-	}
-
-	// Release the arrays now that the vertex and index buffers have been created and loaded.
-	delete [] vertices;
-	vertices = 0;
-
-	delete [] indices;
-	indices = 0;
-
-	return true;
-}
-
 
 void ModelClass::ShutdownBuffers()
 {

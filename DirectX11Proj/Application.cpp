@@ -14,8 +14,8 @@ Application::~Application()
 
 void Application::Init() 
 { 
-	auto tScene = new PlayerSceneExample();
-	LoadScene(tScene);
+	auto tScene = std::make_unique<PlayerSceneExample>();
+	LoadScene(std::move(tScene));
 }
 
 void Application::Tick() 

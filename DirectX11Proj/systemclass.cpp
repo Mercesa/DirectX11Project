@@ -165,11 +165,6 @@ bool SystemClass::Frame()
 		return false;
 	}
 
-	int x, y;
-	m_Input->GetMouseLocation(x,y);
-	std::cout << "x: " << x << std::endl;
-	std::cout << "y: " << y << std::endl;
-
 
 	// Check if the user pressed escape and wants to exit the application.
 	if(m_Input->IsEscapePressed())
@@ -192,7 +187,7 @@ bool SystemClass::Frame()
 
 
 	// Do the frame processing for the graphics object.
-	result = m_Graphics->Frame(mApplication->mpCurrentScene);
+	result = m_Graphics->Frame(mApplication->mpCurrentScene.get());
 	if(!result)
 	{
 		return false;

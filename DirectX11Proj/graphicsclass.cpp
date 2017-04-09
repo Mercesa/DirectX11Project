@@ -10,7 +10,6 @@
 GraphicsClass::GraphicsClass()
 {
 	mpDirect3D = 0;
-	mpModel = 0;
 	m_ColorShader = 0;
 }
 
@@ -62,23 +61,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	// Create the model object.
-	mpModel = std::make_unique<ModelClass>();
-	if (!mpModel)
-	{
-		return false;
-	}
-
-	// Initialize the model object.
-	result = mpModel->Initialize(mpDirect3D->GetDevice());
-	if (!result)
-	{
-		MessageBox(hwnd, L"Could not initialize the model object.", L"Error", MB_OK);
-		return false;
-	}
-
-
-
 	return true;
 }
 
@@ -87,7 +69,6 @@ void GraphicsClass::Shutdown()
 {
 	
 	m_ColorShader->Shutdown();	
-	mpModel->Shutdown();
 	mpDirect3D->Shutdown();
 	
 	return;

@@ -55,7 +55,6 @@ void PlayerSceneExample::Init()
 		std::shared_ptr<ObjectExample> tObject = std::make_shared<ObjectExample>();
 		tObject->mpModel = tModels[i];
 		this->mObjects.push_back(tObject);
-		std::cout << "Going through models" << std::endl;
 	}
 
 	//throw std::logic_error("The method or operation is not implemented.");

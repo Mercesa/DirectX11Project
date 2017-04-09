@@ -8,24 +8,16 @@ using namespace DirectX;
 #include <memory>
 
 class d3dVertexBuffer;
-
+class d3dTexture;
 struct MeshData;
 
 class ModelClass
 {
-private:
-	struct VertexType
-	{
-		XMFLOAT3 position;
-		XMFLOAT4 color;
-	};
-
 public:
 	ModelClass();
 	ModelClass(const ModelClass&);
 	~ModelClass();
 
-	bool Initialize(ID3D11Device*);
 	bool Initialize(ID3D11Device*, const MeshData&);
 
 	void Shutdown();
@@ -33,15 +25,16 @@ public:
 
 	int GetIndexCount();
 
+
+	d3dTexture* mpTexture;
+	bool mHastexture = false;
+
 private:
-	bool InitializeBuffers(ID3D11Device*);
 	bool InitializeBuffers(ID3D11Device*, const MeshData&);
-
-	// Initialize buffers using previously loaded data
-
 
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
+
 
 private:
 	int tIndiceSize = 0;

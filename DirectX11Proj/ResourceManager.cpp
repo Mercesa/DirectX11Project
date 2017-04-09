@@ -1,10 +1,13 @@
 #include "ResourceManager.h"
 
+#include <string>
+#include <iostream>
+
 #include "modelclass.h"
 #include "ModelData.h"
+#include "d3dTexture.h"
 
 #include "easylogging++.h"
-
 ResourceManager::ResourceManager()
 {
 	mpModelLoader = std::make_unique<ModelLoader>();
@@ -18,11 +21,36 @@ std::vector<ModelClass*> ResourceManager::LoadModels(std::string aFilePath)
 	std::vector<ModelClass*> tModels;
 
 	std::shared_ptr<ModelClass> tModelClass = nullptr;
-	
-	for (unsigned int i = 0; i < mpModelLoader->GetMeshesToBeProcessed().size(); ++i)
+	std::shared_ptr<d3dTexture> tTextureClass = nullptr;
+
+	const std::vector<MeshData>& tMeshes = mpModelLoader->GetMeshesToBeProcessed();
+
+	for (unsigned int i = 0; i < tMeshes.size(); ++i)
 	{
+		const MeshData& tData = tMeshes[i];
+
 		tModelClass = std::make_shared<ModelClass>();
 		tModelClass->Initialize(this->mpDevice, mpModelLoader->GetMeshesToBeProcessed()[i]);
+
+		tTextureClass = std::make_shared<d3dTexture>();
+
+		// Convert string texture filepath to wstring
+	
+		std::wstring wString = std::wstring(tData.textureFilePath.begin(), tData.textureFilePath.end());
+		const WCHAR* result = wString.c_str();
+
+		// if the single textuer could not initialize
+		if (!tTextureClass->Initialize(mpDevice, result))
+		{
+			LOG(WARNING) << "ModelLoading: Finished loading model " << aFilePath;
+		}
+
+		else
+		{
+			tModelClass->mpTexture = tTextureClass.get();
+			tModelClass->mHastexture = true;
+			mLoadedTextures.push_back(tTextureClass);
+		}
 
 		tModels.push_back(tModelClass.get());
 		mLoadedModels.push_back(std::move(tModelClass));

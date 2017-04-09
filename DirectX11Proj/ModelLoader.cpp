@@ -105,6 +105,7 @@ std::string GetTextureLocation(aiMaterial* const a_Mat, aiTextureType a_Type)
 	// Check the amount of textures of a specific type
 	if ((count = a_Mat->GetTextureCount(a_Type)) <= 0)
 	{
+		std::cout << "no texture detected fam" << std::endl;
 		return "";
 	}
 

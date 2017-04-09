@@ -8,7 +8,7 @@
 
 #include "ModelLoader.h"
 class ModelClass;
-
+class d3dTexture;
 
 class ResourceManager
 {
@@ -26,7 +26,6 @@ public:
 		return instance;
 	}
 
-
 	std::vector<ModelClass*> LoadModels(std::string aFilePath);
 
 private:
@@ -35,7 +34,10 @@ private:
 	std::unique_ptr<ModelLoader> mpModelLoader;
 	ID3D11Device* mpDevice;
 
+	// Turn these into maps at one point
 	std::vector<std::shared_ptr<ModelClass>> mLoadedModels;
+	std::vector<std::shared_ptr<d3dTexture>> mLoadedTextures;
+
 	// Load models as one
 	// Load models as a list
 };

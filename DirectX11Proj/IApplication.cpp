@@ -7,22 +7,18 @@
 #include "systemclass.h"
 
 
-IApplication::IApplication() : mpCurrentScene(nullptr), mShouldQuit(false)
+IApplication::IApplication() : mShouldQuit(false)
 {
 }
 
 
 IApplication::~IApplication()
 {
-	if (mpCurrentScene)
-	{
-		// fucking evil (wow). should really fix something about this (and think of a decent scene management system)
-		delete mpCurrentScene;
-	}
+
 }
 
 // Setting the current scene also initializes it
-void IApplication::LoadScene(IScene* aScene)
+void IApplication::LoadScene(std::unique_ptr<IScene> aScene)
 {
 	assert(aScene != nullptr);
 
@@ -38,11 +34,11 @@ void IApplication::LoadScene(IScene* aScene)
 		return;
 	}
 
-	this->mpCurrentScene = aScene;
+	this->mpCurrentScene = std::move(aScene);
 	if (!mpCurrentScene->HasBeenInitialized())
 	{
-		aScene->Init();
-		aScene->mInitialized = true;
+		mpCurrentScene->Init();
+		mpCurrentScene->mInitialized = true;
 	}
 }
 

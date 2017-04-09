@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 class IScene;
 class SystemClass;
 
@@ -21,11 +23,11 @@ public:
 
 	bool ShouldQuit();
 
-	void LoadScene(IScene* aScene);
+	void LoadScene(std::unique_ptr<IScene> aScene);
 
 private:
 	void SceneTick(InputClass* const aInput);
-	IScene* mpCurrentScene;
+	std::unique_ptr<IScene> mpCurrentScene;
 
 	bool mShouldQuit = false;
 };

@@ -26,6 +26,6 @@ struct MeshData
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;
 
-	std::string textureFilePath;
+	std::string textureFilePath = "empty";
 
 };
