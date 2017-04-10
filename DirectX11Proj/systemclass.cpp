@@ -2,6 +2,9 @@
 
 #include <fcntl.h>
 
+#include "easylogging++.h"
+
+
 SystemClass::SystemClass()
 {
 	m_Input = 0;
@@ -26,15 +29,17 @@ void SystemClass::InitializeConsoleWindow()
 	freopen("conin$", "r", stdin);
 	freopen("conout$", "w", stdout);
 	freopen("conout$", "w", stderr);
+
+	// Also define a debug flag here, just for now. Its all right, dont worry about it. shhhhh
+#if defined(DEBUG) | defined(_DEBUG)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
 }
+
 
 bool SystemClass::Initialize()
 {
 	InitializeConsoleWindow();
-
-	#if defined(DEBUG) | defined(_DEBUG)
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
 
 	int screenWidth, screenHeight;
 	bool result;
@@ -55,11 +60,25 @@ bool SystemClass::Initialize()
 	}
 
 	// Initialize the input object.
-	m_Input->Initialize();
+	result = m_Input->Initialize(m_hinstance, m_hwnd, screenWidth, screenHeight);
+
+	if (!result)
+	{
+		MessageBox(m_hwnd, L"Could not initialize the input object.", L"error", MB_OK);
+	}
+
+	LOG(INFO) << "Created input class";
 
 	// Create the graphics object.  This object will handle rendering all the graphics for this application.
 	m_Graphics = std::make_unique<GraphicsClass>();
 	if(!m_Graphics)
+	{
+		return false;
+	}
+
+	// Initialize the graphics object.
+	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
+	if(!result)
 	{
 		return false;
 	}
@@ -71,13 +90,9 @@ bool SystemClass::Initialize()
 	}
 	mApplication->Init();
 
-	// Initialize the graphics object.
-	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
-	if(!result)
-	{
-		return false;
-	}
-	
+	LOG(INFO) << "Intialized graphics class";
+
+	LOG(INFO) << "System finished initilization";
 	return true;
 }
 
@@ -91,7 +106,7 @@ void SystemClass::Shutdown()
 	// Shutdown the window.
 	ShutdownWindows();
 	
-	return;
+	LOG(INFO) << "System finished shutdown";
 }
 
 
@@ -122,9 +137,6 @@ void SystemClass::Run()
 		}
 		else
 		{
-			mApplication->Tick();
-			mApplication->SceneTick();
-
 			// Otherwise do the frame processing.
 			result = Frame();
 			if(!result)
@@ -137,28 +149,50 @@ void SystemClass::Run()
 
 	return;
 }
-
-
+using namespace el;
 // Engine tick in a sense, what goes on in one frame
 bool SystemClass::Frame()
 {
+	TIMED_FUNC(Derp);
 	bool result;
 
 
-	// Check if the user pressed escape and wants to exit the application.
-	if(m_Input->IsKeyDown(VK_ESCAPE))
+	TIMED_SCOPE(inputBlkObj, "input time spend");
+	result = m_Input->Frame();
+	
+	if (!result)
 	{
 		return false;
 	}
 
-	if (mApplication->GetShouldQuit())
+	int x, y;
+	m_Input->GetMouseLocation(x,y);
+	std::cout << "x: " << x << std::endl;
+	std::cout << "y: " << y << std::endl;
+
+
+	// Check if the user pressed escape and wants to exit the application.
+	if(m_Input->IsEscapePressed())
 	{
+		LOG(INFO) << "User pressed escape. Exiting application";
 		return false;
 	}
+
+	if (mApplication->ShouldQuit())
+	{
+		LOG(INFO) << "Application requested quit. Exiting application";
+		return false;
+	}
+	
+	//PERFORMANCE_CHECKPOINT(inputBlkObj);
+
+	
+	mApplication->Tick();
+	mApplication->SceneTick(m_Input.get());
 
 
 	// Do the frame processing for the graphics object.
-	result = m_Graphics->Frame();
+	result = m_Graphics->Frame(mApplication->mpCurrentScene);
 	if(!result)
 	{
 		return false;
@@ -170,31 +204,7 @@ bool SystemClass::Frame()
 
 LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
-	switch(umsg)
-	{
-		// Check if a key has been pressed on the keyboard.
-		case WM_KEYDOWN:
-		{
-			// If a key is pressed send it to the input object so it can record that state.
-			m_Input->KeyDown((unsigned int)wparam);
-			return 0;
-		}
-
-		// Check if a key has been released on the keyboard.
-		case WM_KEYUP:
-		{
-			// If a key is released then send it to the input object so it can unset the state for that key.
-			m_Input->KeyUp((unsigned int)wparam);
-			return 0;
-		}
-
-
-		// Any other messages send to the default message handler as our application won't make use of them.
-		default:
-		{
-			return DefWindowProc(hwnd, umsg, wparam, lparam);
-		}
-	}
+	return DefWindowProc(hwnd, umsg, wparam, lparam);
 }
 
 
@@ -274,7 +284,7 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	SetFocus(m_hwnd);
 
 	// Hide the mouse cursor.
-	ShowCursor(false);
+	ShowCursor(true);
 
 	return;
 }
@@ -323,6 +333,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 			PostQuitMessage(0);		
 			return 0;
 		}
+
 
 		// All other messages pass to the message handler in the system class.
 		default:

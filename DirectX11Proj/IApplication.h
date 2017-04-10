@@ -3,6 +3,8 @@
 class IScene;
 class SystemClass;
 
+#include "inputclass.h"
+
 // Application context struct maybe
 // information about the application(size of window, name of window etc)
 class IApplication
@@ -17,14 +19,14 @@ public:
 	virtual void Tick() = 0;
 	virtual void Destroy() = 0;
 
-	bool GetShouldQuit();
+	bool ShouldQuit();
+
+	void LoadScene(IScene* aScene);
 
 private:
-	void SceneTick();
-	void SetCurrentScene(IScene* aScene);
+	void SceneTick(InputClass* const aInput);
+	IScene* mpCurrentScene;
 
-	IScene* currentScene;
-
-	bool shouldQuit = false;
+	bool mShouldQuit = false;
 };
 

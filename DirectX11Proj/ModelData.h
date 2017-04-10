@@ -5,6 +5,7 @@ using namespace DirectX;
 
 #include <vector>
 
+
 struct VertexData
 {
 	XMFLOAT3 position;
@@ -14,9 +15,17 @@ struct VertexData
 	XMFLOAT3 tangent;
 };
 
-struct ModelData
+struct TextureData
+{
+	std::string filepath;
+};
+
+struct MeshData
 {
 	// Vertices, indices
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;
+
+	std::string textureFilePath;
+
 };

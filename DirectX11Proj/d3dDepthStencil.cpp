@@ -12,6 +12,7 @@ d3dDepthStencil::~d3dDepthStencil()
 {
 }
 
+
 ID3D11Texture2D* const d3dDepthStencil::GetDepthTexture() 
 {
 	assert(mDepthStencilBufferTexture.Get() != nullptr);

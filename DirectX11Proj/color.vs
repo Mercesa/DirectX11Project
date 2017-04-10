@@ -1,3 +1,6 @@
+Texture2D shaderTexture;
+SamplerState SampleType;
+
 cbuffer MatrixBuffer
 {
 	matrix worldMatrix;
@@ -8,13 +11,16 @@ cbuffer MatrixBuffer
 struct VertexInputType
 {
     float4 position : POSITION;
-    float4 color : COLOR;
+    float2 uv : TEXCOORD0;
+	float3 normal : NORMAL;
+	float3 bitang : BITANGENT;
+	float3 tangent : TANGENT;
 };
 
 struct PixelInputType
 {
     float4 position : SV_POSITION;
-    float4 color : COLOR;
+    float2 uv : TEXCOORD0;
 };
 
 PixelInputType ColorVertexShader(VertexInputType input)
@@ -29,14 +35,13 @@ PixelInputType ColorVertexShader(VertexInputType input)
     output.position = mul(input.position, worldMatrix);
     output.position = mul(output.position, viewMatrix);
     output.position = mul(output.position, projectionMatrix);
-    
-	// Store the input color for the pixel shader to use.
-    output.color = input.color;
-    
+        
+	output.uv = input.uv;
+
     return output;
 }
 
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-    return input.color;
+    return float4(input.uv.x, input.uv.y, 0.0, 1.0);
 }

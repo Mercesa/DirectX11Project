@@ -14,7 +14,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterState;
 
 private:
-	ID3D11Device* const mPDevice;
-	ID3D11DeviceContext* const mPDeviceContext;
+	ID3D11Device* const mpDevice;
+	ID3D11DeviceContext* const mpDeviceContext;
 };
 

@@ -23,8 +23,11 @@ public:
 	void Render();
 	void GetViewMatrix(XMMATRIX&);
 
-private:
 	float m_positionX, m_positionY, m_positionZ;
+
+	XMFLOAT3 up, position, lookAt;
+
+private:
 	float m_rotationX, m_rotationY, m_rotationZ;
 	XMMATRIX m_viewMatrix;
 };

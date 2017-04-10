@@ -44,17 +44,17 @@ public:
 
 private:
 	bool m_vsync_enabled;
-	Microsoft::WRL::ComPtr<ID3D11Device> m_device;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_deviceContext;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_renderTargetView;
+	Microsoft::WRL::ComPtr<ID3D11Device> mpDevice;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> mpDeviceContext;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mpRenderTargetView;
 
-	XMMATRIX m_projectionMatrix;
-	XMMATRIX m_worldMatrix;
-	XMMATRIX m_orthoMatrix;
+	XMMATRIX mProjectionmatrix;
+	XMMATRIX mWorldMatrix;
+	XMMATRIX mOrthoMatrix;
 
-	std::unique_ptr<d3dSwapchain> mSwapChain;
-	std::unique_ptr<d3dDepthStencil> mDepthStencil;
-	std::unique_ptr<d3dRasterizerState> mRasterizerState;
+	std::unique_ptr<d3dSwapchain> mpSwapChain;
+	std::unique_ptr<d3dDepthStencil> mpDepthStencil;
+	std::unique_ptr<d3dRasterizerState> mpRasterizerState;
 };
 
 #endif

@@ -7,6 +7,9 @@
 #include "d3dSwapchain.h"
 #include "d3dDepthStencil.h"
 #include "d3dRasterizerState.h"
+
+#include "easylogging++.h"
+
 D3DClass::D3DClass()
 {
 }
@@ -46,35 +49,37 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	md3dDXGIManager->Create(screenWidth, screenHeight, numerator, denominator);
 
 	featureLevel = D3D_FEATURE_LEVEL_11_0;
-	result = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, creationFlags, 0, 0, D3D11_SDK_VERSION, &m_device, &featureLevel, &m_deviceContext);
+	result = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, creationFlags, 0, 0, D3D11_SDK_VERSION, &mpDevice, &featureLevel, &mpDeviceContext);
 
 	if (FAILED(result))
 	{
-		std::cout << "device failed creation" << std::endl;
+		LOG(ERROR) << "device failed creation";
 		return false;
 	}
 
-	mSwapChain = std::make_unique<d3dSwapchain>(md3dDXGIManager->GetFactory(), this->m_device.Get());
+	mpSwapChain = std::make_unique<d3dSwapchain>(md3dDXGIManager->GetFactory(), this->mpDevice.Get());
 	
-	bool swapChainCreationResult = mSwapChain->Create(screenWidth, screenHeight, numerator, screenHeight, m_vsync_enabled, fullscreen, hwnd);
+	bool swapChainCreationResult = mpSwapChain->Create(screenWidth, screenHeight, numerator, screenHeight, m_vsync_enabled, fullscreen, hwnd);
 
 	if (!swapChainCreationResult)
 	{
-		std::cout << "swapchain failed creation" << std::endl;
+		LOG(ERROR) << "swapchain failed creation";
 		return false;
 	}
 	
 	// Get the pointer to the back buffer.
-	result = mSwapChain->GetSwapChainPtr()->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
+	result = mpSwapChain->GetSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
 	{
+		LOG(ERROR) << "failed to get back buffer ptr from swapchain";
 		return false;
 	}
 
 	// Create the render target view with the back buffer pointer.
-	result = m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_renderTargetView);
+	result = mpDevice->CreateRenderTargetView(backBufferPtr, NULL, &mpRenderTargetView);
 	if (FAILED(result))
 	{
+		LOG(ERROR) << "failed to create render target view";
 		return false;
 	}
 
@@ -83,18 +88,18 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	backBufferPtr = 0;
 	
 
-	mDepthStencil = std::make_unique<d3dDepthStencil>(m_device.Get(), m_deviceContext.Get());
+	mpDepthStencil = std::make_unique<d3dDepthStencil>(mpDevice.Get(), mpDeviceContext.Get());
 
-	mDepthStencil->Create(screenWidth, screenHeight);
+	mpDepthStencil->Create(screenWidth, screenHeight);
 
 	// Set the depth stencil state.
-	m_deviceContext->OMSetDepthStencilState(mDepthStencil->GetDepthStencilState(), 1);
+	mpDeviceContext->OMSetDepthStencilState(mpDepthStencil->GetDepthStencilState(), 1);
 
 	// Bind the render target view and depth stencil buffer to the output render pipeline.
-	m_deviceContext->OMSetRenderTargets(1, m_renderTargetView.GetAddressOf(), mDepthStencil->GetDepthStencilView());
+	mpDeviceContext->OMSetRenderTargets(1, mpRenderTargetView.GetAddressOf(), mpDepthStencil->GetDepthStencilView());
 
-	mRasterizerState = std::make_unique<d3dRasterizerState>(m_device.Get(), m_deviceContext.Get());
-	mRasterizerState->Create();
+	mpRasterizerState = std::make_unique<d3dRasterizerState>(mpDevice.Get(), mpDeviceContext.Get());
+	mpRasterizerState->Create();
 
 	if (FAILED(result))
 	{
@@ -102,7 +107,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	}
 
 	// Now set the rasterizer state.
-	m_deviceContext->RSSetState(mRasterizerState->m_rasterState.Get());
+	mpDeviceContext->RSSetState(mpRasterizerState->m_rasterState.Get());
 
 	// Setup the viewport for rendering.
 	viewport.Width = (float)screenWidth;
@@ -113,20 +118,20 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	viewport.TopLeftY = 0.0f;
 
 	// Create the viewport.
-	m_deviceContext->RSSetViewports(1, &viewport);
+	mpDeviceContext->RSSetViewports(1, &viewport);
 
 	// Setup the projection matrix.
 	fieldOfView = 3.141592654f / 4.0f;
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
 	// Create the projection matrix for 3D rendering.
-	m_projectionMatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
+	mProjectionmatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
 
 	// Initialize the world matrix to the identity matrix.
-	m_worldMatrix = XMMatrixIdentity();
+	mWorldMatrix = XMMatrixMultiply(XMMatrixIdentity(), XMMatrixScaling(0.1f, 0.1f, 0.1f));
 
 	// Create an orthographic projection matrix for 2D rendering.
-	m_orthoMatrix = XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
+	mOrthoMatrix = XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 
 	return true;
 }
@@ -135,12 +140,12 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 void D3DClass::Shutdown()
 {
 	// Before shutting down set to windowed mode or when you release the swap chain it will throw an exception.
-	mSwapChain->Shutdown();
+	mpSwapChain->Shutdown();
 
 
-	m_renderTargetView.Reset();
-	m_deviceContext.Reset();
-	m_device.Reset();
+	mpRenderTargetView.Reset();
+	mpDeviceContext.Reset();
+	mpDevice.Reset();
 
 	return;
 }
@@ -157,10 +162,10 @@ void D3DClass::BeginScene(float red, float green, float blue, float alpha)
 	color[3] = alpha;
 
 	// Clear the back buffer.
-	m_deviceContext->ClearRenderTargetView(m_renderTargetView.Get(), color);
+	mpDeviceContext->ClearRenderTargetView(mpRenderTargetView.Get(), color);
 
 	// Clear the depth buffer.
-	m_deviceContext->ClearDepthStencilView(mDepthStencil->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+	mpDeviceContext->ClearDepthStencilView(mpDepthStencil->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	return;
 }
@@ -168,38 +173,38 @@ void D3DClass::BeginScene(float red, float green, float blue, float alpha)
 
 void D3DClass::EndScene()
 {
-	mSwapChain->Swap(m_vsync_enabled);
+	mpSwapChain->Swap(m_vsync_enabled);
 }
 
 
 ID3D11Device* D3DClass::GetDevice()
 {
-	return m_device.Get();
+	return mpDevice.Get();
 }
 
 
 ID3D11DeviceContext* D3DClass::GetDeviceContext()
 {
-	return m_deviceContext.Get();
+	return mpDeviceContext.Get();
 }
 
 
 void D3DClass::GetProjectionMatrix(XMMATRIX& projectionMatrix)
 {
-	projectionMatrix = m_projectionMatrix;
+	projectionMatrix = mProjectionmatrix;
 	return;
 }
 
 
 void D3DClass::GetWorldMatrix(XMMATRIX& worldMatrix)
 {
-	worldMatrix = m_worldMatrix;
+	worldMatrix = mWorldMatrix;
 	return;
 }
 
 
 void D3DClass::GetOrthoMatrix(XMMATRIX& orthoMatrix)
 {
-	orthoMatrix = m_orthoMatrix;
+	orthoMatrix = mOrthoMatrix;
 	return;
 }
