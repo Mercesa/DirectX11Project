@@ -206,6 +206,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="color.vs" />
+    <None Include="texture.vs" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

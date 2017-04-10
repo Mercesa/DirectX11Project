@@ -2,9 +2,11 @@
 
 #include <iostream>
 
+#include "easylogging++.h"
 
 #include "IScene.h"
 #include "systemclass.h"
+
 
 
 IApplication::IApplication() : mShouldQuit(false)
@@ -18,23 +20,24 @@ IApplication::~IApplication()
 }
 
 // Setting the current scene also initializes it
-void IApplication::LoadScene(std::unique_ptr<IScene> aScene)
+void IApplication::LoadScene(std::unique_ptr<IScene> apScene)
 {
-	assert(aScene != nullptr);
+	assert(apScene != nullptr);
 
-	if (aScene == nullptr)
+	if (apScene == nullptr)
 	{
 		std::cout << "Can not set a nullptr as current scene!" << std::endl;
 		return;
 	}
 
+	// Delete scene last used.
 	if (mpCurrentScene != nullptr)
 	{
-		std::cout << "There is already a scene loaded!" << std::endl;
-		return;
+		mpCurrentScene.release();
 	}
 
-	this->mpCurrentScene = std::move(aScene);
+	mpCurrentScene = std::move(apScene);;
+
 	if (!mpCurrentScene->HasBeenInitialized())
 	{
 		mpCurrentScene->Init();

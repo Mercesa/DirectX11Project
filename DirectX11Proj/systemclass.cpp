@@ -3,7 +3,7 @@
 #include <fcntl.h>
 
 #include "easylogging++.h"
-
+#include "ResourceManager.h"
 
 SystemClass::SystemClass()
 {
@@ -100,6 +100,8 @@ bool SystemClass::Initialize()
 void SystemClass::Shutdown()
 {
 	// Release the graphics object.
+	ResourceManager::getInstance().Shutdown();
+
 	m_Graphics->Shutdown();
 	mApplication->Destroy();
 	

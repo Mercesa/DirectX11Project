@@ -90,11 +90,11 @@
     <ClCompile Include="d3dTexture.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
-    <ClCompile Include="textureshaderclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="textureshaderclass.cpp">
+      <Filter>D3DSetup</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -171,11 +171,14 @@
       <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="textureshaderclass.h">
-      <Filter>Header Files</Filter>
+      <Filter>D3DSetup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="color.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="texture.vs">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

@@ -8,6 +8,7 @@
 #include "cameraclass.h"
 #include "modelclass.h"
 #include "colorshaderclass.h"
+#include "textureshaderclass.h"
 
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
@@ -33,6 +34,7 @@ private:
 private:
 	std::unique_ptr<D3DClass> mpDirect3D;
 	std::unique_ptr<ColorShaderClass> m_ColorShader;
+	std::unique_ptr<textureshaderclass> mTextureShader;
 };
-
+	
 #endif

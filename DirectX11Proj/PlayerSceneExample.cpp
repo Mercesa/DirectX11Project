@@ -14,7 +14,7 @@ PlayerSceneExample::~PlayerSceneExample()
 {
 }
 
-void PlayerSceneExample::Tick(InputClass* const aInput)
+void PlayerSceneExample::Tick(InputClass* const apInput)
 {
 	//throw std::logic_error("The method or operation is not implemented.");
 	static int x = 0;
@@ -22,21 +22,21 @@ void PlayerSceneExample::Tick(InputClass* const aInput)
 
 	int mouseRelX = 0;
 	int mouseRelY = 0;
-	aInput->GetMouseRelLocation(mouseRelX, mouseRelY);
+	apInput->GetMouseRelLocation(mouseRelX, mouseRelY);
 
 	x += mouseRelX;
 	y += mouseRelY;
 
 	mCamera->SetRotation(y, x, 0);
 
-	if (aInput->mKeyboardState[DIK_W] & 0x80)
+	if (apInput->mKeyboardState[DIK_W] & 0x80)
 	{
 		mCamera->m_positionX += mCamera->lookAt.x;
 		mCamera->m_positionY += mCamera->lookAt.y;
 		mCamera->m_positionZ += mCamera->lookAt.z;
 	}
 
-	if (aInput->mKeyboardState[DIK_S] & 0x80)
+	if (apInput->mKeyboardState[DIK_S] & 0x80)
 	{
 		mCamera->m_positionX -= mCamera->lookAt.x;
 		mCamera->m_positionY -= mCamera->lookAt.y;
@@ -52,9 +52,9 @@ void PlayerSceneExample::Init()
 
 	for (int i = 0; i < tModels.size(); ++i)
 	{
-		std::shared_ptr<ObjectExample> tObject = std::make_shared<ObjectExample>();
+		std::unique_ptr<ObjectExample> tObject = std::make_unique<ObjectExample>();
 		tObject->mpModel = tModels[i];
-		this->mObjects.push_back(tObject);
+		this->mObjects.push_back(std::move(tObject));
 	}
 
 	//throw std::logic_error("The method or operation is not implemented.");

@@ -7,8 +7,9 @@
 #include <string>
 
 #include "ModelLoader.h"
+#include "d3dTexture.h"
 class ModelClass;
-class d3dTexture;
+
 
 class ResourceManager
 {
@@ -17,7 +18,8 @@ public:
 	
 	ResourceManager(ResourceManager const&) = delete;
 	void operator=(ResourceManager const&)	= delete;
-	
+
+	void Shutdown();
 
 	static ResourceManager& getInstance()
 	{
@@ -35,8 +37,8 @@ private:
 	ID3D11Device* mpDevice;
 
 	// Turn these into maps at one point
-	std::vector<std::shared_ptr<ModelClass>> mLoadedModels;
-	std::vector<std::shared_ptr<d3dTexture>> mLoadedTextures;
+	std::vector<std::unique_ptr<ModelClass>> mLoadedModels;
+	std::vector<std::unique_ptr<d3dTexture>> mLoadedTextures;
 
 	// Load models as one
 	// Load models as a list

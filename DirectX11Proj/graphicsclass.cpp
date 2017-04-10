@@ -5,12 +5,13 @@
 #include "ModelLoader.h"
 #include "ModelData.h"
 #include "ResourceManager.h"
-
+#include "d3dTexture.h"
 
 GraphicsClass::GraphicsClass()
 {
 	mpDirect3D = 0;
 	m_ColorShader = 0;
+	mTextureShader = 0;
 }
 
 
@@ -61,6 +62,22 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
+
+	// Create the color shader object.
+	mTextureShader = std::make_unique<textureshaderclass>();
+	if (!mTextureShader)
+	{
+		return false;
+	}
+	
+	// Initialize the color shader object.
+	result = mTextureShader->Initialize(mpDirect3D->GetDevice(), hwnd);
+	if (!result)
+	{
+		MessageBox(hwnd, L"Could not initialize the texture shader object.", L"Error", MB_OK);
+		return false;
+	}
+
 	return true;
 }
 
@@ -68,7 +85,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 void GraphicsClass::Shutdown()
 {
 	
-	m_ColorShader->Shutdown();	
+	m_ColorShader->Shutdown();
+	mTextureShader->Shutdown();
 	mpDirect3D->Shutdown();
 	
 	return;
@@ -117,13 +135,18 @@ bool GraphicsClass::Render(IScene *const aScene)
 	{
 		//std::cout << i << std::endl;
 		aScene->mObjects[i]->mpModel->Render(mpDirect3D->GetDeviceContext());
-		result = m_ColorShader->Render(mpDirect3D->GetDeviceContext(), aScene->mObjects[i]->mpModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+
+		if (aScene->mObjects[i]->mpModel->mHastexture)
+		{
+			mTextureShader->Render(mpDirect3D->GetDeviceContext(), aScene->mObjects[i]->mpModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, aScene->mObjects[i]->mpModel->mpTexture->GetTexture());
+		}
+
+		else
+		{
+			result = m_ColorShader->Render(mpDirect3D->GetDeviceContext(), aScene->mObjects[i]->mpModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+		}
 	}
-	// Render the model using the color shader.
-	if (!result)
-	{
-		return false;
-	}
+
 
 	// Present the rendered scene to the screen.
 	mpDirect3D->EndScene();

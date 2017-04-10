@@ -23,12 +23,12 @@ public:
 
 	bool ShouldQuit();
 
-	void LoadScene(std::unique_ptr<IScene> aScene);
+	void LoadScene(std::unique_ptr<IScene> apScene);
 
 private:
-	void SceneTick(InputClass* const aInput);
+	void SceneTick(InputClass* const apInput);
 	std::unique_ptr<IScene> mpCurrentScene;
 
-	bool mShouldQuit = false;
+	bool mShouldQuit;
 };
 

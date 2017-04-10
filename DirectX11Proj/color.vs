@@ -1,5 +1,4 @@
-Texture2D shaderTexture;
-SamplerState SampleType;
+
 
 cbuffer MatrixBuffer
 {
@@ -43,5 +42,5 @@ PixelInputType ColorVertexShader(VertexInputType input)
 
 float4 ColorPixelShader(PixelInputType input) : SV_TARGET
 {
-    return shaderTexture.Sample(SampleType, input.uv);
+    return float4(input.uv.x, input.uv.y, 0.0, 1.0);
 }

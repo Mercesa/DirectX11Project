@@ -2,6 +2,7 @@
 
 #include <string>
 #include <iostream>
+#include <memory.h>
 
 #include "modelclass.h"
 #include "ModelData.h"
@@ -13,6 +14,12 @@ ResourceManager::ResourceManager()
 	mpModelLoader = std::make_unique<ModelLoader>();
 }
 
+void ResourceManager::Shutdown()
+{
+	this->mLoadedModels.clear();
+	this->mLoadedTextures.clear();
+}
+
 
 // TODO, create a function for model loader which just asks for the next model, this removes it from the model list
 std::vector<ModelClass*> ResourceManager::LoadModels(std::string aFilePath)
@@ -20,8 +27,8 @@ std::vector<ModelClass*> ResourceManager::LoadModels(std::string aFilePath)
 	mpModelLoader->LoadModel(aFilePath.c_str());
 	std::vector<ModelClass*> tModels;
 
-	std::shared_ptr<ModelClass> tModelClass = nullptr;
-	std::shared_ptr<d3dTexture> tTextureClass = nullptr;
+	std::unique_ptr<ModelClass> tModelClass = nullptr;
+	std::unique_ptr<d3dTexture> tTextureClass = nullptr;
 
 	const std::vector<MeshData>& tMeshes = mpModelLoader->GetMeshesToBeProcessed();
 
@@ -29,10 +36,10 @@ std::vector<ModelClass*> ResourceManager::LoadModels(std::string aFilePath)
 	{
 		const MeshData& tData = tMeshes[i];
 
-		tModelClass = std::make_shared<ModelClass>();
+		tModelClass = std::make_unique<ModelClass>();
 		tModelClass->Initialize(this->mpDevice, mpModelLoader->GetMeshesToBeProcessed()[i]);
 
-		tTextureClass = std::make_shared<d3dTexture>();
+		tTextureClass = std::make_unique<d3dTexture>();
 
 		// Convert string texture filepath to wstring
 	
@@ -49,7 +56,8 @@ std::vector<ModelClass*> ResourceManager::LoadModels(std::string aFilePath)
 		{
 			tModelClass->mpTexture = tTextureClass.get();
 			tModelClass->mHastexture = true;
-			mLoadedTextures.push_back(tTextureClass);
+			mLoadedTextures.push_back(std::move(tTextureClass));
+
 		}
 
 		tModels.push_back(tModelClass.get());
