@@ -18,7 +18,7 @@ public:
 	ModelClass(const ModelClass&);
 	~ModelClass();
 
-	bool Initialize(ID3D11Device*, const MeshData&);
+	bool Initialize(ID3D11Device* const apDevice, const MeshData& aMeshData);
 
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
@@ -30,10 +30,10 @@ public:
 	bool mHastexture = false;
 
 private:
-	bool InitializeBuffers(ID3D11Device*, const MeshData&);
+	bool InitializeBuffers(ID3D11Device* const apDevice, const MeshData& aMeshData);
 
 	void ShutdownBuffers();
-	void RenderBuffers(ID3D11DeviceContext*);
+	void RenderBuffers(ID3D11DeviceContext* const apDeviceContext);
 
 
 private:

@@ -26,12 +26,12 @@ public:
 	
 	bool HasBeenInitialized() { return mInitialized; }
 
-	CameraClass* const GetCamera() { return mCamera.get(); }
+	CameraClass* const GetCamera() { return mpCamera.get(); }
 
 protected:
-	std::unique_ptr<CameraClass> mCamera;
+	std::unique_ptr<CameraClass> mpCamera;
 
 private:
-	bool mInitialized = false;
+	bool mInitialized;
 };
 

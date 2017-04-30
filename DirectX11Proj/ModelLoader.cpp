@@ -21,10 +21,12 @@ ModelLoader::~ModelLoader()
 
 std::string mDirectory;
 
+
 void ModelLoader::ClearProcessedMeshes()
 {
 	this->mMeshesToBeProcessed.clear();
 }
+
 
 void ProcessVertices(aiMesh* const a_Mesh, std::vector<VertexData>& a_Vertices)
 {
@@ -98,18 +100,19 @@ const std::vector<MeshData>& ModelLoader::GetMeshesToBeProcessed()
 	return mMeshesToBeProcessed;
 }
 
+bool DoesMaterialHaveTextures(aiMaterial* const aMat, aiTextureType a_Type)
+{
+	// Check the amount of textures of a specific type
+	if ((aMat->GetTextureCount(a_Type)) <= 0)
+	{
+		return false;
+	}
+
+	return true;
+}
 
 std::string GetTextureLocation(aiMaterial* const a_Mat, aiTextureType a_Type)
 {
-	int count = 0;
-	// Check the amount of textures of a specific type
-	if ((count = a_Mat->GetTextureCount(a_Type)) <= 0)
-	{
-		std::cout << "no texture detected fam" << std::endl;
-		return "";
-	}
-
-
 	aiString str;
 	a_Mat->GetTexture(a_Type, 0, &str);
 
@@ -121,23 +124,39 @@ std::string GetTextureLocation(aiMaterial* const a_Mat, aiTextureType a_Type)
 
 	stString.append(".DDS");
 
-	std::cout << stString << std::endl;
 	return stString;
 }
 
+
 // Goes through the material
-TextureData ProcessMaterial(aiMesh* a_Mesh, const aiScene* a_Scene)
+void ProcessMaterial(aiMesh* a_Mesh, const aiScene* a_Scene, MeshData& aMeshdata)
 {
-	TextureData texDat;
+	// If we have a material
 	if (a_Mesh->mMaterialIndex > 0)
 	{
-		aiMaterial* material = a_Scene->mMaterials[a_Mesh->mMaterialIndex];
+		aiMaterial* const material = a_Scene->mMaterials[a_Mesh->mMaterialIndex];
 
-		texDat.filepath = GetTextureLocation(material, aiTextureType_DIFFUSE);
+		aMeshdata.diffuseData.isValid = DoesMaterialHaveTextures(material, aiTextureType_DIFFUSE);
+		aMeshdata.specularData.isValid = DoesMaterialHaveTextures(material, aiTextureType_SPECULAR);
+		aMeshdata.normalData.isValid = DoesMaterialHaveTextures(material, aiTextureType_HEIGHT);
 
-		bool textureSuccess = false;
+		if (aMeshdata.diffuseData.isValid)
+		{
+			aMeshdata.diffuseData.filepath = GetTextureLocation(material, aiTextureType_DIFFUSE);
+		}
+
+		if (aMeshdata.specularData.isValid)
+		{
+			aMeshdata.specularData.filepath = GetTextureLocation(material, aiTextureType_SPECULAR);
+		}
+
+		if (aMeshdata.normalData.isValid)
+		{
+			std::cout << "found normal map" << std::endl;
+			aMeshdata.normalData.filepath = GetTextureLocation(material, aiTextureType_HEIGHT);
+			
+		}
 	}
-	return texDat;
 }
 
 
@@ -151,14 +170,13 @@ void ModelLoader::ProcessMesh(aiMesh* const a_Mesh, const aiScene* const a_Scene
 	ProcessVertices(a_Mesh, vertices);
 	ProcessIndices(a_Mesh, indices);
 
-
-	TextureData textData = ProcessMaterial(a_Mesh, a_Scene);
-
-
 	MeshData meshData;
+
+	ProcessMaterial(a_Mesh, a_Scene, meshData);
+
+
 	meshData.vertices = vertices;
 	meshData.indices = indices;
-	meshData.textureFilePath = textData.filepath;
 
 
 	this->mMeshesToBeProcessed.push_back(meshData);

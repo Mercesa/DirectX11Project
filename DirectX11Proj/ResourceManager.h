@@ -8,8 +8,8 @@
 
 #include "ModelLoader.h"
 #include "d3dTexture.h"
-class ModelClass;
 
+class ModelClass;
 
 class ResourceManager
 {
@@ -21,7 +21,7 @@ public:
 
 	void Shutdown();
 
-	static ResourceManager& getInstance()
+	static ResourceManager& GetInstance()
 	{
 		static ResourceManager instance;
 

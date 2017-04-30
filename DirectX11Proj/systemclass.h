@@ -37,8 +37,8 @@ private:
 	HWND m_hwnd;
 
 	std::unique_ptr<InputClass> m_Input;
-	std::unique_ptr<GraphicsClass> m_Graphics;
-	std::unique_ptr<Application> mApplication;
+	std::unique_ptr<GraphicsClass> mpGraphics;
+	std::unique_ptr<Application> mpApplication;
 };
 
 

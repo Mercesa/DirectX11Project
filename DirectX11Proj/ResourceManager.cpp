@@ -16,10 +16,14 @@ ResourceManager::ResourceManager()
 
 void ResourceManager::Shutdown()
 {
-	this->mLoadedModels.clear();
-	this->mLoadedTextures.clear();
+	mLoadedModels.clear();
+	mLoadedTextures.clear();
 }
 
+void LoadTexturesFromMaterialData(const MeshData& aData)
+{
+
+}
 
 // TODO, create a function for model loader which just asks for the next model, this removes it from the model list
 std::vector<ModelClass*> ResourceManager::LoadModels(std::string aFilePath)
@@ -27,8 +31,8 @@ std::vector<ModelClass*> ResourceManager::LoadModels(std::string aFilePath)
 	mpModelLoader->LoadModel(aFilePath.c_str());
 	std::vector<ModelClass*> tModels;
 
-	std::unique_ptr<ModelClass> tModelClass = nullptr;
-	std::unique_ptr<d3dTexture> tTextureClass = nullptr;
+	std::unique_ptr<ModelClass> tpModelClass = nullptr;
+	std::unique_ptr<d3dTexture> tpTextureClass = nullptr;
 
 	const std::vector<MeshData>& tMeshes = mpModelLoader->GetMeshesToBeProcessed();
 
@@ -36,32 +40,30 @@ std::vector<ModelClass*> ResourceManager::LoadModels(std::string aFilePath)
 	{
 		const MeshData& tData = tMeshes[i];
 
-		tModelClass = std::make_unique<ModelClass>();
-		tModelClass->Initialize(this->mpDevice, mpModelLoader->GetMeshesToBeProcessed()[i]);
+		tpModelClass = std::make_unique<ModelClass>();
+		tpModelClass->Initialize(this->mpDevice, mpModelLoader->GetMeshesToBeProcessed()[i]);
 
-		tTextureClass = std::make_unique<d3dTexture>();
+		tpTextureClass = std::make_unique<d3dTexture>();
 
 		// Convert string texture filepath to wstring
 	
-		std::wstring wString = std::wstring(tData.textureFilePath.begin(), tData.textureFilePath.end());
+		std::wstring wString = std::wstring(tData.specularData.filepath.begin(), tData.specularData.filepath.end());
 		const WCHAR* result = wString.c_str();
 
-		// if the single textuer could not initialize
-		if (!tTextureClass->Initialize(mpDevice, result))
+		// if the single texture could not initialize
+		if (!tpTextureClass->Initialize(mpDevice, result))
 		{
-			LOG(WARNING) << "ModelLoading: Finished loading model " << aFilePath;
+			LOG(WARNING) << "ModelLoading: Texture could not initialize " << tData.specularData.filepath;
 		}
-
 		else
 		{
-			tModelClass->mpTexture = tTextureClass.get();
-			tModelClass->mHastexture = true;
-			mLoadedTextures.push_back(std::move(tTextureClass));
-
+			tpModelClass->mpTexture = tpTextureClass.get();
+			tpModelClass->mHastexture = tData.specularData.isValid;
+			mLoadedTextures.push_back(std::move(tpTextureClass));
 		}
 
-		tModels.push_back(tModelClass.get());
-		mLoadedModels.push_back(std::move(tModelClass));
+		tModels.push_back(tpModelClass.get());
+		mLoadedModels.push_back(std::move(tpModelClass));
 	}
 
 	mpModelLoader->ClearProcessedMeshes();

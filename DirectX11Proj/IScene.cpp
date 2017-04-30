@@ -3,9 +3,10 @@
 #include "IObject.h"
 
 // Create camera on creation of scene
-IScene::IScene() : mInitialized(false)
+IScene::IScene() 
+	: mInitialized(false)
 {
-	mCamera = std::make_unique<CameraClass>();
+	mpCamera = std::make_unique<CameraClass>();
 }
 
 

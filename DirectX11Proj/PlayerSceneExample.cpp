@@ -22,39 +22,39 @@ void PlayerSceneExample::Tick(InputClass* const apInput)
 
 	int mouseRelX = 0;
 	int mouseRelY = 0;
-	apInput->GetMouseRelLocation(mouseRelX, mouseRelY);
+	apInput->GetMouseRelativeLocation(mouseRelX, mouseRelY);
 
 	x += mouseRelX;
 	y += mouseRelY;
 
-	mCamera->SetRotation(y, x, 0);
+	mpCamera->SetRotation(y, x, 0);
 
 	if (apInput->mKeyboardState[DIK_W] & 0x80)
 	{
-		mCamera->m_positionX += mCamera->lookAt.x;
-		mCamera->m_positionY += mCamera->lookAt.y;
-		mCamera->m_positionZ += mCamera->lookAt.z;
+		mpCamera->m_positionX += mpCamera->lookAt.x;
+		mpCamera->m_positionY += mpCamera->lookAt.y;
+		mpCamera->m_positionZ += mpCamera->lookAt.z;
 	}
 
 	if (apInput->mKeyboardState[DIK_S] & 0x80)
 	{
-		mCamera->m_positionX -= mCamera->lookAt.x;
-		mCamera->m_positionY -= mCamera->lookAt.y;
-		mCamera->m_positionZ -= mCamera->lookAt.z;
+		mpCamera->m_positionX -= mpCamera->lookAt.x;
+		mpCamera->m_positionY -= mpCamera->lookAt.y;
+		mpCamera->m_positionZ -= mpCamera->lookAt.z;
 	}
 }
 
 void PlayerSceneExample::Init()
 {
-	mCamera->SetPosition(0.0f, 15.0f, 0.0f);
+	mpCamera->SetPosition(0.0f, 15.0f, 0.0f);
 	
-	std::vector<ModelClass*> tModels = ResourceManager::getInstance().LoadModels("Models\\Sponza\\Sponza.obj");
+	std::vector<ModelClass*> tModels = ResourceManager::GetInstance().LoadModels("Models\\Sponza\\Sponza.obj");
 
 	for (int i = 0; i < tModels.size(); ++i)
 	{
-		std::unique_ptr<ObjectExample> tObject = std::make_unique<ObjectExample>();
-		tObject->mpModel = tModels[i];
-		this->mObjects.push_back(std::move(tObject));
+		std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
+		tpObject->mpModel = tModels[i];
+		this->mObjects.push_back(std::move(tpObject));
 	}
 
 	//throw std::logic_error("The method or operation is not implemented.");

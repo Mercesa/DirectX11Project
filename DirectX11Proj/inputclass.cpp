@@ -243,7 +243,7 @@ void InputClass::GetMouseLocation(int& mouseX, int& mouseY)
 	mouseY = mMouseY;
 }
 
-void InputClass::GetMouseRelLocation(int& aX, int& aY)
+void InputClass::GetMouseRelativeLocation(int& aX, int& aY)
 {
 	aX = mMouseRelX;
 	aY = mMouseRelY;

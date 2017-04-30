@@ -159,6 +159,7 @@
     <ClCompile Include="d3dclass.cpp" />
     <ClCompile Include="d3dDepthStencil.cpp" />
     <ClCompile Include="d3dDXGIManager.cpp" />
+    <ClCompile Include="d3dMaterial.cpp" />
     <ClCompile Include="d3dRasterizerState.cpp" />
     <ClCompile Include="d3dSwapchain.cpp" />
     <ClCompile Include="d3dTexture.cpp" />
@@ -184,6 +185,7 @@
     <ClInclude Include="d3dclass.h" />
     <ClInclude Include="d3dDepthStencil.h" />
     <ClInclude Include="d3dDXGIManager.h" />
+    <ClInclude Include="d3dMaterial.h" />
     <ClInclude Include="d3dRasterizerState.h" />
     <ClInclude Include="d3dSwapchain.h" />
     <ClInclude Include="d3dTexture.h" />

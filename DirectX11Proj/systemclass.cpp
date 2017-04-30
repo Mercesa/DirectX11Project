@@ -8,7 +8,7 @@
 SystemClass::SystemClass()
 {
 	m_Input = 0;
-	m_Graphics = 0;
+	mpGraphics = 0;
 }
 
 
@@ -70,25 +70,25 @@ bool SystemClass::Initialize()
 	LOG(INFO) << "Created input class";
 
 	// Create the graphics object.  This object will handle rendering all the graphics for this application.
-	m_Graphics = std::make_unique<GraphicsClass>();
-	if(!m_Graphics)
+	mpGraphics = std::make_unique<GraphicsClass>();
+	if(!mpGraphics)
 	{
 		return false;
 	}
 
 	// Initialize the graphics object.
-	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
+	result = mpGraphics->Initialize(screenWidth, screenHeight, m_hwnd);
 	if(!result)
 	{
 		return false;
 	}
 
-	mApplication = std::make_unique<Application>();
-	if (!mApplication)
+	mpApplication = std::make_unique<Application>();
+	if (!mpApplication)
 	{
 		return false;
 	}
-	mApplication->Init();
+	mpApplication->Init();
 
 	LOG(INFO) << "Intialized graphics class";
 
@@ -100,10 +100,10 @@ bool SystemClass::Initialize()
 void SystemClass::Shutdown()
 {
 	// Release the graphics object.
-	ResourceManager::getInstance().Shutdown();
+	ResourceManager::GetInstance().Shutdown();
 
-	m_Graphics->Shutdown();
-	mApplication->Destroy();
+	mpGraphics->Shutdown();
+	mpApplication->Destroy();
 	
 	// Shutdown the window.
 	ShutdownWindows();
@@ -175,7 +175,7 @@ bool SystemClass::Frame()
 		return false;
 	}
 
-	if (mApplication->ShouldQuit())
+	if (mpApplication->ShouldQuit())
 	{
 		LOG(INFO) << "Application requested quit. Exiting application";
 		return false;
@@ -184,12 +184,12 @@ bool SystemClass::Frame()
 	//PERFORMANCE_CHECKPOINT(inputBlkObj);
 
 	
-	mApplication->Tick();
-	mApplication->SceneTick(m_Input.get());
+	mpApplication->Tick();
+	mpApplication->SceneTick(m_Input.get());
 
 
 	// Do the frame processing for the graphics object.
-	result = m_Graphics->Frame(mApplication->mpCurrentScene.get());
+	result = mpGraphics->Frame(mpApplication->mpCurrentScene.get());
 	if(!result)
 	{
 		return false;

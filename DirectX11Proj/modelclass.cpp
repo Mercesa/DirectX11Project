@@ -2,6 +2,7 @@
 
 #include "d3dVertexBuffer.h"
 #include "d3dclass.h"
+#include "d3dTexture.h"
 #include "ModelData.h"
 
 

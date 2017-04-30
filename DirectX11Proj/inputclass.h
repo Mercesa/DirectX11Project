@@ -22,7 +22,7 @@ public:
 
 	bool IsEscapePressed();
 	void GetMouseLocation(int&, int&);
-	void GetMouseRelLocation(int& aX, int& aY);
+	void GetMouseRelativeLocation(int& aX, int& aY);
 
 
 	unsigned char mKeyboardState[256];
