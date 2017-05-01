@@ -24,17 +24,39 @@ public:
 	void GetMouseLocation(int&, int&);
 	void GetMouseRelativeLocation(int& aX, int& aY);
 
+	void MouseMove(int aX, int aY)
+	{
+		mMouseRelX = aX - mMouseX;
+		mMouseRelY = aY - mMouseY;
+		mMouseX = aX;
+		mMouseY = aY;
+	}
 
-	unsigned char mKeyboardState[256];
+	void KeyDown(unsigned int input)
+	{
+		// If a key is pressed then save that state in the key array.
+		mKeys[input] = true;
+		return;
+	}
+
+
+	void KeyUp(unsigned int input)
+	{
+		// If a key is released then clear that state in the key array.
+		mKeys[input] = false;
+		return;
+	}
+
+
+	bool IsKeyDown(unsigned int key)
+	{
+		// Return what state the key is in (pressed/not pressed).
+		return mKeys[key];
+	}
+
 
 private:
-	bool ReadKeyboard();
-	bool ReadMouse();
 	void ProcessInput();
-
-	IDirectInput8* mpDirectInput;
-	IDirectInputDevice8* mpKeyboard;
-	IDirectInputDevice8* mpMouse;
 
 	DIMOUSESTATE mMouseState;
 
@@ -42,6 +64,7 @@ private:
 	int mMouseX, mMouseY;
 	int mMouseRelX, mMouseRelY;
 
+	bool mKeys[256];
 };
 
 #endif

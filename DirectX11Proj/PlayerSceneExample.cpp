@@ -4,7 +4,8 @@
 
 #include "ResourceManager.h"
 #include "ObjectExample.h"
-
+#include <windows.h>
+#include <fcntl.h>
 PlayerSceneExample::PlayerSceneExample()
 {
 }
@@ -28,15 +29,15 @@ void PlayerSceneExample::Tick(InputClass* const apInput)
 	y += mouseRelY;
 
 	mpCamera->SetRotation(y, x, 0);
-
-	if (apInput->mKeyboardState[DIK_W] & 0x80)
+	
+	if (apInput->IsKeyDown(0x53))
 	{
 		mpCamera->m_positionX += mpCamera->lookAt.x;
 		mpCamera->m_positionY += mpCamera->lookAt.y;
 		mpCamera->m_positionZ += mpCamera->lookAt.z;
 	}
 
-	if (apInput->mKeyboardState[DIK_S] & 0x80)
+	if (apInput->IsKeyDown(0x57))
 	{
 		mpCamera->m_positionX -= mpCamera->lookAt.x;
 		mpCamera->m_positionY -= mpCamera->lookAt.y;
