@@ -22,7 +22,7 @@ IApplication::~IApplication()
 // Setting the current scene also initializes it
 void IApplication::LoadScene(std::unique_ptr<IScene> apScene)
 {
-	assert(apScene != nullptr);
+	assert(apScene);
 
 	if (apScene == nullptr)
 	{
@@ -30,13 +30,7 @@ void IApplication::LoadScene(std::unique_ptr<IScene> apScene)
 		return;
 	}
 
-	// Delete scene last used.
-	if (mpCurrentScene != nullptr)
-	{
-		mpCurrentScene.release();
-	}
-
-	mpCurrentScene = std::move(apScene);;
+	mpCurrentScene = std::move(apScene);
 
 	if (!mpCurrentScene->HasBeenInitialized())
 	{

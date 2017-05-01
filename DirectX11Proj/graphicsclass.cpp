@@ -10,7 +10,7 @@
 GraphicsClass::GraphicsClass()
 {
 	mpDirect3D = 0;
-	m_ColorShader = 0;
+	mpColorShader = 0;
 	mTextureShader = 0;
 }
 
@@ -44,18 +44,18 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	ResourceManager::getInstance().mpDevice = mpDirect3D->GetDevice();
+	ResourceManager::GetInstance().mpDevice = mpDirect3D->GetDevice();
 
 
 	// Create the color shader object.
-	m_ColorShader = std::make_unique<ColorShaderClass>();
-	if (!m_ColorShader)
+	mpColorShader = std::make_unique<ColorShaderClass>();
+	if (!mpColorShader)
 	{
 		return false;
 	}
 
 	// Initialize the color shader object.
-	result = m_ColorShader->Initialize(mpDirect3D->GetDevice(), hwnd);
+	result = mpColorShader->Initialize(mpDirect3D->GetDevice(), hwnd);
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
@@ -85,11 +85,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 void GraphicsClass::Shutdown()
 {
 	
-	m_ColorShader->Shutdown();
+	mpColorShader->Shutdown();
 	mTextureShader->Shutdown();
 	mpDirect3D->Shutdown();
 	
-	return;
 }
 
 // Do culling
@@ -98,11 +97,11 @@ void GraphicsClass::Shutdown()
 // Create ambient occlussion
 // Render lighting on objects using the g-buffer
 // Apply post processing effects
-bool GraphicsClass::Frame(IScene *const aScene)
+bool GraphicsClass::Frame(IScene *const apScene)
 {
 	bool result;
 	static float f = 0.0f;
-	result = Render(aScene);
+	result = Render(apScene);
 	if(!result)
 	{
 		return false;
@@ -136,14 +135,14 @@ bool GraphicsClass::Render(IScene *const aScene)
 		//std::cout << i << std::endl;
 		aScene->mObjects[i]->mpModel->Render(mpDirect3D->GetDeviceContext());
 
-		if (aScene->mObjects[i]->mpModel->mHastexture)
+		if (aScene->mObjects[i]->mpModel->mMaterial->mpDiffuse->exists)
 		{
-			mTextureShader->Render(mpDirect3D->GetDeviceContext(), aScene->mObjects[i]->mpModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, aScene->mObjects[i]->mpModel->mpTexture->GetTexture());
+			mTextureShader->Render(mpDirect3D->GetDeviceContext(), aScene->mObjects[i]->mpModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, aScene->mObjects[i]->mpModel->mMaterial.get(), aScene->mLights, aScene->GetCamera()->GetPosition());
 		}
 
 		else
 		{
-			result = m_ColorShader->Render(mpDirect3D->GetDeviceContext(), aScene->mObjects[i]->mpModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
+			result = mpColorShader->Render(mpDirect3D->GetDeviceContext(), aScene->mObjects[i]->mpModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
 		}
 	}
 

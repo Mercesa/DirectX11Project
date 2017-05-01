@@ -7,6 +7,8 @@
 
 #include "cameraclass.h"
 #include "inputclass.h"
+#include "LightStruct.h"
+
 
 class IObject;
 
@@ -23,15 +25,16 @@ public:
 
 	// Just a bit lazy and turn it into a vector, will convert back to a list later
 	std::vector <std::unique_ptr<IObject>> mObjects;
+	std::vector <std::unique_ptr<Light>> mLights;
 	
 	bool HasBeenInitialized() { return mInitialized; }
 
-	CameraClass* const GetCamera() { return mCamera.get(); }
+	CameraClass* const GetCamera() { return mpCamera.get(); }
 
 protected:
-	std::unique_ptr<CameraClass> mCamera;
+	std::unique_ptr<CameraClass> mpCamera;
 
 private:
-	bool mInitialized = false;
+	bool mInitialized;
 };
 

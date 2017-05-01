@@ -8,8 +8,10 @@
 
 #include "ModelLoader.h"
 #include "d3dTexture.h"
-class ModelClass;
 
+class ModelClass;
+class d3dMaterial;
+struct TextureData;
 
 class ResourceManager
 {
@@ -21,7 +23,7 @@ public:
 
 	void Shutdown();
 
-	static ResourceManager& getInstance()
+	static ResourceManager& GetInstance()
 	{
 		static ResourceManager instance;
 
@@ -39,6 +41,9 @@ private:
 	// Turn these into maps at one point
 	std::vector<std::unique_ptr<ModelClass>> mLoadedModels;
 	std::vector<std::unique_ptr<d3dTexture>> mLoadedTextures;
+
+	std::unique_ptr<d3dMaterial> LoadTexturesFromMaterial(const MeshData& aMeshData);
+	std::unique_ptr<d3dTexture> LoadTexture(TextureData aData);
 
 	// Load models as one
 	// Load models as a list

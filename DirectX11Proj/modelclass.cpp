@@ -2,10 +2,13 @@
 
 #include "d3dVertexBuffer.h"
 #include "d3dclass.h"
+#include "d3dTexture.h"
+#include "d3dMaterial.h"
 #include "ModelData.h"
 
 
-ModelClass::ModelClass() : mpTexture(nullptr)
+ModelClass::ModelClass() 
+	: mMaterial(nullptr)
 {
 	mVertexBuffer = std::make_unique<d3dVertexBuffer>();
 	mIndexBuffer = std::make_unique<d3dVertexBuffer>();
