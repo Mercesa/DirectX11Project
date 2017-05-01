@@ -11,6 +11,8 @@ class d3dVertexBuffer;
 class d3dTexture;
 struct MeshData;
 
+class d3dMaterial;
+
 class ModelClass
 {
 public:
@@ -26,8 +28,7 @@ public:
 	int GetIndexCount();
 
 
-	d3dTexture* mpTexture;
-	bool mHastexture = false;
+	std::unique_ptr<d3dMaterial> mMaterial;
 
 private:
 	bool InitializeBuffers(ID3D11Device* const apDevice, const MeshData& aMeshData);

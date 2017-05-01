@@ -31,7 +31,7 @@ IDXGISwapChain* const d3dSwapchain::GetSwapChain()
 	// Can't return a swapchain that has no
 	if (mpSwapchain.Get() == nullptr)
 	{
-		assert(false | "TRYING TO OBTAIN EMPTY SWAPCHAIN");
+		assert(false);
 		return nullptr;
 	}
 

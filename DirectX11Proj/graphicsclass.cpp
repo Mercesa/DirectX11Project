@@ -135,9 +135,9 @@ bool GraphicsClass::Render(IScene *const aScene)
 		//std::cout << i << std::endl;
 		aScene->mObjects[i]->mpModel->Render(mpDirect3D->GetDeviceContext());
 
-		if (aScene->mObjects[i]->mpModel->mHastexture)
+		if (aScene->mObjects[i]->mpModel->mMaterial->mpDiffuse->exists)
 		{
-			mTextureShader->Render(mpDirect3D->GetDeviceContext(), aScene->mObjects[i]->mpModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, aScene->mObjects[i]->mpModel->mpTexture->GetTexture());
+			mTextureShader->Render(mpDirect3D->GetDeviceContext(), aScene->mObjects[i]->mpModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, aScene->mObjects[i]->mpModel->mMaterial.get(), aScene->mLights, aScene->GetCamera()->GetPosition());
 		}
 
 		else

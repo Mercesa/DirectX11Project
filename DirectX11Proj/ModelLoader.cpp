@@ -152,7 +152,6 @@ void ProcessMaterial(aiMesh* a_Mesh, const aiScene* a_Scene, MeshData& aMeshdata
 
 		if (aMeshdata.normalData.isValid)
 		{
-			std::cout << "found normal map" << std::endl;
 			aMeshdata.normalData.filepath = GetTextureLocation(material, aiTextureType_HEIGHT);
 			
 		}

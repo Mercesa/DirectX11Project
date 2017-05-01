@@ -3,7 +3,7 @@
 #include "easylogging++.h"
 #include <wrl.h>
 
-d3dTexture::d3dTexture()
+d3dTexture::d3dTexture() : exists(false)
 {
 }
 
@@ -23,9 +23,11 @@ bool d3dTexture::Initialize(ID3D11Device* const apDevice, const WCHAR* apFilepat
 
 	if (FAILED(result))
 	{
+		this->exists = false;
 		return false;
 	}
 
+	this->exists = true;
 	return true;
 
 }

@@ -93,11 +93,14 @@
     <ClCompile Include="textureshaderclass.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
-    <ClCompile Include="d3dMaterial.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ModelLoader.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dMaterial.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dConstantBuffer.cpp">
+      <Filter>D3DSetup</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -170,14 +173,23 @@
     <ClInclude Include="d3dTexture.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dMaterial.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dConstantBuffer.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="LightStruct.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
     <ClInclude Include="textureshaderclass.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
-    <ClInclude Include="d3dMaterial.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelLoader.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="ConstantBuffers.h">
+      <Filter>D3DSetup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -185,6 +197,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="texture.vs">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Lighting.hlsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

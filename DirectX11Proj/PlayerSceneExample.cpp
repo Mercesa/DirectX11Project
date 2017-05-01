@@ -57,6 +57,11 @@ void PlayerSceneExample::Init()
 		this->mObjects.push_back(std::move(tpObject));
 	}
 
+
+	std::unique_ptr<Light> tpLight = std::make_unique<Light>();
+	tpLight->colour = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	tpLight->position = XMFLOAT3(0.0f, 5.0f, 0.0f);
+	this->mLights.push_back(std::move(tpLight));
 	//throw std::logic_error("The method or operation is not implemented.");
 }
 

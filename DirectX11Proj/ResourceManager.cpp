@@ -7,7 +7,7 @@
 #include "modelclass.h"
 #include "ModelData.h"
 #include "d3dTexture.h"
-
+#include "d3dMaterial.h"
 #include "easylogging++.h"
 ResourceManager::ResourceManager()
 {
@@ -20,9 +20,35 @@ void ResourceManager::Shutdown()
 	mLoadedTextures.clear();
 }
 
-void LoadTexturesFromMaterialData(const MeshData& aData)
-{
 
+std::unique_ptr<d3dTexture> ResourceManager::LoadTexture(TextureData aData)
+{
+	// Convert string texture filepath to wstring
+	std::wstring wString = std::wstring(aData.filepath.begin(), aData.filepath.end());
+	const WCHAR* result = wString.c_str();
+
+	auto tpTextureClass = std::make_unique<d3dTexture>();
+	assert(tpTextureClass);
+	// if the single texture could not initialize
+	if (!tpTextureClass->Initialize(mpDevice, result))
+	{
+		LOG(WARNING) << "ModelLoading: Texture could not initialize " << aData.filepath;
+	}
+
+	return std::move(tpTextureClass);
+}
+
+std::unique_ptr<d3dMaterial> ResourceManager::LoadTexturesFromMaterial(const MeshData& aMeshData)
+{
+	auto tpMat = std::make_unique<d3dMaterial>();
+
+	assert(tpMat);
+	tpMat->mpDiffuse = LoadTexture(aMeshData.diffuseData);
+	tpMat->mpSpecular = LoadTexture(aMeshData.specularData);
+	tpMat->mpNormal = LoadTexture(aMeshData.normalData);
+
+	return tpMat;
+	//mLoadedTextures.push_back(std::move(tpTextureClass));
 }
 
 // TODO, create a function for model loader which just asks for the next model, this removes it from the model list
@@ -41,26 +67,8 @@ std::vector<ModelClass*> ResourceManager::LoadModels(std::string aFilePath)
 		const MeshData& tData = tMeshes[i];
 
 		tpModelClass = std::make_unique<ModelClass>();
-		tpModelClass->Initialize(this->mpDevice, mpModelLoader->GetMeshesToBeProcessed()[i]);
-
-		tpTextureClass = std::make_unique<d3dTexture>();
-
-		// Convert string texture filepath to wstring
-	
-		std::wstring wString = std::wstring(tData.specularData.filepath.begin(), tData.specularData.filepath.end());
-		const WCHAR* result = wString.c_str();
-
-		// if the single texture could not initialize
-		if (!tpTextureClass->Initialize(mpDevice, result))
-		{
-			LOG(WARNING) << "ModelLoading: Texture could not initialize " << tData.specularData.filepath;
-		}
-		else
-		{
-			tpModelClass->mpTexture = tpTextureClass.get();
-			tpModelClass->mHastexture = tData.specularData.isValid;
-			mLoadedTextures.push_back(std::move(tpTextureClass));
-		}
+		tpModelClass->Initialize(this->mpDevice, tData);
+		tpModelClass->mMaterial = std::move(LoadTexturesFromMaterial(tData));
 
 		tModels.push_back(tpModelClass.get());
 		mLoadedModels.push_back(std::move(tpModelClass));
