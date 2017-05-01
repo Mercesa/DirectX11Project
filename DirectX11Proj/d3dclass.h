@@ -48,9 +48,9 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> mpDeviceContext;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mpRenderTargetView;
 
-	XMMATRIX mProjectionmatrix;
-	XMMATRIX mWorldMatrix;
-	XMMATRIX mOrthoMatrix;
+	XMFLOAT4X4  mProjectionmatrix;
+	XMFLOAT4X4  mWorldMatrix;
+	XMFLOAT4X4  mOrthoMatrix;
 
 	std::unique_ptr<d3dSwapchain> mpSwapChain;
 	std::unique_ptr<d3dDepthStencil> mpDepthStencil;

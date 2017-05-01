@@ -50,7 +50,7 @@ public:
 
 	bool Initialize(ID3D11Device*, HWND);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*, int, XMMATRIX&, XMMATRIX&, XMMATRIX&, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLights, XMFLOAT3 aCamPos);
+	bool Render(ID3D11DeviceContext*, int, const XMMATRIX&, const XMMATRIX&, const XMMATRIX&, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLights, XMFLOAT3 aCamPos);
 
 private:
 	bool InitializeShader(ID3D11Device*, HWND, WCHAR*);
@@ -58,7 +58,7 @@ private:
 
 	bool SetLightConstantBufferData(ID3D11DeviceContext* const aDeviceContext, std::vector<unique_ptr<Light>>& aLights);
 	bool SetMaterialConstantBufferData(ID3D11DeviceContext* const aDeviceContext, d3dMaterial* const aMaterial);
-	bool SetShaderParameters(ID3D11DeviceContext*, XMMATRIX&, XMMATRIX&, XMMATRIX&, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLights, XMFLOAT3 aCamPos);
+	bool SetShaderParameters(ID3D11DeviceContext*, const XMMATRIX&, const XMMATRIX&, const XMMATRIX&, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLights, XMFLOAT3 aCamPos);
 	void RenderShader(ID3D11DeviceContext*, int);
 
 	ID3D11VertexShader* mpVertexShader;

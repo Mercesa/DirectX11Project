@@ -20,7 +20,7 @@ public:
 	ModelClass(const ModelClass&);
 	~ModelClass();
 
-	bool Initialize(ID3D11Device* const apDevice, const MeshData& aMeshData);
+	bool Initialize(ID3D11Device* const apDevice, const MeshData& acMeshData);
 
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);

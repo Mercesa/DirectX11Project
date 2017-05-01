@@ -216,8 +216,8 @@
     <ClInclude Include="textureshaderclass.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="color.vs" />
-    <None Include="texture.vs" />
+    <None Include="color.hlsl" />
+    <None Include="texture.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Lighting.hlsl">

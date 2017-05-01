@@ -27,8 +27,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	result = System->Initialize();
 	if(result)
 	{
-		LOG(FATAL) << "System failed on initialization";
 		System->Run();
+	}
+
+	else
+	{
+		LOG(FATAL) << "System failed on initialization";
 	}
 
 	// Shutdown and release the system object.

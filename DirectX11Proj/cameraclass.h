@@ -29,7 +29,7 @@ public:
 
 private:
 	float m_rotationX, m_rotationY, m_rotationZ;
-	XMMATRIX m_viewMatrix;
+	XMFLOAT4X4 m_viewMatrix;
 };
 
 #endif

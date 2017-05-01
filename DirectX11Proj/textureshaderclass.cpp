@@ -26,7 +26,7 @@ bool textureshaderclass::Initialize(ID3D11Device* device, HWND hwnd)
 
 
 	// Initialize the vertex and pixel shaders.
-	result = InitializeShader(device, hwnd, L"texture.vs");
+	result = InitializeShader(device, hwnd, L"texture.hlsl");
 	if (!result)
 	{
 		return false;
@@ -95,8 +95,8 @@ void textureshaderclass::ShutdownShader()
 }
 
 
-bool textureshaderclass::Render(ID3D11DeviceContext* deviceContext, int indexCount, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix,
-	XMMATRIX& projectionMatrix, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLight, XMFLOAT3 aCamPos)
+bool textureshaderclass::Render(ID3D11DeviceContext* deviceContext, int indexCount, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix,
+	const XMMATRIX& projectionMatrix, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLight, XMFLOAT3 aCamPos)
 {
 	bool result;
 
@@ -364,8 +364,8 @@ bool textureshaderclass::SetMaterialConstantBufferData(ID3D11DeviceContext* cons
 	aDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &mpMaterialConstantBuffer);
 }
 
-bool textureshaderclass::SetShaderParameters(ID3D11DeviceContext* deviceContext, XMMATRIX& worldMatrix, XMMATRIX& viewMatrix,
-	XMMATRIX& projectionMatrix, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLight, XMFLOAT3 aCamPos)
+bool textureshaderclass::SetShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix,
+	const XMMATRIX& projectionMatrix, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLight, XMFLOAT3 aCamPos)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;

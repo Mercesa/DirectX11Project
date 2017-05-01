@@ -193,13 +193,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="color.vs">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="texture.vs">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Lighting.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="texture.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="color.hlsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

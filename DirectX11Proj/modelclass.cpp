@@ -28,12 +28,12 @@ ModelClass::~ModelClass()
 
 
 
-bool ModelClass::Initialize(ID3D11Device* aDevice, const MeshData& aMesh)
+bool ModelClass::Initialize(ID3D11Device* const apDevice, const MeshData& acMesh)
 {
 	bool result;
 
 	// Initialize the vertex and index buffers.
-	result = InitializeBuffers(aDevice, aMesh);
+	result = InitializeBuffers(apDevice, acMesh);
 	if (!result)
 	{
 		return false;

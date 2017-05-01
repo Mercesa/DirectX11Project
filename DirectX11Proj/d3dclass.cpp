@@ -125,13 +125,17 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
 	// Create the projection matrix for 3D rendering.
-	mProjectionmatrix = XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth);
-
+	XMStoreFloat4x4(&mProjectionmatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth));
 	// Initialize the world matrix to the identity matrix.
-	mWorldMatrix = XMMatrixMultiply(XMMatrixIdentity(), XMMatrixScaling(0.1f, 0.1f, 0.1f));
 
-	// Create an orthographic projection matrix for 2D rendering.
-	mOrthoMatrix = XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
+
+	XMMATRIX tIdentityMat = XMMatrixIdentity();
+	XMMATRIX tScaleMat = tScaleMat = XMMatrixScaling(0.1f, 0.1f, 0.1f);
+	
+	XMStoreFloat4x4(&mWorldMatrix, XMMatrixMultiply(tIdentityMat, tScaleMat));
+	
+	//Create an orthographic projection matrix for 2D rendering.
+	XMStoreFloat4x4(&mOrthoMatrix, XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth));
 
 	return true;
 }
@@ -191,20 +195,17 @@ ID3D11DeviceContext* D3DClass::GetDeviceContext()
 
 void D3DClass::GetProjectionMatrix(XMMATRIX& projectionMatrix)
 {
-	projectionMatrix = mProjectionmatrix;
-	return;
+	projectionMatrix = XMLoadFloat4x4(&mProjectionmatrix);
 }
 
 
 void D3DClass::GetWorldMatrix(XMMATRIX& worldMatrix)
 {
-	worldMatrix = mWorldMatrix;
-	return;
+	worldMatrix = XMLoadFloat4x4(&mWorldMatrix);
 }
 
 
 void D3DClass::GetOrthoMatrix(XMMATRIX& orthoMatrix)
 {
-	orthoMatrix = mOrthoMatrix;
-	return;
+	orthoMatrix = XMLoadFloat4x4(&mOrthoMatrix);
 }

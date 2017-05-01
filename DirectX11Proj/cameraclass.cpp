@@ -34,9 +34,10 @@ void CameraClass::SetPosition(float x, float y, float z)
 	return;
 }
 
-
+#include <iostream>
 void CameraClass::SetRotation(float x, float y, float z)
 {
+
 	m_rotationX = x;
 	m_rotationY = y;
 	m_rotationZ = z;
@@ -92,6 +93,15 @@ void CameraClass::Render()
 	yaw   = m_rotationY * 0.0174532925f;
 	roll  = m_rotationZ * 0.0174532925f;
 
+	if (pitch >= 7.8)
+	{
+		pitch = 7.8;
+	}
+	if (pitch <= 4.8)
+	{
+		pitch = 4.8;
+	}
+
 	// Create the rotation matrix from the yaw, pitch, and roll values.
 	rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
@@ -103,7 +113,7 @@ void CameraClass::Render()
 	lookAtVector = XMVectorAdd(positionVector, lookAtVector);
 
 	// Finally create the view matrix from the three updated vectors.
-	m_viewMatrix = XMMatrixLookAtLH(positionVector, lookAtVector, upVector);
+	XMStoreFloat4x4(&m_viewMatrix, XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
 
 	return;
 }
@@ -111,6 +121,5 @@ void CameraClass::Render()
 
 void CameraClass::GetViewMatrix(XMMATRIX& viewMatrix)
 {
-	viewMatrix = m_viewMatrix;
-	return;
+	viewMatrix = XMLoadFloat4x4(&m_viewMatrix);
 }

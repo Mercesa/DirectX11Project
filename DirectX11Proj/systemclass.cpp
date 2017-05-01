@@ -73,6 +73,7 @@ bool SystemClass::Initialize()
 	mpGraphics = std::make_unique<GraphicsClass>();
 	if(!mpGraphics)
 	{
+		MessageBox(m_hwnd, L"Could not create the graphics object.", L"error", MB_OK);
 		return false;
 	}
 
@@ -80,6 +81,7 @@ bool SystemClass::Initialize()
 	result = mpGraphics->Initialize(screenWidth, screenHeight, m_hwnd);
 	if(!result)
 	{
+		MessageBox(m_hwnd, L"Could not initialize the graphics object.", L"error", MB_OK);
 		return false;
 	}
 
@@ -202,6 +204,8 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam
 
 		m_Input->MouseMove(xPos, yPos);
 	}
+
+	
 
 		// Check if a key has been pressed on the keyboard.
 	case WM_KEYDOWN:

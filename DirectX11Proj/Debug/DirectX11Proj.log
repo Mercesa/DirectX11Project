@@ -1,4 +1,4 @@
-﻿  systemclass.cpp
+﻿  textureshaderclass.cpp
 c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
   c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51693): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
 c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
@@ -55,4 +55,661 @@ c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): w
   c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52073): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
 c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
   c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52082): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
+e:\github projects\directx11project\directx11proj\textureshaderclass.cpp(139): warning C4800: 'HRESULT': forcing value to bool 'true' or 'false' (performance warning)
+e:\github projects\directx11project\directx11proj\textureshaderclass.cpp(146): warning C4800: 'HRESULT': forcing value to bool 'true' or 'false' (performance warning)
+e:\github projects\directx11project\directx11proj\textureshaderclass.cpp(321): warning C4018: '<': signed/unsigned mismatch
+  systemclass.cpp
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51693): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51702): note: see previous definition of 'DXGI_STATUS_CLIPPED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(14): warning C4005: 'DXGI_STATUS_NO_REDIRECTION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51711): note: see previous definition of 'DXGI_STATUS_NO_REDIRECTION'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(15): warning C4005: 'DXGI_STATUS_NO_DESKTOP_ACCESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51720): note: see previous definition of 'DXGI_STATUS_NO_DESKTOP_ACCESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(16): warning C4005: 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51729): note: see previous definition of 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(17): warning C4005: 'DXGI_STATUS_MODE_CHANGED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51738): note: see previous definition of 'DXGI_STATUS_MODE_CHANGED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(18): warning C4005: 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51747): note: see previous definition of 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(21): warning C4005: 'DXGI_ERROR_INVALID_CALL': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51762): note: see previous definition of 'DXGI_ERROR_INVALID_CALL'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(22): warning C4005: 'DXGI_ERROR_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51771): note: see previous definition of 'DXGI_ERROR_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(23): warning C4005: 'DXGI_ERROR_MORE_DATA': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51780): note: see previous definition of 'DXGI_ERROR_MORE_DATA'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(24): warning C4005: 'DXGI_ERROR_UNSUPPORTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51789): note: see previous definition of 'DXGI_ERROR_UNSUPPORTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(25): warning C4005: 'DXGI_ERROR_DEVICE_REMOVED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51798): note: see previous definition of 'DXGI_ERROR_DEVICE_REMOVED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(26): warning C4005: 'DXGI_ERROR_DEVICE_HUNG': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51807): note: see previous definition of 'DXGI_ERROR_DEVICE_HUNG'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(27): warning C4005: 'DXGI_ERROR_DEVICE_RESET': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51817): note: see previous definition of 'DXGI_ERROR_DEVICE_RESET'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(28): warning C4005: 'DXGI_ERROR_WAS_STILL_DRAWING': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51826): note: see previous definition of 'DXGI_ERROR_WAS_STILL_DRAWING'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(29): warning C4005: 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51836): note: see previous definition of 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(30): warning C4005: 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51845): note: see previous definition of 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(31): warning C4005: 'DXGI_ERROR_DRIVER_INTERNAL_ERROR': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51855): note: see previous definition of 'DXGI_ERROR_DRIVER_INTERNAL_ERROR'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(32): warning C4005: 'DXGI_ERROR_NONEXCLUSIVE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51864): note: see previous definition of 'DXGI_ERROR_NONEXCLUSIVE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(33): warning C4005: 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51873): note: see previous definition of 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(34): warning C4005: 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51883): note: see previous definition of 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(35): warning C4005: 'DXGI_ERROR_REMOTE_OUTOFMEMORY': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51892): note: see previous definition of 'DXGI_ERROR_REMOTE_OUTOFMEMORY'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(917): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52097): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(918): warning C4005: 'D3D11_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52106): note: see previous definition of 'D3D11_ERROR_FILE_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(919): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52116): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(920): warning C4005: 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52125): note: see previous definition of 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): warning C4005: 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52073): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52082): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
+  modelclass.cpp
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51693): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51702): note: see previous definition of 'DXGI_STATUS_CLIPPED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(14): warning C4005: 'DXGI_STATUS_NO_REDIRECTION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51711): note: see previous definition of 'DXGI_STATUS_NO_REDIRECTION'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(15): warning C4005: 'DXGI_STATUS_NO_DESKTOP_ACCESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51720): note: see previous definition of 'DXGI_STATUS_NO_DESKTOP_ACCESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(16): warning C4005: 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51729): note: see previous definition of 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(17): warning C4005: 'DXGI_STATUS_MODE_CHANGED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51738): note: see previous definition of 'DXGI_STATUS_MODE_CHANGED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(18): warning C4005: 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51747): note: see previous definition of 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(21): warning C4005: 'DXGI_ERROR_INVALID_CALL': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51762): note: see previous definition of 'DXGI_ERROR_INVALID_CALL'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(22): warning C4005: 'DXGI_ERROR_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51771): note: see previous definition of 'DXGI_ERROR_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(23): warning C4005: 'DXGI_ERROR_MORE_DATA': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51780): note: see previous definition of 'DXGI_ERROR_MORE_DATA'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(24): warning C4005: 'DXGI_ERROR_UNSUPPORTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51789): note: see previous definition of 'DXGI_ERROR_UNSUPPORTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(25): warning C4005: 'DXGI_ERROR_DEVICE_REMOVED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51798): note: see previous definition of 'DXGI_ERROR_DEVICE_REMOVED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(26): warning C4005: 'DXGI_ERROR_DEVICE_HUNG': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51807): note: see previous definition of 'DXGI_ERROR_DEVICE_HUNG'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(27): warning C4005: 'DXGI_ERROR_DEVICE_RESET': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51817): note: see previous definition of 'DXGI_ERROR_DEVICE_RESET'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(28): warning C4005: 'DXGI_ERROR_WAS_STILL_DRAWING': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51826): note: see previous definition of 'DXGI_ERROR_WAS_STILL_DRAWING'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(29): warning C4005: 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51836): note: see previous definition of 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(30): warning C4005: 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51845): note: see previous definition of 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(31): warning C4005: 'DXGI_ERROR_DRIVER_INTERNAL_ERROR': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51855): note: see previous definition of 'DXGI_ERROR_DRIVER_INTERNAL_ERROR'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(32): warning C4005: 'DXGI_ERROR_NONEXCLUSIVE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51864): note: see previous definition of 'DXGI_ERROR_NONEXCLUSIVE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(33): warning C4005: 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51873): note: see previous definition of 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(34): warning C4005: 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51883): note: see previous definition of 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(35): warning C4005: 'DXGI_ERROR_REMOTE_OUTOFMEMORY': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51892): note: see previous definition of 'DXGI_ERROR_REMOTE_OUTOFMEMORY'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(917): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52097): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(918): warning C4005: 'D3D11_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52106): note: see previous definition of 'D3D11_ERROR_FILE_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(919): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52116): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(920): warning C4005: 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52125): note: see previous definition of 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): warning C4005: 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52073): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52082): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
+  inputclass.cpp
+e:\github projects\directx11project\directx11proj\inputclass.cpp(26): warning C4101: 'result': unreferenced local variable
+  graphicsclass.cpp
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51693): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51702): note: see previous definition of 'DXGI_STATUS_CLIPPED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(14): warning C4005: 'DXGI_STATUS_NO_REDIRECTION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51711): note: see previous definition of 'DXGI_STATUS_NO_REDIRECTION'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(15): warning C4005: 'DXGI_STATUS_NO_DESKTOP_ACCESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51720): note: see previous definition of 'DXGI_STATUS_NO_DESKTOP_ACCESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(16): warning C4005: 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51729): note: see previous definition of 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(17): warning C4005: 'DXGI_STATUS_MODE_CHANGED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51738): note: see previous definition of 'DXGI_STATUS_MODE_CHANGED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(18): warning C4005: 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51747): note: see previous definition of 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(21): warning C4005: 'DXGI_ERROR_INVALID_CALL': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51762): note: see previous definition of 'DXGI_ERROR_INVALID_CALL'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(22): warning C4005: 'DXGI_ERROR_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51771): note: see previous definition of 'DXGI_ERROR_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(23): warning C4005: 'DXGI_ERROR_MORE_DATA': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51780): note: see previous definition of 'DXGI_ERROR_MORE_DATA'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(24): warning C4005: 'DXGI_ERROR_UNSUPPORTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51789): note: see previous definition of 'DXGI_ERROR_UNSUPPORTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(25): warning C4005: 'DXGI_ERROR_DEVICE_REMOVED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51798): note: see previous definition of 'DXGI_ERROR_DEVICE_REMOVED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(26): warning C4005: 'DXGI_ERROR_DEVICE_HUNG': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51807): note: see previous definition of 'DXGI_ERROR_DEVICE_HUNG'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(27): warning C4005: 'DXGI_ERROR_DEVICE_RESET': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51817): note: see previous definition of 'DXGI_ERROR_DEVICE_RESET'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(28): warning C4005: 'DXGI_ERROR_WAS_STILL_DRAWING': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51826): note: see previous definition of 'DXGI_ERROR_WAS_STILL_DRAWING'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(29): warning C4005: 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51836): note: see previous definition of 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(30): warning C4005: 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51845): note: see previous definition of 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(31): warning C4005: 'DXGI_ERROR_DRIVER_INTERNAL_ERROR': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51855): note: see previous definition of 'DXGI_ERROR_DRIVER_INTERNAL_ERROR'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(32): warning C4005: 'DXGI_ERROR_NONEXCLUSIVE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51864): note: see previous definition of 'DXGI_ERROR_NONEXCLUSIVE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(33): warning C4005: 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51873): note: see previous definition of 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(34): warning C4005: 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51883): note: see previous definition of 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(35): warning C4005: 'DXGI_ERROR_REMOTE_OUTOFMEMORY': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51892): note: see previous definition of 'DXGI_ERROR_REMOTE_OUTOFMEMORY'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(917): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52097): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(918): warning C4005: 'D3D11_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52106): note: see previous definition of 'D3D11_ERROR_FILE_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(919): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52116): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(920): warning C4005: 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52125): note: see previous definition of 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): warning C4005: 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52073): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52082): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
+e:\github projects\directx11project\directx11proj\graphicsclass.cpp(133): warning C4018: '<': signed/unsigned mismatch
+c:\program files (x86)\microsoft visual studio 14.0\vc\include\memory(1630): warning C4316: 'D3DClass': object allocated on the heap may not be aligned 16
+  e:\github projects\directx11project\directx11proj\graphicsclass.cpp(33): note: see reference to function template instantiation 'std::unique_ptr<D3DClass,std::default_delete<_Ty>> std::make_unique<D3DClass,>(void)' being compiled
+          with
+          [
+              _Ty=D3DClass
+          ]
+  d3dTexture.cpp
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51693): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51702): note: see previous definition of 'DXGI_STATUS_CLIPPED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(14): warning C4005: 'DXGI_STATUS_NO_REDIRECTION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51711): note: see previous definition of 'DXGI_STATUS_NO_REDIRECTION'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(15): warning C4005: 'DXGI_STATUS_NO_DESKTOP_ACCESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51720): note: see previous definition of 'DXGI_STATUS_NO_DESKTOP_ACCESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(16): warning C4005: 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51729): note: see previous definition of 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(17): warning C4005: 'DXGI_STATUS_MODE_CHANGED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51738): note: see previous definition of 'DXGI_STATUS_MODE_CHANGED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(18): warning C4005: 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51747): note: see previous definition of 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(21): warning C4005: 'DXGI_ERROR_INVALID_CALL': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51762): note: see previous definition of 'DXGI_ERROR_INVALID_CALL'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(22): warning C4005: 'DXGI_ERROR_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51771): note: see previous definition of 'DXGI_ERROR_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(23): warning C4005: 'DXGI_ERROR_MORE_DATA': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51780): note: see previous definition of 'DXGI_ERROR_MORE_DATA'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(24): warning C4005: 'DXGI_ERROR_UNSUPPORTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51789): note: see previous definition of 'DXGI_ERROR_UNSUPPORTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(25): warning C4005: 'DXGI_ERROR_DEVICE_REMOVED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51798): note: see previous definition of 'DXGI_ERROR_DEVICE_REMOVED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(26): warning C4005: 'DXGI_ERROR_DEVICE_HUNG': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51807): note: see previous definition of 'DXGI_ERROR_DEVICE_HUNG'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(27): warning C4005: 'DXGI_ERROR_DEVICE_RESET': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51817): note: see previous definition of 'DXGI_ERROR_DEVICE_RESET'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(28): warning C4005: 'DXGI_ERROR_WAS_STILL_DRAWING': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51826): note: see previous definition of 'DXGI_ERROR_WAS_STILL_DRAWING'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(29): warning C4005: 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51836): note: see previous definition of 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(30): warning C4005: 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51845): note: see previous definition of 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(31): warning C4005: 'DXGI_ERROR_DRIVER_INTERNAL_ERROR': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51855): note: see previous definition of 'DXGI_ERROR_DRIVER_INTERNAL_ERROR'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(32): warning C4005: 'DXGI_ERROR_NONEXCLUSIVE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51864): note: see previous definition of 'DXGI_ERROR_NONEXCLUSIVE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(33): warning C4005: 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51873): note: see previous definition of 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(34): warning C4005: 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51883): note: see previous definition of 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(35): warning C4005: 'DXGI_ERROR_REMOTE_OUTOFMEMORY': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51892): note: see previous definition of 'DXGI_ERROR_REMOTE_OUTOFMEMORY'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(917): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52097): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(918): warning C4005: 'D3D11_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52106): note: see previous definition of 'D3D11_ERROR_FILE_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(919): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52116): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(920): warning C4005: 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52125): note: see previous definition of 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): warning C4005: 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52073): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52082): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
+  d3dSwapchain.cpp
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51693): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51702): note: see previous definition of 'DXGI_STATUS_CLIPPED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(14): warning C4005: 'DXGI_STATUS_NO_REDIRECTION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51711): note: see previous definition of 'DXGI_STATUS_NO_REDIRECTION'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(15): warning C4005: 'DXGI_STATUS_NO_DESKTOP_ACCESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51720): note: see previous definition of 'DXGI_STATUS_NO_DESKTOP_ACCESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(16): warning C4005: 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51729): note: see previous definition of 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(17): warning C4005: 'DXGI_STATUS_MODE_CHANGED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51738): note: see previous definition of 'DXGI_STATUS_MODE_CHANGED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(18): warning C4005: 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51747): note: see previous definition of 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(21): warning C4005: 'DXGI_ERROR_INVALID_CALL': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51762): note: see previous definition of 'DXGI_ERROR_INVALID_CALL'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(22): warning C4005: 'DXGI_ERROR_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51771): note: see previous definition of 'DXGI_ERROR_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(23): warning C4005: 'DXGI_ERROR_MORE_DATA': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51780): note: see previous definition of 'DXGI_ERROR_MORE_DATA'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(24): warning C4005: 'DXGI_ERROR_UNSUPPORTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51789): note: see previous definition of 'DXGI_ERROR_UNSUPPORTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(25): warning C4005: 'DXGI_ERROR_DEVICE_REMOVED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51798): note: see previous definition of 'DXGI_ERROR_DEVICE_REMOVED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(26): warning C4005: 'DXGI_ERROR_DEVICE_HUNG': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51807): note: see previous definition of 'DXGI_ERROR_DEVICE_HUNG'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(27): warning C4005: 'DXGI_ERROR_DEVICE_RESET': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51817): note: see previous definition of 'DXGI_ERROR_DEVICE_RESET'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(28): warning C4005: 'DXGI_ERROR_WAS_STILL_DRAWING': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51826): note: see previous definition of 'DXGI_ERROR_WAS_STILL_DRAWING'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(29): warning C4005: 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51836): note: see previous definition of 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(30): warning C4005: 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51845): note: see previous definition of 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(31): warning C4005: 'DXGI_ERROR_DRIVER_INTERNAL_ERROR': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51855): note: see previous definition of 'DXGI_ERROR_DRIVER_INTERNAL_ERROR'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(32): warning C4005: 'DXGI_ERROR_NONEXCLUSIVE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51864): note: see previous definition of 'DXGI_ERROR_NONEXCLUSIVE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(33): warning C4005: 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51873): note: see previous definition of 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(34): warning C4005: 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51883): note: see previous definition of 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(35): warning C4005: 'DXGI_ERROR_REMOTE_OUTOFMEMORY': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51892): note: see previous definition of 'DXGI_ERROR_REMOTE_OUTOFMEMORY'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(917): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52097): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(918): warning C4005: 'D3D11_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52106): note: see previous definition of 'D3D11_ERROR_FILE_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(919): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52116): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(920): warning C4005: 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52125): note: see previous definition of 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): warning C4005: 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52073): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52082): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
+  d3dMaterial.cpp
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51693): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51702): note: see previous definition of 'DXGI_STATUS_CLIPPED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(14): warning C4005: 'DXGI_STATUS_NO_REDIRECTION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51711): note: see previous definition of 'DXGI_STATUS_NO_REDIRECTION'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(15): warning C4005: 'DXGI_STATUS_NO_DESKTOP_ACCESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51720): note: see previous definition of 'DXGI_STATUS_NO_DESKTOP_ACCESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(16): warning C4005: 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51729): note: see previous definition of 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(17): warning C4005: 'DXGI_STATUS_MODE_CHANGED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51738): note: see previous definition of 'DXGI_STATUS_MODE_CHANGED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(18): warning C4005: 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51747): note: see previous definition of 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(21): warning C4005: 'DXGI_ERROR_INVALID_CALL': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51762): note: see previous definition of 'DXGI_ERROR_INVALID_CALL'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(22): warning C4005: 'DXGI_ERROR_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51771): note: see previous definition of 'DXGI_ERROR_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(23): warning C4005: 'DXGI_ERROR_MORE_DATA': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51780): note: see previous definition of 'DXGI_ERROR_MORE_DATA'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(24): warning C4005: 'DXGI_ERROR_UNSUPPORTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51789): note: see previous definition of 'DXGI_ERROR_UNSUPPORTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(25): warning C4005: 'DXGI_ERROR_DEVICE_REMOVED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51798): note: see previous definition of 'DXGI_ERROR_DEVICE_REMOVED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(26): warning C4005: 'DXGI_ERROR_DEVICE_HUNG': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51807): note: see previous definition of 'DXGI_ERROR_DEVICE_HUNG'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(27): warning C4005: 'DXGI_ERROR_DEVICE_RESET': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51817): note: see previous definition of 'DXGI_ERROR_DEVICE_RESET'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(28): warning C4005: 'DXGI_ERROR_WAS_STILL_DRAWING': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51826): note: see previous definition of 'DXGI_ERROR_WAS_STILL_DRAWING'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(29): warning C4005: 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51836): note: see previous definition of 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(30): warning C4005: 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51845): note: see previous definition of 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(31): warning C4005: 'DXGI_ERROR_DRIVER_INTERNAL_ERROR': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51855): note: see previous definition of 'DXGI_ERROR_DRIVER_INTERNAL_ERROR'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(32): warning C4005: 'DXGI_ERROR_NONEXCLUSIVE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51864): note: see previous definition of 'DXGI_ERROR_NONEXCLUSIVE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(33): warning C4005: 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51873): note: see previous definition of 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(34): warning C4005: 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51883): note: see previous definition of 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(35): warning C4005: 'DXGI_ERROR_REMOTE_OUTOFMEMORY': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51892): note: see previous definition of 'DXGI_ERROR_REMOTE_OUTOFMEMORY'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(917): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52097): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(918): warning C4005: 'D3D11_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52106): note: see previous definition of 'D3D11_ERROR_FILE_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(919): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52116): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(920): warning C4005: 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52125): note: see previous definition of 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): warning C4005: 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52073): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52082): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
+  d3dConstantBuffer.cpp
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51693): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51702): note: see previous definition of 'DXGI_STATUS_CLIPPED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(14): warning C4005: 'DXGI_STATUS_NO_REDIRECTION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51711): note: see previous definition of 'DXGI_STATUS_NO_REDIRECTION'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(15): warning C4005: 'DXGI_STATUS_NO_DESKTOP_ACCESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51720): note: see previous definition of 'DXGI_STATUS_NO_DESKTOP_ACCESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(16): warning C4005: 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51729): note: see previous definition of 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(17): warning C4005: 'DXGI_STATUS_MODE_CHANGED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51738): note: see previous definition of 'DXGI_STATUS_MODE_CHANGED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(18): warning C4005: 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51747): note: see previous definition of 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(21): warning C4005: 'DXGI_ERROR_INVALID_CALL': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51762): note: see previous definition of 'DXGI_ERROR_INVALID_CALL'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(22): warning C4005: 'DXGI_ERROR_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51771): note: see previous definition of 'DXGI_ERROR_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(23): warning C4005: 'DXGI_ERROR_MORE_DATA': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51780): note: see previous definition of 'DXGI_ERROR_MORE_DATA'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(24): warning C4005: 'DXGI_ERROR_UNSUPPORTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51789): note: see previous definition of 'DXGI_ERROR_UNSUPPORTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(25): warning C4005: 'DXGI_ERROR_DEVICE_REMOVED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51798): note: see previous definition of 'DXGI_ERROR_DEVICE_REMOVED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(26): warning C4005: 'DXGI_ERROR_DEVICE_HUNG': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51807): note: see previous definition of 'DXGI_ERROR_DEVICE_HUNG'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(27): warning C4005: 'DXGI_ERROR_DEVICE_RESET': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51817): note: see previous definition of 'DXGI_ERROR_DEVICE_RESET'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(28): warning C4005: 'DXGI_ERROR_WAS_STILL_DRAWING': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51826): note: see previous definition of 'DXGI_ERROR_WAS_STILL_DRAWING'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(29): warning C4005: 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51836): note: see previous definition of 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(30): warning C4005: 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51845): note: see previous definition of 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(31): warning C4005: 'DXGI_ERROR_DRIVER_INTERNAL_ERROR': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51855): note: see previous definition of 'DXGI_ERROR_DRIVER_INTERNAL_ERROR'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(32): warning C4005: 'DXGI_ERROR_NONEXCLUSIVE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51864): note: see previous definition of 'DXGI_ERROR_NONEXCLUSIVE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(33): warning C4005: 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51873): note: see previous definition of 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(34): warning C4005: 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51883): note: see previous definition of 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(35): warning C4005: 'DXGI_ERROR_REMOTE_OUTOFMEMORY': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51892): note: see previous definition of 'DXGI_ERROR_REMOTE_OUTOFMEMORY'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(917): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52097): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(918): warning C4005: 'D3D11_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52106): note: see previous definition of 'D3D11_ERROR_FILE_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(919): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52116): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(920): warning C4005: 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52125): note: see previous definition of 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): warning C4005: 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52073): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52082): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
+e:\github projects\directx11project\directx11proj\d3dconstantbuffer.cpp(21): warning C4101: 'hr': unreferenced local variable
+  ResourceManager.cpp
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51693): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51702): note: see previous definition of 'DXGI_STATUS_CLIPPED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(14): warning C4005: 'DXGI_STATUS_NO_REDIRECTION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51711): note: see previous definition of 'DXGI_STATUS_NO_REDIRECTION'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(15): warning C4005: 'DXGI_STATUS_NO_DESKTOP_ACCESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51720): note: see previous definition of 'DXGI_STATUS_NO_DESKTOP_ACCESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(16): warning C4005: 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51729): note: see previous definition of 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(17): warning C4005: 'DXGI_STATUS_MODE_CHANGED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51738): note: see previous definition of 'DXGI_STATUS_MODE_CHANGED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(18): warning C4005: 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51747): note: see previous definition of 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(21): warning C4005: 'DXGI_ERROR_INVALID_CALL': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51762): note: see previous definition of 'DXGI_ERROR_INVALID_CALL'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(22): warning C4005: 'DXGI_ERROR_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51771): note: see previous definition of 'DXGI_ERROR_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(23): warning C4005: 'DXGI_ERROR_MORE_DATA': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51780): note: see previous definition of 'DXGI_ERROR_MORE_DATA'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(24): warning C4005: 'DXGI_ERROR_UNSUPPORTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51789): note: see previous definition of 'DXGI_ERROR_UNSUPPORTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(25): warning C4005: 'DXGI_ERROR_DEVICE_REMOVED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51798): note: see previous definition of 'DXGI_ERROR_DEVICE_REMOVED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(26): warning C4005: 'DXGI_ERROR_DEVICE_HUNG': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51807): note: see previous definition of 'DXGI_ERROR_DEVICE_HUNG'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(27): warning C4005: 'DXGI_ERROR_DEVICE_RESET': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51817): note: see previous definition of 'DXGI_ERROR_DEVICE_RESET'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(28): warning C4005: 'DXGI_ERROR_WAS_STILL_DRAWING': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51826): note: see previous definition of 'DXGI_ERROR_WAS_STILL_DRAWING'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(29): warning C4005: 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51836): note: see previous definition of 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(30): warning C4005: 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51845): note: see previous definition of 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(31): warning C4005: 'DXGI_ERROR_DRIVER_INTERNAL_ERROR': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51855): note: see previous definition of 'DXGI_ERROR_DRIVER_INTERNAL_ERROR'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(32): warning C4005: 'DXGI_ERROR_NONEXCLUSIVE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51864): note: see previous definition of 'DXGI_ERROR_NONEXCLUSIVE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(33): warning C4005: 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51873): note: see previous definition of 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(34): warning C4005: 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51883): note: see previous definition of 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(35): warning C4005: 'DXGI_ERROR_REMOTE_OUTOFMEMORY': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51892): note: see previous definition of 'DXGI_ERROR_REMOTE_OUTOFMEMORY'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(917): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52097): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(918): warning C4005: 'D3D11_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52106): note: see previous definition of 'D3D11_ERROR_FILE_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(919): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52116): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(920): warning C4005: 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52125): note: see previous definition of 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): warning C4005: 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52073): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52082): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
+  PlayerSceneExample.cpp
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51693): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51702): note: see previous definition of 'DXGI_STATUS_CLIPPED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(14): warning C4005: 'DXGI_STATUS_NO_REDIRECTION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51711): note: see previous definition of 'DXGI_STATUS_NO_REDIRECTION'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(15): warning C4005: 'DXGI_STATUS_NO_DESKTOP_ACCESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51720): note: see previous definition of 'DXGI_STATUS_NO_DESKTOP_ACCESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(16): warning C4005: 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51729): note: see previous definition of 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(17): warning C4005: 'DXGI_STATUS_MODE_CHANGED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51738): note: see previous definition of 'DXGI_STATUS_MODE_CHANGED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(18): warning C4005: 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51747): note: see previous definition of 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(21): warning C4005: 'DXGI_ERROR_INVALID_CALL': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51762): note: see previous definition of 'DXGI_ERROR_INVALID_CALL'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(22): warning C4005: 'DXGI_ERROR_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51771): note: see previous definition of 'DXGI_ERROR_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(23): warning C4005: 'DXGI_ERROR_MORE_DATA': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51780): note: see previous definition of 'DXGI_ERROR_MORE_DATA'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(24): warning C4005: 'DXGI_ERROR_UNSUPPORTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51789): note: see previous definition of 'DXGI_ERROR_UNSUPPORTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(25): warning C4005: 'DXGI_ERROR_DEVICE_REMOVED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51798): note: see previous definition of 'DXGI_ERROR_DEVICE_REMOVED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(26): warning C4005: 'DXGI_ERROR_DEVICE_HUNG': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51807): note: see previous definition of 'DXGI_ERROR_DEVICE_HUNG'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(27): warning C4005: 'DXGI_ERROR_DEVICE_RESET': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51817): note: see previous definition of 'DXGI_ERROR_DEVICE_RESET'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(28): warning C4005: 'DXGI_ERROR_WAS_STILL_DRAWING': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51826): note: see previous definition of 'DXGI_ERROR_WAS_STILL_DRAWING'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(29): warning C4005: 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51836): note: see previous definition of 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(30): warning C4005: 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51845): note: see previous definition of 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(31): warning C4005: 'DXGI_ERROR_DRIVER_INTERNAL_ERROR': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51855): note: see previous definition of 'DXGI_ERROR_DRIVER_INTERNAL_ERROR'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(32): warning C4005: 'DXGI_ERROR_NONEXCLUSIVE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51864): note: see previous definition of 'DXGI_ERROR_NONEXCLUSIVE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(33): warning C4005: 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51873): note: see previous definition of 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(34): warning C4005: 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51883): note: see previous definition of 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(35): warning C4005: 'DXGI_ERROR_REMOTE_OUTOFMEMORY': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51892): note: see previous definition of 'DXGI_ERROR_REMOTE_OUTOFMEMORY'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(917): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52097): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(918): warning C4005: 'D3D11_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52106): note: see previous definition of 'D3D11_ERROR_FILE_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(919): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52116): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(920): warning C4005: 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52125): note: see previous definition of 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): warning C4005: 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52073): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52082): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
+e:\github projects\directx11project\directx11proj\playersceneexample.cpp(31): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+e:\github projects\directx11project\directx11proj\playersceneexample.cpp(54): warning C4018: '<': signed/unsigned mismatch
+  ModelLoader.cpp
+  IScene.cpp
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51693): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51702): note: see previous definition of 'DXGI_STATUS_CLIPPED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(14): warning C4005: 'DXGI_STATUS_NO_REDIRECTION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51711): note: see previous definition of 'DXGI_STATUS_NO_REDIRECTION'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(15): warning C4005: 'DXGI_STATUS_NO_DESKTOP_ACCESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51720): note: see previous definition of 'DXGI_STATUS_NO_DESKTOP_ACCESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(16): warning C4005: 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51729): note: see previous definition of 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(17): warning C4005: 'DXGI_STATUS_MODE_CHANGED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51738): note: see previous definition of 'DXGI_STATUS_MODE_CHANGED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(18): warning C4005: 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51747): note: see previous definition of 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(21): warning C4005: 'DXGI_ERROR_INVALID_CALL': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51762): note: see previous definition of 'DXGI_ERROR_INVALID_CALL'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(22): warning C4005: 'DXGI_ERROR_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51771): note: see previous definition of 'DXGI_ERROR_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(23): warning C4005: 'DXGI_ERROR_MORE_DATA': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51780): note: see previous definition of 'DXGI_ERROR_MORE_DATA'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(24): warning C4005: 'DXGI_ERROR_UNSUPPORTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51789): note: see previous definition of 'DXGI_ERROR_UNSUPPORTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(25): warning C4005: 'DXGI_ERROR_DEVICE_REMOVED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51798): note: see previous definition of 'DXGI_ERROR_DEVICE_REMOVED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(26): warning C4005: 'DXGI_ERROR_DEVICE_HUNG': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51807): note: see previous definition of 'DXGI_ERROR_DEVICE_HUNG'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(27): warning C4005: 'DXGI_ERROR_DEVICE_RESET': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51817): note: see previous definition of 'DXGI_ERROR_DEVICE_RESET'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(28): warning C4005: 'DXGI_ERROR_WAS_STILL_DRAWING': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51826): note: see previous definition of 'DXGI_ERROR_WAS_STILL_DRAWING'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(29): warning C4005: 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51836): note: see previous definition of 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(30): warning C4005: 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51845): note: see previous definition of 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(31): warning C4005: 'DXGI_ERROR_DRIVER_INTERNAL_ERROR': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51855): note: see previous definition of 'DXGI_ERROR_DRIVER_INTERNAL_ERROR'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(32): warning C4005: 'DXGI_ERROR_NONEXCLUSIVE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51864): note: see previous definition of 'DXGI_ERROR_NONEXCLUSIVE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(33): warning C4005: 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51873): note: see previous definition of 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(34): warning C4005: 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51883): note: see previous definition of 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(35): warning C4005: 'DXGI_ERROR_REMOTE_OUTOFMEMORY': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51892): note: see previous definition of 'DXGI_ERROR_REMOTE_OUTOFMEMORY'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(917): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52097): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(918): warning C4005: 'D3D11_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52106): note: see previous definition of 'D3D11_ERROR_FILE_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(919): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52116): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(920): warning C4005: 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52125): note: see previous definition of 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): warning C4005: 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52073): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52082): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
+c:\program files (x86)\microsoft visual studio 14.0\vc\include\memory(1630): warning C4316: 'CameraClass': object allocated on the heap may not be aligned 16
+  e:\github projects\directx11project\directx11proj\iscene.cpp(9): note: see reference to function template instantiation 'std::unique_ptr<CameraClass,std::default_delete<_Ty>> std::make_unique<CameraClass,>(void)' being compiled
+          with
+          [
+              _Ty=CameraClass
+          ]
+  IApplication.cpp
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(12): warning C4005: 'DXGI_STATUS_OCCLUDED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51693): note: see previous definition of 'DXGI_STATUS_OCCLUDED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(13): warning C4005: 'DXGI_STATUS_CLIPPED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51702): note: see previous definition of 'DXGI_STATUS_CLIPPED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(14): warning C4005: 'DXGI_STATUS_NO_REDIRECTION': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51711): note: see previous definition of 'DXGI_STATUS_NO_REDIRECTION'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(15): warning C4005: 'DXGI_STATUS_NO_DESKTOP_ACCESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51720): note: see previous definition of 'DXGI_STATUS_NO_DESKTOP_ACCESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(16): warning C4005: 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51729): note: see previous definition of 'DXGI_STATUS_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(17): warning C4005: 'DXGI_STATUS_MODE_CHANGED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51738): note: see previous definition of 'DXGI_STATUS_MODE_CHANGED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(18): warning C4005: 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51747): note: see previous definition of 'DXGI_STATUS_MODE_CHANGE_IN_PROGRESS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(21): warning C4005: 'DXGI_ERROR_INVALID_CALL': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51762): note: see previous definition of 'DXGI_ERROR_INVALID_CALL'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(22): warning C4005: 'DXGI_ERROR_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51771): note: see previous definition of 'DXGI_ERROR_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(23): warning C4005: 'DXGI_ERROR_MORE_DATA': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51780): note: see previous definition of 'DXGI_ERROR_MORE_DATA'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(24): warning C4005: 'DXGI_ERROR_UNSUPPORTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51789): note: see previous definition of 'DXGI_ERROR_UNSUPPORTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(25): warning C4005: 'DXGI_ERROR_DEVICE_REMOVED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51798): note: see previous definition of 'DXGI_ERROR_DEVICE_REMOVED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(26): warning C4005: 'DXGI_ERROR_DEVICE_HUNG': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51807): note: see previous definition of 'DXGI_ERROR_DEVICE_HUNG'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(27): warning C4005: 'DXGI_ERROR_DEVICE_RESET': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51817): note: see previous definition of 'DXGI_ERROR_DEVICE_RESET'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(28): warning C4005: 'DXGI_ERROR_WAS_STILL_DRAWING': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51826): note: see previous definition of 'DXGI_ERROR_WAS_STILL_DRAWING'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(29): warning C4005: 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51836): note: see previous definition of 'DXGI_ERROR_FRAME_STATISTICS_DISJOINT'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(30): warning C4005: 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51845): note: see previous definition of 'DXGI_ERROR_GRAPHICS_VIDPN_SOURCE_IN_USE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(31): warning C4005: 'DXGI_ERROR_DRIVER_INTERNAL_ERROR': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51855): note: see previous definition of 'DXGI_ERROR_DRIVER_INTERNAL_ERROR'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(32): warning C4005: 'DXGI_ERROR_NONEXCLUSIVE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51864): note: see previous definition of 'DXGI_ERROR_NONEXCLUSIVE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(33): warning C4005: 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51873): note: see previous definition of 'DXGI_ERROR_NOT_CURRENTLY_AVAILABLE'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(34): warning C4005: 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51883): note: see previous definition of 'DXGI_ERROR_REMOTE_CLIENT_DISCONNECTED'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\dxgitype.h(35): warning C4005: 'DXGI_ERROR_REMOTE_OUTOFMEMORY': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(51892): note: see previous definition of 'DXGI_ERROR_REMOTE_OUTOFMEMORY'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(917): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52097): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(918): warning C4005: 'D3D11_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52106): note: see previous definition of 'D3D11_ERROR_FILE_NOT_FOUND'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(919): warning C4005: 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52116): note: see previous definition of 'D3D11_ERROR_TOO_MANY_UNIQUE_VIEW_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d11.h(920): warning C4005: 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52125): note: see previous definition of 'D3D11_ERROR_DEFERRED_CONTEXT_MAP_WITHOUT_INITIAL_DISCARD'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(608): warning C4005: 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52073): note: see previous definition of 'D3D10_ERROR_TOO_MANY_UNIQUE_STATE_OBJECTS'
+c:\program files (x86)\microsoft directx sdk (june 2010)\include\d3d10.h(609): warning C4005: 'D3D10_ERROR_FILE_NOT_FOUND': macro redefinition
+  c:\program files (x86)\windows kits\10\include\10.0.10586.0\shared\winerror.h(52082): note: see previous definition of 'D3D10_ERROR_FILE_NOT_FOUND'
+  Application.cpp
+  Generating Code...
+e:\github projects\directx11project\directx11proj\textureshaderclass.cpp(334): warning C4715: 'textureshaderclass::SetLightConstantBufferData': not all control paths return a value
+e:\github projects\directx11project\directx11proj\textureshaderclass.cpp(365): warning C4715: 'textureshaderclass::SetMaterialConstantBufferData': not all control paths return a value
+  Skipping... (no relevant changes detected)
+  ObjectExample.cpp
+  Main.cpp
+  IObject.cpp
   DirectX11Proj.vcxproj -> E:\Github Projects\DirectX11Project\DirectX11Proj\Debug\DirectX11Proj.exe
