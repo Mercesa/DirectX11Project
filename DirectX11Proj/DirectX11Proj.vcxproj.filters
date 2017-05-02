@@ -90,9 +90,6 @@
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Header Files</Filter>
     </ClCompile>
-    <ClCompile Include="textureshaderclass.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
     <ClCompile Include="ModelLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -101,6 +98,12 @@
     </ClCompile>
     <ClCompile Include="d3dConstantBuffer.cpp">
       <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="textureshaderclass.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dShaderManager.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -185,11 +188,14 @@
     <ClInclude Include="LightStruct.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
+    <ClInclude Include="ConstantBuffers.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
     <ClInclude Include="textureshaderclass.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
-    <ClInclude Include="ConstantBuffers.h">
-      <Filter>D3DSetup</Filter>
+    <ClInclude Include="d3dShaderManager.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

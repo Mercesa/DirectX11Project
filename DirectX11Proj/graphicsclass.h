@@ -34,7 +34,7 @@ private:
 private:
 	std::unique_ptr<D3DClass> mpDirect3D;
 	std::unique_ptr<ColorShaderClass> mpColorShader;
-	std::unique_ptr<textureshaderclass> mTextureShader;
+	std::unique_ptr<TextureShaderClass> mTextureShader;
 };
 	
 #endif

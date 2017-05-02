@@ -24,15 +24,19 @@ d3dConstantBuffer::d3dConstantBuffer(int aSize, void* aData, ID3D11Device* const
 
 void d3dConstantBuffer::UpdateBuffer(void* data, ID3D11DeviceContext* const aContext)
 {
-	//engine->GetContext()->UpdateSubresource(Buffer, 0, nullptr, data, 0, 0);
+	// Update the sub resource with data
+	//aContext->UpdateSubresource(this->mpBuffer, 0, nullptr, data, 0, 0);
 
 	D3D11_MAPPED_SUBRESOURCE res;
+
+	// Enable the buffer to be written to
 	HRESULT result = aContext->Map(mpBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
 	if (!FAILED(result))
 	{
 		// Copy data
 		memcpy(res.pData, data, res.DepthPitch);
 
+		// Disable the buffer to be written to
 		aContext->Unmap(mpBuffer, 0);
 	}
 

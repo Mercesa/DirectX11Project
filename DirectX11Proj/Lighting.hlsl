@@ -32,11 +32,8 @@ cbuffer LightBuffer : register(b2)
 	int padLB02;
 	int padLB03;
 
-
 	Light arr[16];
 };
-// assume light at position 0,5,0 for now
-
 
 float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangentW)
 {

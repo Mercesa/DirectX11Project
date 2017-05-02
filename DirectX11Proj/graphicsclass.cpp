@@ -64,7 +64,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 
 	// Create the color shader object.
-	mTextureShader = std::make_unique<textureshaderclass>();
+	mTextureShader = std::make_unique<TextureShaderClass>();
 	if (!mTextureShader)
 	{
 		return false;

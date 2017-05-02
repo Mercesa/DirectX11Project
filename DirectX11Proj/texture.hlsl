@@ -8,8 +8,6 @@ SamplerState SampleType;
 
 
 
-
-
 struct VertexInputType
 {
     float4 position : POSITION;
@@ -25,7 +23,7 @@ struct PixelInputType
     float2 uv : TEXCOORD0;
 	float3 norm : NORMAL;
 	float3 fragPos : FRAGPOSITION;
-	float3 tang : TANGOUT;
+	float3 tang : TANGENT;
 	
 };
 
