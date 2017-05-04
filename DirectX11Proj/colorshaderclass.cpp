@@ -4,8 +4,6 @@
 
 ColorShaderClass::ColorShaderClass()
 {
-	m_vertexShader = 0;
-	m_pixelShader = 0;
 	m_layout = 0;
 	m_matrixBuffer = 0;
 }
@@ -21,13 +19,13 @@ ColorShaderClass::~ColorShaderClass()
 }
 
 
-bool ColorShaderClass::Initialize(ID3D11Device* device, HWND hwnd)
+bool ColorShaderClass::Initialize(ID3D11Device* device)
 {
 	bool result;
 
 
 	// Initialize the vertex and pixel shaders.
-	result = InitializeShader(device, hwnd, L"color.hlsl");
+	result = InitializeShader(device, L"Shaders\\color.hlsl");
 	if(!result)
 	{
 		return false;
@@ -66,112 +64,17 @@ bool ColorShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount
 }
 
 
-bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename)
+bool ColorShaderClass::InitializeShader(ID3D11Device* device, WCHAR* vsFilename)
 {
 	HRESULT result;
 	ID3D10Blob* errorMessage;
-	ID3D10Blob* vertexShaderBuffer;
-	ID3D10Blob* pixelShaderBuffer;
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[5];
 	unsigned int numElements;
 	D3D11_BUFFER_DESC matrixBufferDesc;
 
 
 	// Initialize the pointers this function will use to null.
-	errorMessage = 0;
-	vertexShaderBuffer = 0;
-	pixelShaderBuffer = 0;
 
-	result = LoadShaderWithErrorChecking(vsFilename, "ColorVertexShader", "vs_5_0", vertexShaderBuffer, hwnd);
-
-	if (!result)
-	{
-		return result;
-	}
-
-	result = LoadShaderWithErrorChecking(vsFilename, "ColorPixelShader", "ps_5_0", pixelShaderBuffer, hwnd);
-
-	if (!result)
-	{
-		return result;
-	}
-
-    // Create the vertex shader from the buffer.
-    result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_vertexShader);
-	if(FAILED(result))
-	{
-		return false;
-	}
-
-    // Create the pixel shader from the buffer.
-    result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pixelShader);
-	
-	if(FAILED(result))
-	{
-		return false;
-	}
-
-	// Create the vertex input layout description.
-	// This setup needs to match the VertexType stucture in the ModelClass and in the shader.
-	polygonLayout[0].SemanticName = "POSITION";
-	polygonLayout[0].SemanticIndex = 0;
-	polygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	polygonLayout[0].InputSlot = 0;
-	polygonLayout[0].AlignedByteOffset = 0;
-	polygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	polygonLayout[0].InstanceDataStepRate = 0;
-
-	polygonLayout[1].SemanticName = "TEXCOORD";
-	polygonLayout[1].SemanticIndex = 0;
-	polygonLayout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
-	polygonLayout[1].InputSlot = 0;
-	polygonLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	polygonLayout[1].InstanceDataStepRate = 0;
-
-	polygonLayout[2].SemanticName = "NORMAL";
-	polygonLayout[2].SemanticIndex = 0;
-	polygonLayout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	polygonLayout[2].InputSlot = 0;
-	polygonLayout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	polygonLayout[2].InstanceDataStepRate = 0;
-
-
-	polygonLayout[3].SemanticName = "BITANGENT";
-	polygonLayout[3].SemanticIndex = 0;
-	polygonLayout[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	polygonLayout[3].InputSlot = 0;
-	polygonLayout[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	polygonLayout[3].InstanceDataStepRate = 0;
-
-	polygonLayout[4].SemanticName = "TANGENT";
-	polygonLayout[4].SemanticIndex = 0;
-	polygonLayout[4].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-	polygonLayout[4].InputSlot = 0;
-	polygonLayout[4].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	polygonLayout[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	polygonLayout[4].InstanceDataStepRate = 0;
-
-	// Get a count of the elements in the layout.
-    numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
-
-	// Create the vertex input layout.
-	result = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(), 
-									   vertexShaderBuffer->GetBufferSize(), &m_layout);
-	if(FAILED(result))
-	{
-		std::cout << "failed to create input layout" << std::endl;
-		return false;
-	}
-
-	// Release the vertex shader buffer and pixel shader buffer since they are no longer needed.
-	vertexShaderBuffer->Release();
-	vertexShaderBuffer = 0;
-
-	pixelShaderBuffer->Release();
-	pixelShaderBuffer = 0;
 
     // Setup the description of the dynamic matrix constant buffer that is in the vertex shader.
     matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
@@ -206,20 +109,6 @@ void ColorShaderClass::ShutdownShader()
 	{
 		m_layout->Release();
 		m_layout = 0;
-	}
-
-	// Release the pixel shader.
-	if(m_pixelShader)
-	{
-		m_pixelShader->Release();
-		m_pixelShader = 0;
-	}
-
-	// Release the vertex shader.
-	if(m_vertexShader)
-	{
-		m_vertexShader->Release();
-		m_vertexShader = 0;
 	}
 
 	return;
@@ -270,11 +159,11 @@ bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, c
 void ColorShaderClass::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
 {
 	// Set the vertex input layout.
-	deviceContext->IASetInputLayout(m_layout);
+	deviceContext->IASetInputLayout(mpVertexShader->mpLayout.Get());
 
     // Set the vertex and pixel shaders that will be used to render this triangle.
-    deviceContext->VSSetShader(m_vertexShader, NULL, 0);
-    deviceContext->PSSetShader(m_pixelShader, NULL, 0);
+    deviceContext->VSSetShader(mpVertexShader->GetVertexShader(), NULL, 0);
+    deviceContext->PSSetShader(mpPixelShader->GetPixelShader(), NULL, 0);
 
 	// Render the triangle.
 	deviceContext->DrawIndexed(indexCount, 0, 0);

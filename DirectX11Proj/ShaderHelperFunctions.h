@@ -5,7 +5,9 @@
 
 #include <fstream>
 
-static void OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFilename)
+#include "easylogging++.h"
+
+static void OutputShaderErrorMessage(ID3D10Blob* errorMessage, WCHAR* shaderFilename)
 {
 	char* compileErrors;
 	unsigned long long bufferSize, i;
@@ -34,13 +36,13 @@ static void OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR*
 	errorMessage = 0;
 
 	// Pop a message up on the screen to notify the user to check the text file for compile errors.
-	MessageBox(hwnd, L"Error compiling shader.  Check shader-error.txt for message.", shaderFilename, MB_OK);
+	LOG(FATAL) << "Error compiling shader. Check shader-error.txt for message. " << shaderFilename;
 
 	return;
 }
 
 // Contains reference to a pointer, its a bit hacky but D3DX11Compile from file requires a reference
-static bool LoadShaderWithErrorChecking(LPCWSTR aFileName, LPCSTR aFunctionName, LPCSTR shaderProfile, ID3D10Blob*& aContainer, HWND hwnd)
+static bool LoadShaderWithErrorChecking(LPCWSTR aFileName, LPCSTR aFunctionName, LPCSTR shaderProfile, ID3D10Blob*& aContainer)
 {
 	HRESULT result;
 
@@ -49,18 +51,18 @@ static bool LoadShaderWithErrorChecking(LPCWSTR aFileName, LPCSTR aFunctionName,
 
 	result = D3DX11CompileFromFile(aFileName, NULL, NULL, aFunctionName, shaderProfile, D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
 		&aContainer, &errorMessage, NULL);
-
 	if (FAILED(result))
 	{
-		// If the shader failed to compile it should have writen something to the error message.
+		// If the shader failed to compile it should have written something to the error message.
 		if (errorMessage)
 		{
-			OutputShaderErrorMessage(errorMessage, hwnd, (WCHAR*)aFileName);
+			OutputShaderErrorMessage(errorMessage, (WCHAR*)aFileName);
+
 		}
 		// If there was  nothing in the error message then it simply could not find the shader file itself.
 		else
 		{
-			MessageBox(hwnd, aFileName, L"Missing Shader File", MB_OK);
+			LOG(FATAL) << "Missing shader file " << aFileName;
 		}
 
 		return false;

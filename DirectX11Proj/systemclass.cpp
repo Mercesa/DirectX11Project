@@ -158,10 +158,10 @@ using namespace el;
 // Engine tick in a sense, what goes on in one frame
 bool SystemClass::Frame()
 {
-	TIMED_FUNC(Derp);
+	//TIMED_FUNC(Derp);
 
 
-	TIMED_SCOPE(inputBlkObj, "input time spend");
+	//TIMED_SCOPE(inputBlkObj, "input time spend");
 	
 
 	// Check if the user pressed escape and wants to exit the application.
@@ -203,6 +203,8 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam
 		int yPos = GET_Y_LPARAM(lparam);
 
 		m_Input->MouseMove(xPos, yPos);
+
+		return 0;
 	}
 
 	

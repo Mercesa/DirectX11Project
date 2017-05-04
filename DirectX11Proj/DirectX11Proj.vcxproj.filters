@@ -25,6 +25,9 @@
     <Filter Include="Libs">
       <UniqueIdentifier>{b5c942b3-b9a3-4ea9-91e2-dfe1d138626c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="D3DSetup\D3DShaderTypes">
+      <UniqueIdentifier>{e810992e-765c-44da-9774-6b792bf4a10f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -103,7 +106,16 @@
       <Filter>D3DSetup</Filter>
     </ClCompile>
     <ClCompile Include="d3dShaderManager.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dShaderInterface.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dShaderVS.cpp">
+      <Filter>D3DSetup\D3DShaderTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dShaderPS.cpp">
+      <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -155,9 +167,6 @@
     <ClInclude Include="d3dVertexBuffer.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderHelperFunctions.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
     <ClInclude Include="IObject.h">
       <Filter>NonFramework</Filter>
     </ClInclude>
@@ -195,18 +204,39 @@
       <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="d3dShaderManager.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dShaderInterface.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dShaderVS.h">
+      <Filter>D3DSetup\D3DShaderTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderHelperFunctions.h">
+      <Filter>D3DSetup\D3DShaderTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dShaderPS.h">
+      <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Lighting.hlsl">
+    <None Include="PS_texture.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\VS_texture.hlsl">
       <Filter>Shaders</Filter>
-    </None>
-    <None Include="texture.hlsl">
+    </FxCompile>
+    <FxCompile Include="Shaders\Lighting.hlsl">
       <Filter>Shaders</Filter>
-    </None>
-    <None Include="color.hlsl">
+    </FxCompile>
+    <FxCompile Include="Shaders\PS_texture.hlsl">
       <Filter>Shaders</Filter>
-    </None>
+    </FxCompile>
+    <FxCompile Include="Shaders\PS_color.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="Shaders\VS_color.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

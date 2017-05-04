@@ -47,6 +47,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	ResourceManager::GetInstance().mpDevice = mpDirect3D->GetDevice();
 
 
+	mpShaderManager = std::make_unique<d3dShaderManager>();
+
+	if (!mpShaderManager->InitializeShaders(this->mpDirect3D->GetDevice()))
+	{
+		return false;
+	}
+
 	// Create the color shader object.
 	mpColorShader = std::make_unique<ColorShaderClass>();
 	if (!mpColorShader)
@@ -55,13 +62,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 
 	// Initialize the color shader object.
-	result = mpColorShader->Initialize(mpDirect3D->GetDevice(), hwnd);
+	result = mpColorShader->Initialize(mpDirect3D->GetDevice());
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the color shader object.", L"Error", MB_OK);
 		return false;
 	}
 
+	mpColorShader->mpVertexShader = mpShaderManager->GetVertexShader("Shaders\\VS_color.hlsl");
+	mpColorShader->mpPixelShader = mpShaderManager->GetPixelShader("Shaders\\PS_color.hlsl");
 
 	// Create the color shader object.
 	mTextureShader = std::make_unique<TextureShaderClass>();
@@ -71,12 +80,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	}
 	
 	// Initialize the color shader object.
-	result = mTextureShader->Initialize(mpDirect3D->GetDevice(), hwnd);
+	result = mTextureShader->Initialize(mpDirect3D->GetDevice());
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the texture shader object.", L"Error", MB_OK);
 		return false;
 	}
+
+	mTextureShader->mpVSShader = mpShaderManager->GetVertexShader("Shaders\\VS_texture.hlsl");
+	mTextureShader->mpPSShader = mpShaderManager->GetPixelShader("Shaders\\PS_texture.hlsl");
 
 	return true;
 }
@@ -84,7 +96,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
-	
 	mpColorShader->Shutdown();
 	mTextureShader->Shutdown();
 	mpDirect3D->Shutdown();

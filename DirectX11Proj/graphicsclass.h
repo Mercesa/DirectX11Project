@@ -9,7 +9,7 @@
 #include "modelclass.h"
 #include "colorshaderclass.h"
 #include "textureshaderclass.h"
-
+#include "d3dShaderManager.h"
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;
@@ -35,6 +35,7 @@ private:
 	std::unique_ptr<D3DClass> mpDirect3D;
 	std::unique_ptr<ColorShaderClass> mpColorShader;
 	std::unique_ptr<TextureShaderClass> mTextureShader;
+	std::unique_ptr<d3dShaderManager> mpShaderManager;
 };
 	
 #endif

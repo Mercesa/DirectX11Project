@@ -15,45 +15,28 @@
 using namespace DirectX;
 using namespace std;
 
-class textureshaderclass
-{
-private:
-	struct MatrixBufferType
-	{
-		XMMATRIX world;
-		XMMATRIX view;
-		XMMATRIX projection;
-		XMFLOAT3 gEyePos;
-	};
+#include "ConstantBuffers.h"
+#include "d3dConstantBuffer.h"
 
-	struct MaterialBufferType
-	{
-		int hasDiffuse; // 4 bytes
-		int hasSpecular;// 8 bytes
-		int hasNormal;	// 12 bytes
-		int padding0;	// 16 bytes, 16 bytes aligned :)
-	};
+#include "d3dShaderVS.h"
+#include "d3dShaderPS.h"
 
-	struct LightBufferType
-	{
-		int amountOfLights;
-		int padLB01;
-		int padLB02;
-		int padLB03;
-
-		Light arr[16];
-	};
-
+class TextureShaderClass
+{	
 public:
-	textureshaderclass();
-	~textureshaderclass();
+	TextureShaderClass();
+	~TextureShaderClass();
 
-	bool Initialize(ID3D11Device*, HWND);
+	bool Initialize(ID3D11Device*);
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, int, const XMMATRIX&, const XMMATRIX&, const XMMATRIX&, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLights, XMFLOAT3 aCamPos);
 
+
+	d3dShaderVS* mpVSShader;
+	d3dShaderPS* mpPSShader;
+
 private:
-	bool InitializeShader(ID3D11Device*, HWND, WCHAR*);
+	bool InitializeShader(ID3D11Device*, WCHAR*);
 	void ShutdownShader();
 
 	bool SetLightConstantBufferData(ID3D11DeviceContext* const aDeviceContext, std::vector<unique_ptr<Light>>& aLights);
@@ -61,12 +44,11 @@ private:
 	bool SetShaderParameters(ID3D11DeviceContext*, const XMMATRIX&, const XMMATRIX&, const XMMATRIX&, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLights, XMFLOAT3 aCamPos);
 	void RenderShader(ID3D11DeviceContext*, int);
 
-	ID3D11VertexShader* mpVertexShader;
-	ID3D11PixelShader* mpPixelShader;
-	ID3D11InputLayout* mpLayout;
 	ID3D11Buffer* mpMatrixBuffer;
 	ID3D11Buffer* mpMaterialConstantBuffer;
 	ID3D11Buffer* mpLightConstantBuffer;
 	ID3D11SamplerState* mpSampleState;
+
+	std::unique_ptr<d3dConstantBuffer> mpConstantBuffer;
 };
 
