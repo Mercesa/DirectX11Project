@@ -206,7 +206,7 @@ void ModelLoader::LoadModel(const char* const aFilePath)
 
 	const aiScene* scene;
 
-	scene = importer.ReadFile(aFilePath, aiProcess_GenUVCoords | aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_Fast);
+	scene = importer.ReadFile(aFilePath, aiProcess_GenUVCoords | aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_Fast | aiProcess_CalcTangentSpace);
 	assert(scene != nullptr);
 
 	if (!scene)

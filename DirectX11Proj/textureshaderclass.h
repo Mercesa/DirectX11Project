@@ -29,26 +29,25 @@ public:
 
 	bool Initialize(ID3D11Device*);
 	void Shutdown();
-	bool Render(ID3D11DeviceContext*, int, const XMMATRIX&, const XMMATRIX&, const XMMATRIX&, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLights, XMFLOAT3 aCamPos);
+	bool Render(ID3D11DeviceContext*, int, const XMMATRIX&, const XMMATRIX&, const XMMATRIX&, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLights, XMFLOAT3 aCamPos, Light* const aLight);
 
 
 	d3dShaderVS* mpVSShader;
 	d3dShaderPS* mpPSShader;
 
 private:
-	bool InitializeShader(ID3D11Device*, WCHAR*);
+	bool InitializeShader(ID3D11Device*);
 	void ShutdownShader();
 
-	bool SetLightConstantBufferData(ID3D11DeviceContext* const aDeviceContext, std::vector<unique_ptr<Light>>& aLights);
+	bool SetLightConstantBufferData(ID3D11DeviceContext* const aDeviceContext, std::vector<unique_ptr<Light>>& aLights, Light* const aLight);
 	bool SetMaterialConstantBufferData(ID3D11DeviceContext* const aDeviceContext, d3dMaterial* const aMaterial);
-	bool SetShaderParameters(ID3D11DeviceContext*, const XMMATRIX&, const XMMATRIX&, const XMMATRIX&, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLights, XMFLOAT3 aCamPos);
+	bool SetShaderParameters(ID3D11DeviceContext*, const XMMATRIX&, const XMMATRIX&, const XMMATRIX&, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLights, XMFLOAT3 aCamPos, Light* const aLight);
 	void RenderShader(ID3D11DeviceContext*, int);
 
-	ID3D11Buffer* mpMatrixBuffer;
-	ID3D11Buffer* mpMaterialConstantBuffer;
-	ID3D11Buffer* mpLightConstantBuffer;
 	ID3D11SamplerState* mpSampleState;
 
-	std::unique_ptr<d3dConstantBuffer> mpConstantBuffer;
+	std::unique_ptr<d3dConstantBuffer> mpMatrixCB;
+	std::unique_ptr<d3dConstantBuffer> mpMaterialCB;
+	std::unique_ptr<d3dConstantBuffer> mpLightCB;
 };
 

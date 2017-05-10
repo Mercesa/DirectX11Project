@@ -8,6 +8,10 @@ struct MatrixBufferType
 	XMMATRIX view;
 	XMMATRIX projection;
 	XMFLOAT3 gEyePos;
+	float pad0;
+
+	XMMATRIX lightViewMatrix;
+	XMMATRIX lightProjectionMatrix;
 };
 
 struct MaterialBufferType
@@ -24,6 +28,8 @@ struct LightBufferType
 	int padLB01;
 	int padLB02;
 	int padLB03;
+
+	Light directionalLight;
 
 	Light arr[16];
 };

@@ -6,16 +6,16 @@
 #include "ObjectExample.h"
 #include <windows.h>
 #include <fcntl.h>
+
 PlayerSceneExample::PlayerSceneExample()
 {
 }
-
 
 PlayerSceneExample::~PlayerSceneExample()
 {
 }
 
-void PlayerSceneExample::Tick(InputClass* const apInput)
+void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 {
 	//throw std::logic_error("The method or operation is not implemented.");
 	static int x = 0;
@@ -60,9 +60,12 @@ void PlayerSceneExample::Init()
 
 
 	std::unique_ptr<Light> tpLight = std::make_unique<Light>();
-	tpLight->colour = XMFLOAT3(1.0f, 1.0f, 1.0f);
+	tpLight->diffuseColor = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	tpLight->position = XMFLOAT3(0.0f, 5.0f, 0.0f);
 	this->mLights.push_back(std::move(tpLight));
+
+	this->mDirectionalLight = std::make_unique<Light>();
+	this->mDirectionalLight->position = XMFLOAT3(0.0f, -1.0f, 0.5f);
 	//throw std::logic_error("The method or operation is not implemented.");
 }
 

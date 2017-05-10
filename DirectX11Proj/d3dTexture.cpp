@@ -32,10 +32,6 @@ bool d3dTexture::Initialize(ID3D11Device* const apDevice, const WCHAR* apFilepat
 
 }
 
-void d3dTexture::Shutdown()
-{
-
-}
 
 ID3D11ShaderResourceView* const  d3dTexture::GetTexture() const
 {

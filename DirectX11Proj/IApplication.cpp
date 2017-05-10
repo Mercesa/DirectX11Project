@@ -40,16 +40,12 @@ void IApplication::LoadScene(std::unique_ptr<IScene> apScene)
 }
 
 
-void IApplication::SceneTick(InputClass* const aInput)
-{
-	if (mpCurrentScene != nullptr)
-	{
-		mpCurrentScene->Tick(aInput);
-	}
-}
-
-
 bool IApplication::ShouldQuit()
 {
 	return mShouldQuit;
+}
+
+IScene* const IApplication::GetCurrentScene()
+{
+	return mpCurrentScene.get(); 
 }

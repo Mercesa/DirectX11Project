@@ -12,7 +12,6 @@ public:
 	~d3dTexture();
 
 	bool Initialize(ID3D11Device* const apDevice, const WCHAR* apFilepath);
-	void Shutdown();
 
 	ID3D11ShaderResourceView* const GetTexture() const;
 

@@ -22,19 +22,15 @@ d3dShaderManager::~d3dShaderManager()
 bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 {
 	// Load vertex and pixel shader
-	ShaderInfo tShaderInfo = ShaderInfo("Shaders\\VS_texture.hlsl", "TextureVertexShader", "vs_5_0", EVERTEX);
-	mShadersInfo.push_back(tShaderInfo);
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_texture.hlsl", "TextureVertexShader", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_texture.hlsl", "TexturePixelShader", "ps_5_0", EPIXEL));
 
-	tShaderInfo = ShaderInfo("Shaders\\PS_texture.hlsl", "TexturePixelShader", "ps_5_0", EPIXEL);
-	mShadersInfo.push_back(tShaderInfo);
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_color.hlsl", "ColorVertexShader", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_color.hlsl", "ColorPixelShader", "ps_5_0", EPIXEL));
 
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_shadow.hlsl", "ShadowVertexShader", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_shadow.hlsl", "ShadowPixelShader", "ps_5_0", EPIXEL));
 
-
-	tShaderInfo = ShaderInfo("Shaders\\VS_color.hlsl", "ColorVertexShader", "vs_5_0", EVERTEX);
-	mShadersInfo.push_back(tShaderInfo);
-
-	tShaderInfo = ShaderInfo("Shaders\\PS_color.hlsl", "ColorPixelShader", "ps_5_0", EPIXEL);
-	mShadersInfo.push_back(tShaderInfo);
 
 	LOG(INFO) << "ShaderManager: Finished initializing all shaders";
 

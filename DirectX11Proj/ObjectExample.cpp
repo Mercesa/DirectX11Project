@@ -21,7 +21,7 @@ void ObjectExample::OnInit()
 
 }
 
-void ObjectExample::OnUpdate()
+void ObjectExample::Tick()
 {
 
 }

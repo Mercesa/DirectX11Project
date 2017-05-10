@@ -11,6 +11,7 @@
 #include "inputclass.h"
 #include "graphicsclass.h"
 #include "Application.h"
+#include "EngineTimer.h"
 
 class SystemClass
 {
@@ -39,6 +40,7 @@ private:
 	std::unique_ptr<InputClass> m_Input;
 	std::unique_ptr<GraphicsClass> mpGraphics;
 	std::unique_ptr<Application> mpApplication;
+	std::unique_ptr<EngineTimer> mTimer;
 };
 
 

@@ -28,6 +28,12 @@
     <Filter Include="D3DSetup\D3DShaderTypes">
       <UniqueIdentifier>{e810992e-765c-44da-9774-6b792bf4a10f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="D3DSetup\DXGI">
+      <UniqueIdentifier>{a49f142c-2c65-4524-901e-5eb59ab70156}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3DSetup\Shaderclasses">
+      <UniqueIdentifier>{9e312e10-0cb7-4f63-89e8-bf29bd194cac}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -57,16 +63,7 @@
     <ClCompile Include="d3dclass.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
-    <ClCompile Include="d3dDXGIManager.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dSwapchain.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
     <ClCompile Include="graphicsclass.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="colorshaderclass.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
     <ClCompile Include="d3dDepthStencil.cpp">
@@ -102,14 +99,8 @@
     <ClCompile Include="d3dConstantBuffer.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
-    <ClCompile Include="textureshaderclass.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
     <ClCompile Include="d3dShaderManager.cpp">
       <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dShaderInterface.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="d3dShaderVS.cpp">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
@@ -117,12 +108,27 @@
     <ClCompile Include="d3dShaderPS.cpp">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClCompile>
+    <ClCompile Include="EngineTimer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dSamplerStateManager.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dDXGIManager.cpp">
+      <Filter>D3DSetup\DXGI</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dSwapchain.cpp">
+      <Filter>D3DSetup\DXGI</Filter>
+    </ClCompile>
+    <ClCompile Include="colorshaderclass.cpp">
+      <Filter>D3DSetup\Shaderclasses</Filter>
+    </ClCompile>
+    <ClCompile Include="textureshaderclass.cpp">
+      <Filter>D3DSetup\Shaderclasses</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="inputclass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="systemclass.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="cameraclass.h">
@@ -146,16 +152,7 @@
     <ClInclude Include="d3dclass.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
-    <ClInclude Include="d3dDXGIManager.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dSwapchain.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
     <ClInclude Include="graphicsclass.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="colorshaderclass.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="d3dDepthStencil.h">
@@ -200,9 +197,6 @@
     <ClInclude Include="ConstantBuffers.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
-    <ClInclude Include="textureshaderclass.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
     <ClInclude Include="d3dShaderManager.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
@@ -218,25 +212,49 @@
     <ClInclude Include="d3dShaderPS.h">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClInclude>
+    <ClInclude Include="d3dSamplerStateManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="systemclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dDXGIManager.h">
+      <Filter>D3DSetup\DXGI</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dSwapchain.h">
+      <Filter>D3DSetup\DXGI</Filter>
+    </ClInclude>
+    <ClInclude Include="colorshaderclass.h">
+      <Filter>D3DSetup\Shaderclasses</Filter>
+    </ClInclude>
+    <ClInclude Include="textureshaderclass.h">
+      <Filter>D3DSetup\Shaderclasses</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineTimer.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="PS_texture.hlsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Shaders\VS_texture.hlsl">
+    <None Include="Shaders\VS_texture.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Lighting.hlsl">
+    </None>
+    <None Include="Shaders\Lighting.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\PS_texture.hlsl">
+    </None>
+    <None Include="Shaders\PS_color.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\PS_color.hlsl">
+    </None>
+    <None Include="Shaders\PS_texture.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\VS_color.hlsl">
+    </None>
+    <None Include="Shaders\VS_color.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
+    </None>
+    <None Include="Shaders\VS_shadow.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PS_shadow.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

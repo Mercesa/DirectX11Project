@@ -10,8 +10,8 @@ public:
 	Application();
 	~Application();
 
-	virtual void Init();
-	virtual void Tick();
-	virtual void Destroy();
+	virtual void Init()override;
+	virtual void Tick()override;
+	virtual void Destroy()override;
 };
 

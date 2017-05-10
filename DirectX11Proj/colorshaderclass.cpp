@@ -68,7 +68,6 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, WCHAR* vsFilename)
 {
 	HRESULT result;
 	ID3D10Blob* errorMessage;
-	D3D11_INPUT_ELEMENT_DESC polygonLayout[5];
 	unsigned int numElements;
 	D3D11_BUFFER_DESC matrixBufferDesc;
 

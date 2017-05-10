@@ -8,9 +8,7 @@
 #include "cameraclass.h"
 #include "inputclass.h"
 #include "LightStruct.h"
-
-
-class IObject;
+#include "IObject.h"
 
 class IScene
 {
@@ -19,14 +17,15 @@ public:
 	IScene();
 	~IScene();
 
-	virtual void Tick(InputClass* const apInput) = 0;
+	virtual void Tick(InputClass* const apInput, float aDT) = 0;
 	virtual void Init() = 0;
 	virtual void Destroy() = 0;
 
-	// Just a bit lazy and turn it into a vector, will convert back to a list later
 	std::vector <std::unique_ptr<IObject>> mObjects;
 	std::vector <std::unique_ptr<Light>> mLights;
 	
+	std::unique_ptr<Light> mDirectionalLight;
+
 	bool HasBeenInitialized() { return mInitialized; }
 
 	CameraClass* const GetCamera() { return mpCamera.get(); }

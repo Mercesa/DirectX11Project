@@ -5,6 +5,9 @@
 
 #include "easylogging++.h"
 #include "ResourceManager.h"
+#include "IScene.h"
+#include "IObject.h"
+
 SystemClass::SystemClass()
 {
 	m_Input = 0;
@@ -95,6 +98,10 @@ bool SystemClass::Initialize()
 	LOG(INFO) << "Intialized graphics class";
 
 	LOG(INFO) << "System finished initilization";
+	
+	
+	mTimer->Start();
+	
 	return true;
 }
 
@@ -151,9 +158,11 @@ void SystemClass::Run()
 		}
 
 	}
+	mTimer->Update();
 
 	return;
 }
+
 using namespace el;
 // Engine tick in a sense, what goes on in one frame
 bool SystemClass::Frame()
@@ -181,12 +190,18 @@ bool SystemClass::Frame()
 
 	
 	mpApplication->Tick();
-	mpApplication->SceneTick(m_Input.get());
 
+	mpApplication->GetCurrentScene()->Tick(m_Input.get(), mTimer->GetDeltaTime());
+	
+	std::vector <std::unique_ptr<IObject>>& tpScene = mpApplication->GetCurrentScene()->mObjects;
+	
+	for (int i = 0; i < tpScene.size(); ++i)
+	{
+		tpScene[i]->Tick();
+	}
 
 	// Do the frame processing for the graphics object.
 	mpGraphics->Frame(mpApplication->mpCurrentScene.get());
-
 
 	return true;
 }
@@ -206,8 +221,6 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam
 
 		return 0;
 	}
-
-	
 
 		// Check if a key has been pressed on the keyboard.
 	case WM_KEYDOWN:
