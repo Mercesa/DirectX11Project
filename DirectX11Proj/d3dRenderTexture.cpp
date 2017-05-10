@@ -1,10 +1,8 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: rendertextureclass.cpp
-////////////////////////////////////////////////////////////////////////////////
-#include "rendertextureclass.h"
+
+#include "d3dRenderTexture.h"
 
 
-RenderTextureClass::RenderTextureClass()
+d3dRenderTexture::d3dRenderTexture()
 {
 	m_renderTargetTexture = 0;
 	m_renderTargetView = 0;
@@ -14,17 +12,17 @@ RenderTextureClass::RenderTextureClass()
 }
 
 
-RenderTextureClass::RenderTextureClass(const RenderTextureClass& other)
+d3dRenderTexture::d3dRenderTexture(const d3dRenderTexture& other)
 {
 }
 
 
-RenderTextureClass::~RenderTextureClass()
+d3dRenderTexture::~d3dRenderTexture()
 {
 }
 
 
-bool RenderTextureClass::Initialize(ID3D11Device* device, int textureWidth, int textureHeight, float screenDepth, float screenNear)
+bool d3dRenderTexture::Initialize(ID3D11Device* device, int textureWidth, int textureHeight, float screenDepth, float screenNear)
 {
 	D3D11_TEXTURE2D_DESC textureDesc;
 	HRESULT result;
@@ -137,7 +135,7 @@ bool RenderTextureClass::Initialize(ID3D11Device* device, int textureWidth, int 
 }
 
 
-void RenderTextureClass::Shutdown()
+void d3dRenderTexture::Shutdown()
 {
 	if(m_depthStencilView)
 	{
@@ -173,7 +171,7 @@ void RenderTextureClass::Shutdown()
 }
 
 
-void RenderTextureClass::SetRenderTarget(ID3D11DeviceContext* deviceContext)
+void d3dRenderTexture::SetRenderTarget(ID3D11DeviceContext* deviceContext)
 {
 	// Bind the render target view and depth stencil buffer to the output render pipeline.
 	deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
@@ -185,7 +183,7 @@ void RenderTextureClass::SetRenderTarget(ID3D11DeviceContext* deviceContext)
 }
 
 
-void RenderTextureClass::ClearRenderTarget(ID3D11DeviceContext* deviceContext, float red, float green, float blue, float alpha)
+void d3dRenderTexture::ClearRenderTarget(ID3D11DeviceContext* deviceContext, float red, float green, float blue, float alpha)
 {
 	float color[4];
 
@@ -206,20 +204,20 @@ void RenderTextureClass::ClearRenderTarget(ID3D11DeviceContext* deviceContext, f
 }
 
 
-ID3D11ShaderResourceView* RenderTextureClass::GetShaderResourceView()
+ID3D11ShaderResourceView* d3dRenderTexture::GetShaderResourceView()
 {
 	return m_shaderResourceView;
 }
 
 
-void RenderTextureClass::GetProjectionMatrix(D3DXMATRIX& projectionMatrix)
+void d3dRenderTexture::GetProjectionMatrix(D3DXMATRIX& projectionMatrix)
 {
 	projectionMatrix = m_projectionMatrix;
 	return;
 }
 
 
-void RenderTextureClass::GetOrthoMatrix(D3DXMATRIX& orthoMatrix)
+void d3dRenderTexture::GetOrthoMatrix(D3DXMATRIX& orthoMatrix)
 {
 	orthoMatrix = m_orthoMatrix;
 	return;
