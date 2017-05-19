@@ -96,7 +96,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\DirectXTK-master;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -167,27 +167,30 @@
     <ClCompile Include="d3dDXGIManager.cpp" />
     <ClCompile Include="d3dMaterial.cpp" />
     <ClCompile Include="d3dRasterizerState.cpp" />
-    <ClCompile Include="d3dSamplerStateManager.cpp" />
     <ClCompile Include="d3dShaderManager.cpp" />
     <ClCompile Include="d3dShaderPS.cpp" />
     <ClCompile Include="d3dShaderVS.cpp" />
     <ClCompile Include="d3dSwapchain.cpp" />
     <ClCompile Include="d3dTexture.cpp" />
     <ClCompile Include="d3dVertexBuffer.cpp" />
+    <ClCompile Include="depthshaderclass.cpp" />
     <ClCompile Include="EngineTimer.cpp" />
     <ClCompile Include="graphicsclass.cpp" />
     <ClCompile Include="IApplication.cpp" />
     <ClCompile Include="inputclass.cpp" />
     <ClCompile Include="IObject.cpp" />
     <ClCompile Include="IScene.cpp" />
+    <ClCompile Include="d3dLightClass.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="modelclass.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ObjectExample.cpp" />
     <ClCompile Include="PlayerSceneExample.cpp" />
+    <ClCompile Include="d3dRenderTexture.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="systemclass.cpp" />
     <ClCompile Include="textureshaderclass.cpp" />
+    <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
@@ -208,6 +211,7 @@
     <ClInclude Include="d3dSwapchain.h" />
     <ClInclude Include="d3dTexture.h" />
     <ClInclude Include="d3dVertexBuffer.h" />
+    <ClInclude Include="depthshaderclass.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EngineTimer.h" />
     <ClInclude Include="graphicsclass.h" />
@@ -215,16 +219,19 @@
     <ClInclude Include="inputclass.h" />
     <ClInclude Include="IObject.h" />
     <ClInclude Include="IScene.h" />
+    <ClInclude Include="d3dLightClass.h" />
     <ClInclude Include="LightStruct.h" />
     <ClInclude Include="modelclass.h" />
     <ClInclude Include="ModelData.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="ObjectExample.h" />
     <ClInclude Include="PlayerSceneExample.h" />
+    <ClInclude Include="d3dRenderTexture.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ShaderHelperFunctions.h" />
     <ClInclude Include="systemclass.h" />
     <ClInclude Include="textureshaderclass.h" />
+    <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Lighting.hlsl">
@@ -248,6 +255,14 @@
       <FileType>Document</FileType>
     </None>
     <None Include="Shaders\VS_shadow.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\PS_depth.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shaders\VS_depth.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

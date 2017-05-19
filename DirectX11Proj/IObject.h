@@ -18,6 +18,7 @@ public:
 
 
 	ModelClass* mpModel;
+	XMFLOAT4X4  mWorldMatrix;
 
 protected:
 	// premature initialization just so I dont forget in general

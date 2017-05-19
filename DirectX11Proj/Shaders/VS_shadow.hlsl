@@ -20,7 +20,6 @@ struct PixelInputType
 PixelInputType ShadowVertexShader(VertexInputType input)
 {
 	PixelInputType output;
-	float4 worldPosition;
 
 
 	// Change the position vector to be 4 units for proper matrix calculations.
@@ -39,20 +38,11 @@ PixelInputType ShadowVertexShader(VertexInputType input)
 	output.lightViewPosition = mul(output.lightViewPosition, lightViewMatrix);
 	output.lightViewPosition = mul(output.lightViewPosition, lightProjectionMatrix);
 
-
-
 	// Store the texture coordinates for the pixel shader.
 	output.tex = input.tex;
 
-	// Calculate the normal vector against the world matrix only.
 	output.normal = mul(input.normal, (float3x3)worldMatrix);
-
-	// Normalize the normal vector.
 	output.normal = normalize(output.normal);
-
-	// Calculate the position of the vertex in the world.
-	worldPosition = mul(input.position, worldMatrix);
-
 
 	return output;
 }

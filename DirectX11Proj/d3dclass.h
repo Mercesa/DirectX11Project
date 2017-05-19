@@ -39,7 +39,6 @@ public:
 	ID3D11DeviceContext* GetDeviceContext();
 
 	void GetProjectionMatrix(XMMATRIX&);
-	void GetWorldMatrix(XMMATRIX&);
 	void GetOrthoMatrix(XMMATRIX&);
 
 private:
@@ -49,7 +48,6 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mpRenderTargetView;
 
 	XMFLOAT4X4  mProjectionmatrix;
-	XMFLOAT4X4  mWorldMatrix;
 	XMFLOAT4X4  mOrthoMatrix;
 
 	std::unique_ptr<d3dSwapchain> mpSwapChain;

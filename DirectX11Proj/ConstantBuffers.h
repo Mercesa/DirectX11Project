@@ -4,11 +4,14 @@
 
 struct MatrixBufferType
 {
+	float gEyePosX;
+	float gEyePosY;
+	float gEyePosZ;
+	float pad0;
 	XMMATRIX world;
 	XMMATRIX view;
 	XMMATRIX projection;
-	XMFLOAT3 gEyePos;
-	float pad0;
+
 
 	XMMATRIX lightViewMatrix;
 	XMMATRIX lightProjectionMatrix;

@@ -13,13 +13,13 @@ struct Light
 
 cbuffer MatrixBuffer : register(b0)
 {
+	float3 gEyePos;
+	float1 pad0;
+
 	matrix worldMatrix;
 	matrix viewMatrix;
 	matrix projectionMatrix;
 	
-	float3 gEyePos;
-	float1 pad0;
-
 	matrix lightViewMatrix;
 	matrix lightProjectionMatrix;
 };
@@ -81,7 +81,7 @@ float4 DoSpecular(Light light, float3 V, float3 L, float3 N)
 	float3 reflV = reflect(-L, N);
 
 	// Calculate the specular intensity
-	float spec = pow(max(dot(V, reflV), 0.0f), 32);
+	float spec = pow(max(dot(V, reflV), 0.0f), 16);
 
 	return float4(spec, spec, spec, 1.0);
 }
@@ -139,7 +139,7 @@ float4 PerformLighting(float3 aFragPosition, float3 aNormal, float4 aDiffMapSamp
 	{
 		// From frag position to eye 
 		float3 eyeDir = normalize(gEyePos - aFragPosition);
-
+		
 		tResultCol += DoPointLight(arr[i], eyeDir, aFragPosition, normalize(aNormal), aDiffMapSample, aSpecMapSample);
 	}
 
@@ -154,7 +154,7 @@ float4 PerformDirectionalLight(float3 aFragPosition, float3 aNormal, float4 aDif
 
 	// From frag position to eye 
 	float3 eyeDir = normalize(gEyePos - aFragPosition);
-
+	
 	tResultCol += DoDirectionalLight(directionalLight, eyeDir, aFragPosition, normalize(aNormal), aDiffMapSample, aSpecMapSample);
 	
 

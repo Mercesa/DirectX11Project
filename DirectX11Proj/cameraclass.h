@@ -24,12 +24,13 @@ public:
 	void GetViewMatrix(XMMATRIX&);
 
 	float m_positionX, m_positionY, m_positionZ;
-
+	
 	XMFLOAT3 up, position, lookAt;
 
 private:
 	float m_rotationX, m_rotationY, m_rotationZ;
-	XMFLOAT4X4 m_viewMatrix;
+	XMFLOAT4X4 mViewMatrix;
+	XMFLOAT4X4 mProjectionMatrix;
 };
 
 #endif

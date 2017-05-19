@@ -1,6 +1,3 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: cameraclass.cpp
-////////////////////////////////////////////////////////////////////////////////
 #include "cameraclass.h"
 
 
@@ -113,7 +110,7 @@ void CameraClass::Render()
 	lookAtVector = XMVectorAdd(positionVector, lookAtVector);
 
 	// Finally create the view matrix from the three updated vectors.
-	XMStoreFloat4x4(&m_viewMatrix, XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
+	XMStoreFloat4x4(&mViewMatrix, XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
 
 	return;
 }
@@ -121,5 +118,5 @@ void CameraClass::Render()
 
 void CameraClass::GetViewMatrix(XMMATRIX& viewMatrix)
 {
-	viewMatrix = XMLoadFloat4x4(&m_viewMatrix);
+	viewMatrix = XMLoadFloat4x4(&mViewMatrix);
 }

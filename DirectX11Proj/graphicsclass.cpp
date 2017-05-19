@@ -127,6 +127,9 @@ bool GraphicsClass::Render(IScene *const aScene)
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	bool result;
 
+	
+
+
 
 	// Clear the buffers to begin the scene.
 	mpDirect3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
@@ -135,7 +138,6 @@ bool GraphicsClass::Render(IScene *const aScene)
 	 aScene->GetCamera()->Render();
 
 	// Get the world, view, and projection matrices from the camera and d3d objects.
-	mpDirect3D->GetWorldMatrix(worldMatrix);
 	aScene->GetCamera()->GetViewMatrix(viewMatrix);
 	mpDirect3D->GetProjectionMatrix(projectionMatrix);
 
@@ -143,9 +145,10 @@ bool GraphicsClass::Render(IScene *const aScene)
 
 	for (int i = 0; i < aScene->mObjects.size(); ++i)
 	{
-		//std::cout << i << std::endl;
 		aScene->mObjects[i]->mpModel->Render(mpDirect3D->GetDeviceContext());
 
+		// Get the world matrix from the object
+		worldMatrix = XMLoadFloat4x4(&aScene->mObjects[i]->mWorldMatrix);
 		if (aScene->mObjects[i]->mpModel->mMaterial->mpDiffuse->exists)
 		{
 			mTextureShader->Render(mpDirect3D->GetDeviceContext(), aScene->mObjects[i]->mpModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, aScene->mObjects[i]->mpModel->mMaterial.get(), aScene->mLights, aScene->GetCamera()->GetPosition(), aScene->mDirectionalLight.get());

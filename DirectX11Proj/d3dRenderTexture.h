@@ -9,12 +9,12 @@
 
 
 
-class RenderTextureClass
+class d3dRenderTexture
 {
 public:
-	RenderTextureClass();
-	RenderTextureClass(const RenderTextureClass&);
-	~RenderTextureClass();
+	d3dRenderTexture();
+	d3dRenderTexture(const d3dRenderTexture&);
+	~d3dRenderTexture();
 
 	bool Initialize(ID3D11Device*, int, int, float, float);
 	void Shutdown();

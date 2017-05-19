@@ -31,6 +31,9 @@ bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_shadow.hlsl", "ShadowVertexShader", "vs_5_0", EVERTEX));
 	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_shadow.hlsl", "ShadowPixelShader", "ps_5_0", EPIXEL));
 
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_depth.hlsl", "DepthVertexShader", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_depth.hlsl", "DepthPixelShader", "ps_5_0", EPIXEL));
+
 
 	LOG(INFO) << "ShaderManager: Finished initializing all shaders";
 

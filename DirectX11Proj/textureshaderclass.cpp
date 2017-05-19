@@ -167,7 +167,7 @@ bool TextureShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext,
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	static MatrixBufferType* dataPtr = new MatrixBufferType();
+	 MatrixBufferType* dataPtr = new MatrixBufferType();
 	uint32_t bufferNumber;
 
 	// Transpose the matrices to prepare them for the shader.
@@ -175,14 +175,16 @@ bool TextureShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext,
 	XMMATRIX viewMatrix2 = XMMatrixTranspose(viewMatrix);
 	XMMATRIX projectionMatrix2 = XMMatrixTranspose(projectionMatrix);
 
-
 	// Get a pointer to the data in the constant buffer.
 
 	// Copy the matrices into the constant buffer.
 	dataPtr->world = worldMatrix2;
 	dataPtr->view = viewMatrix2;
 	dataPtr->projection = projectionMatrix2;
-	dataPtr->gEyePos = aCamPos;
+	dataPtr->gEyePosX = aCamPos.x;
+	dataPtr->gEyePosY = aCamPos.y;
+	dataPtr->gEyePosZ = aCamPos.z;
+
 
 	mpMatrixCB->UpdateBuffer((void*)dataPtr, deviceContext);
 
@@ -192,6 +194,8 @@ bool TextureShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext,
 	ID3D11Buffer* tBuff = mpMatrixCB->GetBuffer();
 	// finally set the constant buffer in the vertex shader with the updated values.
 	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
+	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
+	
 	SetMaterialConstantBufferData(deviceContext, aMaterial);
 	SetLightConstantBufferData(deviceContext, aLights, aLight);
 	
@@ -214,7 +218,7 @@ bool TextureShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext,
 	// Set shader texture resource in the pixel shader.
 	deviceContext->PSSetShaderResources(2, 1, &aView3);
 
-
+	delete dataPtr;
 	return true;
 }
 
