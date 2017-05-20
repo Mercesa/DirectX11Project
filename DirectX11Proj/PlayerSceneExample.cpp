@@ -62,10 +62,10 @@ void PlayerSceneExample::Init()
 	mpCamera->SetPosition(0.0f, 15.0f, -100.0f);
 	
 	
-	std::vector<ModelClass*> tModels = ResourceManager::GetInstance().LoadModels("Models\\Sponza\\Sponza.obj");
+	std::vector<ModelClass*> tModels = ResourceManager::GetInstance().LoadModels("Models\\Box\\cube.obj");
 
 	
-	XMMATRIX tScaleMat = tScaleMat = XMMatrixScaling(10.0f, 10.0f, 10.0f);
+	XMMATRIX tScaleMat = tScaleMat = XMMatrixScaling(200.0f, 1.0f, 200.0f);
 	XMMATRIX tTranslateMat = XMMatrixTranslation(0.0f, -5.0f, 0.0f);
 
 	// load models and translate them as game objects
@@ -73,26 +73,26 @@ void PlayerSceneExample::Init()
 	{
 		std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
 		tpObject->mpModel = tModels[i];
-		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixIdentity());
+		XMStoreFloat4x4(&tpObject->mWorldMatrix, tScaleMat);
 
 		this->mObjects.push_back(std::move(tpObject));
 	}
 
 	// Load cube
 	tModels = ResourceManager::GetInstance().LoadModels("Models\\Box\\cube.obj");
-	tTranslateMat = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
+	tTranslateMat = XMMatrixTranslation(25.0f, 25.0f, 0.0f);
 	for (int i = 0; i < tModels.size(); ++i)
 	{
 		std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
 		tpObject->mpModel = tModels[i];
-		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixIdentity());
+		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(10.0f, 10.0f, 10.0f), tTranslateMat));
 
 		this->mObjects.push_back(std::move(tpObject));
 	}
 
 	// Load sphere
 	tModels = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\sphere.obj");
-	tTranslateMat = XMMatrixTranslation(0.0f, 100.0f, 0.0f);
+	tTranslateMat = XMMatrixTranslation(0.0f, 25.0f, 0.0f);
 	for (int i = 0; i < tModels.size(); ++i)
 	{
 		std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
@@ -101,8 +101,6 @@ void PlayerSceneExample::Init()
 
 		this->mObjects.push_back(std::move(tpObject));
 	}
-
-	
 
 	// Create light, set diffuse and position, add light to list
 	std::unique_ptr<Light> tpLight = std::make_unique<Light>();

@@ -20,7 +20,7 @@ public:
 	XMFLOAT3 GetPosition();
 	XMFLOAT3 GetRotation();
 
-	void Render();
+	void UpdateViewMatrix();
 	void GetViewMatrix(XMMATRIX&);
 
 	float m_positionX, m_positionY, m_positionZ;

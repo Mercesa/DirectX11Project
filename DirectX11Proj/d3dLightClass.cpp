@@ -16,49 +16,49 @@ d3dLightClass::~d3dLightClass()
 }
 
 
-void d3dLightClass::SetAmbientColor(float red, float green, float blue, float alpha)
+void d3dLightClass::SetAmbientColor(float red, float green, float blue)
 {
-	m_ambientColor = D3DXVECTOR4(red, green, blue, alpha);
+	m_ambientColor = XMFLOAT3(red, green, blue);
 	return;
 }
 
 
-void d3dLightClass::SetDiffuseColor(float red, float green, float blue, float alpha)
+void d3dLightClass::SetDiffuseColor(float red, float green, float blue)
 {
-	m_diffuseColor = D3DXVECTOR4(red, green, blue, alpha);
+	m_diffuseColor = XMFLOAT3(red, green, blue);
 	return;
 }
 
 
 void d3dLightClass::SetPosition(float x, float y, float z)
 {
-	m_position = D3DXVECTOR3(x, y, z);
-	return;
+	mPosition.x = x;
+	mPosition.y = y;
+	mPosition.z = z;
 }
 
 
 void d3dLightClass::SetLookAt(float x, float y, float z)
 {
-	m_lookAt.x = x;
-	m_lookAt.y = y;
-	m_lookAt.z = z;
-	return;
+	mLookAt.x = x;
+	mLookAt.y = y;
+	mLookAt.z = z;
 }
 
 
-D3DXVECTOR4 d3dLightClass::GetAmbientColor()
+XMFLOAT3 d3dLightClass::GetAmbientColor()
 {
 	return m_ambientColor;
 }
 
 
-D3DXVECTOR4 d3dLightClass::GetDiffuseColor()
+XMFLOAT3 d3dLightClass::GetDiffuseColor()
 {
 	return m_diffuseColor;
 }
 
 
-D3DXVECTOR3 d3dLightClass::GetPosition()
+XMFLOAT3 d3dLightClass::GetPosition()
 {
 	return m_position;
 }
@@ -66,7 +66,7 @@ D3DXVECTOR3 d3dLightClass::GetPosition()
 
 void d3dLightClass::GenerateViewMatrix()
 {
-	D3DXVECTOR3 up;
+	XMFLOAT3 up;
 
 
 	// Setup the vector that points upwards.
@@ -75,8 +75,16 @@ void d3dLightClass::GenerateViewMatrix()
 	up.z = 0.0f;
 
 	// Create the view matrix from the three vectors.
-	D3DXMatrixLookAtLH(&m_viewMatrix, &m_position, &m_lookAt, &up);
 	
+	XMVECTOR upVector, positionVector, lookAtVector;
+
+	upVector = XMLoadFloat3(&up);
+	positionVector = XMLoadFloat3(&mPosition);
+	lookAtVector = XMLoadFloat3(&mLookAt);
+
+	//D3DXMatrixLookAtLH(&m_viewMatrix, &m_position, &m_lookAt, &up);
+	
+	XMStoreFloat4x4(&mViewMatrix, XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
 	return;
 }
 
@@ -90,22 +98,19 @@ void d3dLightClass::GenerateProjectionMatrix(float screenDepth, float screenNear
 	fieldOfView = (float)D3DX_PI / 2.0f;
 	screenAspect = 1.0f;
 
-	// Create the projection matrix for the light.
-	D3DXMatrixPerspectiveFovLH(&m_projectionMatrix, fieldOfView, screenAspect, screenNear, screenDepth);
+	XMStoreFloat4x4(&mProjectionmatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth));
 
 	return;
 }
 
 
-void d3dLightClass::GetViewMatrix(D3DXMATRIX& viewMatrix)
+void d3dLightClass::GetViewMatrix(XMMATRIX& viewMatrix)
 {
-	viewMatrix = m_viewMatrix;
-	return;
+	viewMatrix = XMLoadFloat4x4(&mViewMatrix);
 }
 
 
-void d3dLightClass::GetProjectionMatrix(D3DXMATRIX& projectionMatrix)
+void d3dLightClass::GetProjectionMatrix(XMMATRIX& projectionMatrix)
 {
-	projectionMatrix = m_projectionMatrix;
-	return;
+	projectionMatrix = XMLoadFloat4x4(&mProjectionmatrix);
 }

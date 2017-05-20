@@ -54,7 +54,7 @@ XMFLOAT3 CameraClass::GetRotation()
 }
 
 
-void CameraClass::Render()
+void CameraClass::UpdateViewMatrix()
 {
 	XMVECTOR upVector, positionVector, lookAtVector;
 	float yaw, pitch, roll;

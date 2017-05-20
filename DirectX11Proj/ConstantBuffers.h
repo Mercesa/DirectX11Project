@@ -11,8 +11,11 @@ struct MatrixBufferType
 	XMMATRIX world;
 	XMMATRIX view;
 	XMMATRIX projection;
+};
 
-
+struct LightMatrixBufferType
+{
+	XMMATRIX worldMatrix;
 	XMMATRIX lightViewMatrix;
 	XMMATRIX lightProjectionMatrix;
 };

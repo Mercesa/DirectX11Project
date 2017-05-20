@@ -37,12 +37,18 @@
     <Filter Include="NonFramework\Interfaces">
       <UniqueIdentifier>{51a44c7a-bb86-4352-821b-16ba45b14fd7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="D3DSetup\SetupClasses">
+      <UniqueIdentifier>{4017dcef-3591-4572-a99e-065d2b1580db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{1578abde-7f40-4936-90cb-27fbb939e80a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3DSetup\Managers">
+      <UniqueIdentifier>{8734bb2f-0609-41ec-8c29-2c1fd88d5eaa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="inputclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="systemclass.cpp">
@@ -57,19 +63,7 @@
     <ClCompile Include="Application.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
-    <ClCompile Include="d3dclass.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
     <ClCompile Include="graphicsclass.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dDepthStencil.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dRasterizerState.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dVertexBuffer.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
     <ClCompile Include="PlayerSceneExample.cpp">
@@ -87,9 +81,6 @@
     <ClCompile Include="d3dMaterial.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
-    <ClCompile Include="d3dConstantBuffer.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
     <ClCompile Include="d3dShaderManager.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
@@ -98,9 +89,6 @@
     </ClCompile>
     <ClCompile Include="d3dShaderPS.cpp">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
-    </ClCompile>
-    <ClCompile Include="EngineTimer.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="d3dDXGIManager.cpp">
       <Filter>D3DSetup\DXGI</Filter>
@@ -117,12 +105,6 @@
     <ClCompile Include="d3dRenderTexture.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
-    <ClCompile Include="d3dLightClass.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IApplication.cpp">
       <Filter>NonFramework\Interfaces</Filter>
     </ClCompile>
@@ -136,13 +118,40 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="depthshaderclass.cpp">
+      <Filter>D3DSetup\Shaderclasses</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dLightClass.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dConstantBuffer.cpp">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dDepthStencil.cpp">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dRasterizerState.cpp">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dVertexBuffer.cpp">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="inputclass.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineTimer.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsEngine.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="SamplerStateManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inputclass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="cameraclass.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -155,19 +164,7 @@
     <ClInclude Include="ModelData.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="d3dclass.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
     <ClInclude Include="graphicsclass.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dDepthStencil.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dRasterizerState.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dVertexBuffer.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="PlayerSceneExample.h">
@@ -185,13 +182,7 @@
     <ClInclude Include="d3dTexture.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
-    <ClInclude Include="ModelLoader.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="d3dMaterial.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dConstantBuffer.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="LightStruct.h">
@@ -215,9 +206,6 @@
     <ClInclude Include="d3dShaderPS.h">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClInclude>
-    <ClInclude Include="d3dSamplerStateManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="systemclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -233,14 +221,8 @@
     <ClInclude Include="textureshaderclass.h">
       <Filter>D3DSetup\Shaderclasses</Filter>
     </ClInclude>
-    <ClInclude Include="EngineTimer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="d3dRenderTexture.h">
       <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dLightClass.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IApplication.h">
       <Filter>NonFramework\Interfaces</Filter>
@@ -255,6 +237,36 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="depthshaderclass.h">
+      <Filter>D3DSetup\Shaderclasses</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dLightClass.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dDepthStencil.h">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dConstantBuffer.h">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dRasterizerState.h">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dVertexBuffer.h">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="inputclass.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineTimer.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsEngine.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="SamplerStateManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

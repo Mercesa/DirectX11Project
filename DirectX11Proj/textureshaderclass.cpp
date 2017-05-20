@@ -50,14 +50,13 @@ void TextureShaderClass::ShutdownShader()
 }
 
 
-bool TextureShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix,
-	const XMMATRIX& projectionMatrix, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLights, XMFLOAT3 aCamPos, Light* const aLight)
+bool TextureShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount, d3dMaterial* const aMaterial)
 {
 	bool result;
 
 
 	// Set the shader parameters that it will use for rendering.
-	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, aMaterial, aLights, aCamPos, aLight);
+	result = SetShaderParameters(deviceContext, aMaterial);
 	if (!result)
 	{
 		return false;
@@ -74,14 +73,9 @@ bool TextureShaderClass::InitializeShader(ID3D11Device* device)
 {
 	HRESULT result;
 	ID3D10Blob* errorMessage;
-	D3D11_BUFFER_DESC matrixBufferDesc;
 	D3D11_SAMPLER_DESC samplerDesc;
 
 
-
-	mpMatrixCB = std::make_unique<d3dConstantBuffer>(sizeof(MatrixBufferType), nullptr, device);
-	mpMaterialCB = std::make_unique<d3dConstantBuffer>(sizeof(MaterialBufferType), nullptr, device);
-	mpLightCB = std::make_unique<d3dConstantBuffer>(sizeof(LightBufferType), nullptr, device); 
 
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
@@ -108,98 +102,11 @@ bool TextureShaderClass::InitializeShader(ID3D11Device* device)
 	return true;
 }
 
-bool TextureShaderClass::SetLightConstantBufferData(ID3D11DeviceContext* const aDeviceContext, std::vector<unique_ptr<Light>>& aLights, Light* const aLight)
+
+bool TextureShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, d3dMaterial* const aMaterial)
 {
-	HRESULT result;
-	static LightBufferType* dataPtr = new LightBufferType();
-	uint32_t bufferNumber;
-
-	// Get a pointer to the data in the constant buffer.
-
-	dataPtr->amountOfLights = static_cast<int>(aLights.size());
-
-	
-
-	for (int i = 0; i < aLights.size(); ++i)
-	{
-		dataPtr->arr[i].position = aLights[i]->position;
-		dataPtr->arr[i].diffuseColor = aLights[i]->diffuseColor;
-	}
-
-	dataPtr->directionalLight.diffuseColor = aLight->diffuseColor;
-	dataPtr->directionalLight.specularColor = aLight->specularColor;
-	dataPtr->directionalLight.position = aLight->position;
 
 
-	mpLightCB->UpdateBuffer((void*)dataPtr, aDeviceContext);
-
-
-	bufferNumber = 2;
-	ID3D11Buffer* tBuff = mpLightCB->GetBuffer();
-
-	aDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
-
-	return true;
-}
-
-bool TextureShaderClass::SetMaterialConstantBufferData(ID3D11DeviceContext* const aDeviceContext, d3dMaterial* const aMaterial)
-{
-	HRESULT result;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	static MaterialBufferType* dataPtr = new MaterialBufferType();
-	uint32_t bufferNumber;
-
-	dataPtr->hasDiffuse = (int)aMaterial->mpDiffuse->exists;
-	dataPtr->hasSpecular = (int)aMaterial->mpSpecular->exists;
-	dataPtr->hasNormal = (int)aMaterial->mpNormal->exists;
-
-
-	mpMaterialCB->UpdateBuffer((void*)dataPtr, aDeviceContext);
-	bufferNumber = 1;
-	ID3D11Buffer* tBuff = mpMaterialCB->GetBuffer();
-	aDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
-
-	return true;
-}
-
-bool TextureShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, const XMMATRIX& worldMatrix, const XMMATRIX& viewMatrix,
-	const XMMATRIX& projectionMatrix, d3dMaterial* const aMaterial, std::vector<unique_ptr<Light>>& aLights, XMFLOAT3 aCamPos, Light* const aLight)
-{
-	HRESULT result;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	 MatrixBufferType* dataPtr = new MatrixBufferType();
-	uint32_t bufferNumber;
-
-	// Transpose the matrices to prepare them for the shader.
-	XMMATRIX worldMatrix2 = XMMatrixTranspose(worldMatrix);
-	XMMATRIX viewMatrix2 = XMMatrixTranspose(viewMatrix);
-	XMMATRIX projectionMatrix2 = XMMatrixTranspose(projectionMatrix);
-
-	// Get a pointer to the data in the constant buffer.
-
-	// Copy the matrices into the constant buffer.
-	dataPtr->world = worldMatrix2;
-	dataPtr->view = viewMatrix2;
-	dataPtr->projection = projectionMatrix2;
-	dataPtr->gEyePosX = aCamPos.x;
-	dataPtr->gEyePosY = aCamPos.y;
-	dataPtr->gEyePosZ = aCamPos.z;
-
-
-	mpMatrixCB->UpdateBuffer((void*)dataPtr, deviceContext);
-
-	// Set the position of the constant buffer in the vertex shader.
-	bufferNumber = 0;
-
-	ID3D11Buffer* tBuff = mpMatrixCB->GetBuffer();
-	// finally set the constant buffer in the vertex shader with the updated values.
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
-	
-	SetMaterialConstantBufferData(deviceContext, aMaterial);
-	SetLightConstantBufferData(deviceContext, aLights, aLight);
-	
-	
 	
 	ID3D11ShaderResourceView* aView = aMaterial->mpDiffuse->GetTexture();
 
@@ -218,7 +125,6 @@ bool TextureShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext,
 	// Set shader texture resource in the pixel shader.
 	deviceContext->PSSetShaderResources(2, 1, &aView3);
 
-	delete dataPtr;
 	return true;
 }
 

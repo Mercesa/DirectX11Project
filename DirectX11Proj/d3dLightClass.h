@@ -5,8 +5,9 @@
 
 
 #include <d3dx10math.h>
+#include <DirectXMath.h>
 
-
+using namespace DirectX;
 
 class d3dLightClass
 {
@@ -15,28 +16,33 @@ public:
 	d3dLightClass(const d3dLightClass&);
 	~d3dLightClass();
 
-	void SetAmbientColor(float, float, float, float);
-	void SetDiffuseColor(float, float, float, float);
+	void SetAmbientColor(float, float, float);
+	void SetDiffuseColor(float, float, float);
 	void SetPosition(float, float, float);
 	void SetLookAt(float, float, float);
 
-	D3DXVECTOR4 GetAmbientColor();
-	D3DXVECTOR4 GetDiffuseColor();
-	D3DXVECTOR3 GetPosition();
+	XMFLOAT3 GetAmbientColor();
+	XMFLOAT3 GetDiffuseColor();
+	XMFLOAT3 GetPosition();
 
 	void GenerateViewMatrix();
 	void GenerateProjectionMatrix(float, float);
 
-	void GetViewMatrix(D3DXMATRIX&);
-	void GetProjectionMatrix(D3DXMATRIX&);
+	void GetViewMatrix(XMMATRIX&);
+	void GetProjectionMatrix(XMMATRIX&);
 
 private:
-	D3DXVECTOR4 m_ambientColor;
-	D3DXVECTOR4 m_diffuseColor;
-	D3DXVECTOR3 m_position;
-	D3DXVECTOR3 m_lookAt;
-	D3DXMATRIX m_viewMatrix;
-	D3DXMATRIX m_projectionMatrix;
+	XMFLOAT3 m_ambientColor;
+	XMFLOAT3 m_diffuseColor;
+	XMFLOAT3 m_position;
+
+	XMFLOAT3 mPosition;
+	XMFLOAT3 mLookAt;
+
+
+	XMFLOAT4X4	mViewMatrix;
+	XMFLOAT4X4  mProjectionmatrix;
+	XMFLOAT4X4  mOrthoMatrix;
 };
 
 #endif

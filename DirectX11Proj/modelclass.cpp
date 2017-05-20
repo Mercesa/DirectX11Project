@@ -1,7 +1,6 @@
 #include "modelclass.h"
 
 #include "d3dVertexBuffer.h"
-#include "d3dclass.h"
 #include "d3dTexture.h"
 #include "d3dMaterial.h"
 #include "ModelData.h"

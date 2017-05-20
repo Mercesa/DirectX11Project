@@ -19,9 +19,7 @@ cbuffer MatrixBuffer : register(b0)
 	matrix worldMatrix;
 	matrix viewMatrix;
 	matrix projectionMatrix;
-	
-	matrix lightViewMatrix;
-	matrix lightProjectionMatrix;
+
 };
 
 // integers are 32 bit in HLSL
@@ -44,6 +42,13 @@ cbuffer LightBuffer : register(b2)
 
 	Light arr[16];
 };
+
+cbuffer LightMatrixBuffer : register (b3)
+{
+	matrix worldMatrix2;
+	matrix lightViewMatrix;
+	matrix lightProjectionMatrix;
+}
 
 float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangentW)
 {

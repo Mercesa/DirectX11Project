@@ -6,6 +6,7 @@
 class d3dConstantBuffer
 {
 public:
+	// Size of the struct, the data provided, the device
 	d3dConstantBuffer(int aSize, void* aData, ID3D11Device* const aDevice);
 	~d3dConstantBuffer();
 	

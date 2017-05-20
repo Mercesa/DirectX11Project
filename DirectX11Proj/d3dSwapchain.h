@@ -25,5 +25,6 @@ private:
 
 	Microsoft::WRL::ComPtr<IDXGISwapChain> mpSwapchain;
 
+
 };
 
