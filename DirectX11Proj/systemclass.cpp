@@ -201,7 +201,12 @@ bool SystemClass::Frame()
 	}
 
 	// Do the frame processing for the graphics object.
+	EngineTimer t;
+	t.Start();
+
 	mpGraphics->Frame(mpApplication->mpCurrentScene.get());
+	t.Update();
+	std::cout << t.GetDeltaTime() << std::endl;
 
 	return true;
 }

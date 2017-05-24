@@ -111,7 +111,7 @@ void CameraClass::UpdateViewMatrix()
 
 	// Finally create the view matrix from the three updated vectors.
 	XMStoreFloat4x4(&mViewMatrix, XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
-
+	
 	return;
 }
 

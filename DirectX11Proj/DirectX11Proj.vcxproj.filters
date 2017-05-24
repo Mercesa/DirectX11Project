@@ -147,9 +147,6 @@
     <ClCompile Include="GraphicsEngine.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
-    <ClCompile Include="SamplerStateManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cameraclass.h">
@@ -265,9 +262,6 @@
     </ClInclude>
     <ClInclude Include="GraphicsEngine.h">
       <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="SamplerStateManager.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

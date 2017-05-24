@@ -54,7 +54,6 @@ private:
 	bool Initialize(int, int, bool, HWND, bool, float, float);
 
 	void BeginScene(float, float, float, float);
-	void EndScene();
 
 	ID3D11Device* GetDevice();
 	ID3D11DeviceContext* GetDeviceContext();
@@ -77,7 +76,6 @@ private:
 	std::unique_ptr<TextureShaderClass> mTextureShader;
 	std::unique_ptr<depthshaderclass> mDepthShader;
 
-	std::unique_ptr<d3dShaderManager> mpShaderManager;
 
 	std::unique_ptr<d3dLightClass> mpD3LightClass;
 	std::unique_ptr<d3dRenderTexture> mpRenderTexture;
@@ -88,7 +86,6 @@ private:
 	XMFLOAT4X4  mProjectionmatrix;
 	XMFLOAT4X4  mOrthoMatrix;
 
-	std::unique_ptr<d3dSwapchain> mpSwapChain;
 	std::unique_ptr<d3dDepthStencil> mpDepthStencil;
 	std::unique_ptr<d3dRasterizerState> mpRasterizerState;
 

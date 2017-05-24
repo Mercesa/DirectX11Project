@@ -37,7 +37,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, bool vsync, HW
 	float screenDepth, float screenNear)
 {
 	HRESULT result;
-	int numerator, denominator;
 	D3D_FEATURE_LEVEL featureLevel;
 	ID3D11Texture2D* backBufferPtr;
 	D3D11_RASTERIZER_DESC rasterDesc;
@@ -53,29 +52,15 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, bool vsync, HW
 	// Store the vsync setting.
 	m_vsync_enabled = vsync;
 
-	std::unique_ptr<d3dDXGIManager> md3dDXGIManager = std::make_unique<d3dDXGIManager>();
-	md3dDXGIManager->Create(screenWidth, screenHeight, numerator, denominator);
-
 	GraphicsEngine& engine = GraphicsEngine::getInstance();
 
-	engine.CreateDevice();
+	engine.Initialize(screenWidth, screenHeight, hwnd);
 
 
-
-	GraphicsEngine::getInstance().CreateDevice();
-
-	mpSwapChain = std::make_unique<d3dSwapchain>(md3dDXGIManager->GetFactory(), engine.GetDevice());
-
-	bool swapChainCreationResult = mpSwapChain->Create(screenWidth, screenHeight, numerator, screenHeight, m_vsync_enabled, fullscreen, hwnd);
-
-	if (!swapChainCreationResult)
-	{
-		LOG(ERROR) << "swapchain failed creation";
-		return false;
-	}
+	
 
 	// Get the pointer to the back buffer.
-	result = mpSwapChain->GetSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
+	result = engine.GetSwapchain()->GetSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
 	{
 		LOG(ERROR) << "failed to get back buffer ptr from swapchain";
@@ -281,12 +266,6 @@ void GraphicsClass::BeginScene(float red, float green, float blue, float alpha)
 }
 
 
-void GraphicsClass::EndScene()
-{
-	mpSwapChain->Swap(m_vsync_enabled);
-}
-
-
 ID3D11Device* GraphicsClass::GetDevice()
 {
 	return GraphicsEngine::getInstance().GetDevice();
@@ -327,12 +306,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	ResourceManager::GetInstance().mpDevice = GetDevice();
 
 
-	mpShaderManager = std::make_unique<d3dShaderManager>();
+	d3dShaderManager* const tShaderManager = GraphicsEngine::getInstance().GetShaderManager();
 
-	if (!mpShaderManager->InitializeShaders(GetDevice()))
-	{
-		return false;
-	}
 	
 	// Prepare the color shader
 	mpColorShader = std::make_unique<ColorShaderClass>();
@@ -349,8 +324,8 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	mpColorShader->mpVertexShader = mpShaderManager->GetVertexShader("Shaders\\VS_color.hlsl");
-	mpColorShader->mpPixelShader = mpShaderManager->GetPixelShader("Shaders\\PS_color.hlsl");
+	mpColorShader->mpVertexShader = tShaderManager->GetVertexShader("Shaders\\VS_color.hlsl");
+	mpColorShader->mpPixelShader = tShaderManager->GetPixelShader("Shaders\\PS_color.hlsl");
 
 	// Prepare the texture shader
 	mTextureShader = std::make_unique<TextureShaderClass>();
@@ -367,8 +342,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	mTextureShader->mpVSShader = mpShaderManager->GetVertexShader("Shaders\\VS_texture.hlsl");
-	mTextureShader->mpPSShader = mpShaderManager->GetPixelShader("Shaders\\PS_texture.hlsl");
 
 
 
@@ -381,8 +354,6 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 	}
 
-	mDepthShader->mpVSShader = mpShaderManager->GetVertexShader("Shaders\\VS_depth.hlsl");
-	mDepthShader->mpPSShader = mpShaderManager->GetPixelShader("Shaders\\PS_depth.hlsl");
 
 
 	mpD3LightClass = std::make_unique<d3dLightClass>();
@@ -407,7 +378,6 @@ void GraphicsClass::Shutdown()
 	mTextureShader->Shutdown();
 	mpRenderTexture->Shutdown();
 	// Before shutting down set to windowed mode or when you release the swap chain it will throw an exception.
-	mpSwapChain->Shutdown();
 
 
 	mpRenderTargetView.Reset();
@@ -499,7 +469,7 @@ bool GraphicsClass::Render(IScene *const aScene)
 
 
 	// Present the rendered scene to the screen.
-	EndScene();
+	GraphicsEngine::getInstance().EndScene();
 
 	return true;
 }

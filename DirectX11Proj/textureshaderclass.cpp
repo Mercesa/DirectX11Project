@@ -5,6 +5,8 @@
 #include "easylogging++.h"
 
 #include "d3dTexture.h"
+#include "GraphicsEngine.h"
+#include "d3dShaderManager.h"
 TextureShaderClass::TextureShaderClass() 
 {
 	mpSampleState = 0;
@@ -19,6 +21,10 @@ bool TextureShaderClass::Initialize(ID3D11Device* device)
 {
 	bool result;
 
+	d3dShaderManager*const shaderManager = GraphicsEngine::getInstance().GetShaderManager();
+
+	mpVSShader = shaderManager->GetVertexShader("Shaders\\VS_texture.hlsl");
+	mpPSShader = shaderManager->GetPixelShader("Shaders\\PS_texture.hlsl");
 
 	// Initialize the vertex and pixel shaders.
 	result = InitializeShader(device);

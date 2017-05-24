@@ -36,22 +36,22 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 	
 	if (apInput->IsKeyDown(0x53))
 	{
-		mpCamera->m_positionZ += -1.0f;
+		mpCamera->m_positionZ += -100.0f * aDT;
 	}
 
 	if (apInput->IsKeyDown(0x57))
 	{
-		mpCamera->m_positionZ += 1.0f;
+		mpCamera->m_positionZ += 100.0f * aDT;
 	}
 
 	if (apInput->IsKeyDown(0x41))
 	{
-		mpCamera->m_positionY -= 1.0f;
+		mpCamera->m_positionY -= 100.0f * aDT;
 	}
 
 	if (apInput->IsKeyDown(0x44))
 	{
-		mpCamera->m_positionY += 1.0f;
+		mpCamera->m_positionY += 100.0f * aDT;
 	}
 
 	std::cout << mpCamera->m_positionY << std::endl;
