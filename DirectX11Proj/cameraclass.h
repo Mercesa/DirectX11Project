@@ -20,16 +20,17 @@ public:
 	XMFLOAT3 GetPosition();
 	XMFLOAT3 GetRotation();
 
-	void Render();
+	void UpdateViewMatrix();
 	void GetViewMatrix(XMMATRIX&);
 
 	float m_positionX, m_positionY, m_positionZ;
-
+	
 	XMFLOAT3 up, position, lookAt;
 
 private:
 	float m_rotationX, m_rotationY, m_rotationZ;
-	XMMATRIX m_viewMatrix;
+	XMFLOAT4X4 mViewMatrix;
+	XMFLOAT4X4 mProjectionMatrix;
 };
 
 #endif

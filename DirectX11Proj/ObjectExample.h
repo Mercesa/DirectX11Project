@@ -9,6 +9,6 @@ public:
 
 	virtual void OnDestroy() override;
 	virtual void OnInit() override;
-	virtual void OnUpdate() override;
+	virtual void Tick() override;
 };
 

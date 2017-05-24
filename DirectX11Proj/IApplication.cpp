@@ -2,56 +2,40 @@
 
 #include <iostream>
 
+#include "easylogging++.h"
 
 #include "IScene.h"
 #include "systemclass.h"
 
 
-IApplication::IApplication() : mpCurrentScene(nullptr), mShouldQuit(false)
+
+IApplication::IApplication() : mShouldQuit(false)
 {
 }
 
 
 IApplication::~IApplication()
 {
-	if (mpCurrentScene)
-	{
-		// fucking evil (wow). should really fix something about this (and think of a decent scene management system)
-		delete mpCurrentScene;
-	}
+
 }
 
 // Setting the current scene also initializes it
-void IApplication::LoadScene(IScene* aScene)
+void IApplication::LoadScene(std::unique_ptr<IScene> apScene)
 {
-	assert(aScene != nullptr);
+	assert(apScene);
 
-	if (aScene == nullptr)
+	if (apScene == nullptr)
 	{
 		std::cout << "Can not set a nullptr as current scene!" << std::endl;
 		return;
 	}
 
-	if (mpCurrentScene != nullptr)
-	{
-		std::cout << "There is already a scene loaded!" << std::endl;
-		return;
-	}
+	mpCurrentScene = std::move(apScene);
 
-	this->mpCurrentScene = aScene;
 	if (!mpCurrentScene->HasBeenInitialized())
 	{
-		aScene->Init();
-		aScene->mInitialized = true;
-	}
-}
-
-
-void IApplication::SceneTick(InputClass* const aInput)
-{
-	if (mpCurrentScene != nullptr)
-	{
-		mpCurrentScene->Tick(aInput);
+		mpCurrentScene->Init();
+		mpCurrentScene->mInitialized = true;
 	}
 }
 
@@ -59,4 +43,9 @@ void IApplication::SceneTick(InputClass* const aInput)
 bool IApplication::ShouldQuit()
 {
 	return mShouldQuit;
+}
+
+IScene* const IApplication::GetCurrentScene()
+{
+	return mpCurrentScene.get(); 
 }

@@ -7,8 +7,11 @@
 #include <string>
 
 #include "ModelLoader.h"
-class ModelClass;
+#include "d3dTexture.h"
 
+class ModelClass;
+class d3dMaterial;
+struct TextureData;
 
 class ResourceManager
 {
@@ -17,15 +20,15 @@ public:
 	
 	ResourceManager(ResourceManager const&) = delete;
 	void operator=(ResourceManager const&)	= delete;
-	
 
-	static ResourceManager& getInstance()
+	void Shutdown();
+
+	static ResourceManager& GetInstance()
 	{
 		static ResourceManager instance;
 
 		return instance;
 	}
-
 
 	std::vector<ModelClass*> LoadModels(std::string aFilePath);
 
@@ -35,7 +38,13 @@ private:
 	std::unique_ptr<ModelLoader> mpModelLoader;
 	ID3D11Device* mpDevice;
 
-	std::vector<std::shared_ptr<ModelClass>> mLoadedModels;
+	// Turn these into maps at one point
+	std::vector<std::unique_ptr<ModelClass>> mLoadedModels;
+	std::vector<std::unique_ptr<d3dTexture>> mLoadedTextures;
+
+	std::unique_ptr<d3dMaterial> LoadTexturesFromMaterial(const MeshData& aMeshData);
+	std::unique_ptr<d3dTexture> LoadTexture(TextureData aData);
+
 	// Load models as one
 	// Load models as a list
 };

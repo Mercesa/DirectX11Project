@@ -7,6 +7,10 @@
 #include <d3dx11async.h>
 #include <directxmath.h>
 #include <fstream>
+
+#include "d3dShaderVS.h"
+#include "d3dShaderPS.h"
+
 using namespace DirectX;
 using namespace std;
 
@@ -26,20 +30,23 @@ public:
 	ColorShaderClass(const ColorShaderClass&);
 	~ColorShaderClass();
 
-	bool Initialize(ID3D11Device*, HWND);
+	bool Initialize(ID3D11Device*);
 	void Shutdown();
 	bool Render(ID3D11DeviceContext*, int, const XMMATRIX&, const XMMATRIX& , const XMMATRIX&);
 
+	d3dShaderVS* mpVertexShader;
+	d3dShaderPS* mpPixelShader;
+
 private:
-	bool InitializeShader(ID3D11Device*, HWND, WCHAR*);
+	bool InitializeShader(ID3D11Device*, WCHAR*);
 	void ShutdownShader();
 
 	bool SetShaderParameters(ID3D11DeviceContext*, const XMMATRIX&, const XMMATRIX&, const XMMATRIX&) const;
 	void RenderShader(ID3D11DeviceContext*, int);
 
+
 private:
-	ID3D11VertexShader* m_vertexShader;
-	ID3D11PixelShader* m_pixelShader;
+	
 	ID3D11InputLayout* m_layout;
 	ID3D11Buffer* m_matrixBuffer;
 };

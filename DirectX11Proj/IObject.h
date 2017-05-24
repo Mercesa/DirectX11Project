@@ -10,7 +10,7 @@ public:
 
 	virtual void OnDestroy() = 0;
 	virtual void OnInit() = 0;
-	virtual void OnUpdate() = 0;
+	virtual void Tick() = 0;
 	
 	bool GetActive() { return mIsActive; }
 	bool GetCastShadow() { return mCastShadow; }
@@ -18,6 +18,7 @@ public:
 
 
 	ModelClass* mpModel;
+	XMFLOAT4X4  mWorldMatrix;
 
 protected:
 	// premature initialization just so I dont forget in general

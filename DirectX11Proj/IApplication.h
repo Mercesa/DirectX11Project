@@ -1,9 +1,11 @@
 #pragma once
 
+#include <memory>
+#include "inputclass.h"
+
 class IScene;
 class SystemClass;
 
-#include "inputclass.h"
 
 // Application context struct maybe
 // information about the application(size of window, name of window etc)
@@ -21,12 +23,12 @@ public:
 
 	bool ShouldQuit();
 
-	void LoadScene(IScene* aScene);
+	void LoadScene(std::unique_ptr<IScene> apScene);
+	IScene* const GetCurrentScene();
 
 private:
-	void SceneTick(InputClass* const aInput);
-	IScene* mpCurrentScene;
+	std::unique_ptr<IScene> mpCurrentScene;
 
-	bool mShouldQuit = false;
+	bool mShouldQuit;
 };
 
