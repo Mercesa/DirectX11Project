@@ -5,7 +5,6 @@
 #include "easylogging++.h"
 
 #include "IScene.h"
-#include "systemclass.h"
 
 
 

@@ -3,8 +3,6 @@
 #include "easylogging++.h"
 
 #include "d3dShaderManager.h"
-#include "d3dDXGIManager.h"
-#include "d3dSwapchain.h"
 
 
 GraphicsEngine::GraphicsEngine() : hasBeenInitialized(false)
@@ -31,22 +29,22 @@ bool GraphicsEngine::Initialize(int aScreenWidth, int aScreenHeight, HWND hwnd)
 		return false;
 	}
 
-	mpDXGIManager = std::make_unique<d3dDXGIManager>();
+	//mpDXGIManager = std::make_unique<d3dDXGIManager>();
 	
-	if (!mpDXGIManager->Create(aScreenWidth, aScreenHeight, numerator, denominator))
-	{
-		LOG(FATAL) << "Failed to create DXGI manager";
-		return false;
-	}
-
-	mpSwapChain = std::make_unique<d3dSwapchain>();
-	bool swapChainCreationResult = mpSwapChain->Create(aScreenWidth, aScreenHeight, numerator, denominator, true, false, hwnd);
-
-	if (!swapChainCreationResult)
-	{
-		LOG(FATAL) << "swapchain failed creation";
-		return false;
-	}
+	//if (!mpDXGIManager->Create(aScreenWidth, aScreenHeight, numerator, denominator))
+	//{
+	//	LOG(FATAL) << "Failed to create DXGI manager";
+	//	return false;
+	//}
+	//
+	//mpSwapChain = std::make_unique<d3dSwapchain>();
+	//bool swapChainCreationResult = mpSwapChain->Create(aScreenWidth, aScreenHeight, numerator, denominator, true, false, hwnd);
+	//
+	//if (!swapChainCreationResult)
+	//{
+	//	LOG(FATAL) << "swapchain failed creation";
+	//	return false;
+	//}
 	
 	if (!InitializeSamplers())
 	{
@@ -126,7 +124,7 @@ bool GraphicsEngine::CreateDevice()
 
 void GraphicsEngine::EndScene()
 {
-	mpSwapChain->Swap(true);
+//mpSwapChain->Swap(true);
 }
 
 
@@ -176,14 +174,14 @@ d3dShaderManager* const GraphicsEngine::GetShaderManager()
 	return mpShaderManager.get();
 }
 
-d3dDXGIManager* const GraphicsEngine::GetDXGIManager()
-{
-	assert(this->mpDXGIManager.get() != nullptr);
-	return mpDXGIManager.get();
-}
+//d3dDXGIManager* const GraphicsEngine::GetDXGIManager()
+//{
+//	assert(this->mpDXGIManager.get() != nullptr);
+//	return mpDXGIManager.get();
+//}
 
-d3dSwapchain* const GraphicsEngine::GetSwapchain()
-{
-	assert(this->mpSwapChain.get() != nullptr);
-	return mpSwapChain.get();
-}
+//d3dSwapchain* const GraphicsEngine::GetSwapchain()
+//{
+//	assert(this->mpSwapChain.get() != nullptr);
+//	return mpSwapChain.get();
+//}

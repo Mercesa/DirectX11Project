@@ -16,7 +16,7 @@ public:
 	InputClass(const InputClass&);
 	~InputClass();
 
-	bool Initialize(HINSTANCE, HWND, int, int);
+	bool Initialize();
 	void Shutdown();
 	bool Frame();
 
@@ -60,7 +60,6 @@ private:
 
 	DIMOUSESTATE mMouseState;
 
-	int mScreenWidth, mScreenHeight;
 	int mMouseX, mMouseY;
 	int mMouseRelX, mMouseRelY;
 

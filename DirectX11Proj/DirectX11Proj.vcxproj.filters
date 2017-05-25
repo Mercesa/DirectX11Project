@@ -51,9 +51,6 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="systemclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="cameraclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -90,12 +87,6 @@
     <ClCompile Include="d3dShaderPS.cpp">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClCompile>
-    <ClCompile Include="d3dDXGIManager.cpp">
-      <Filter>D3DSetup\DXGI</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dSwapchain.cpp">
-      <Filter>D3DSetup\DXGI</Filter>
-    </ClCompile>
     <ClCompile Include="colorshaderclass.cpp">
       <Filter>D3DSetup\Shaderclasses</Filter>
     </ClCompile>
@@ -127,9 +118,6 @@
       <Filter>D3DSetup\SetupClasses</Filter>
     </ClCompile>
     <ClCompile Include="d3dDepthStencil.cpp">
-      <Filter>D3DSetup\SetupClasses</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dRasterizerState.cpp">
       <Filter>D3DSetup\SetupClasses</Filter>
     </ClCompile>
     <ClCompile Include="d3dVertexBuffer.cpp">
@@ -203,15 +191,6 @@
     <ClInclude Include="d3dShaderPS.h">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClInclude>
-    <ClInclude Include="systemclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dDXGIManager.h">
-      <Filter>D3DSetup\DXGI</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dSwapchain.h">
-      <Filter>D3DSetup\DXGI</Filter>
-    </ClInclude>
     <ClInclude Include="colorshaderclass.h">
       <Filter>D3DSetup\Shaderclasses</Filter>
     </ClInclude>
@@ -243,9 +222,6 @@
       <Filter>D3DSetup\SetupClasses</Filter>
     </ClInclude>
     <ClInclude Include="d3dConstantBuffer.h">
-      <Filter>D3DSetup\SetupClasses</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dRasterizerState.h">
       <Filter>D3DSetup\SetupClasses</Filter>
     </ClInclude>
     <ClInclude Include="d3dVertexBuffer.h">

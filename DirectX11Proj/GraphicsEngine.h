@@ -8,8 +8,8 @@ using namespace DirectX;
 #include <memory>
 
 class d3dShaderManager;
-class d3dDXGIManager;
-class d3dSwapchain;
+//class d3dDXGIManager;
+//class d3dSwapchain;
 
 class GraphicsEngine
 {
@@ -49,9 +49,8 @@ public:
 	XMFLOAT4X4 GetViewMatrix();
 
 	d3dShaderManager* const GetShaderManager();
-	d3dDXGIManager* const GetDXGIManager();
 
-	d3dSwapchain* const GetSwapchain();
+	//d3dSwapchain* const GetSwapchain();
 
 	void EndScene();
 
@@ -66,10 +65,10 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11Device> mpDevice;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> mpDeviceContext;
 
-	std::unique_ptr<d3dSwapchain> mpSwapChain;
+	//std::unique_ptr<d3dSwapchain> mpSwapChain;
 
 	std::unique_ptr<d3dShaderManager> mpShaderManager;
-	std::unique_ptr<d3dDXGIManager> mpDXGIManager;
+	//std::unique_ptr<d3dDXGIManager> mpDXGIManager;
 
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpAnisotropicWrapSampler;
 

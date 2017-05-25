@@ -9,8 +9,7 @@
 #include "ResourceManager.h"
 
 #include "d3dTexture.h"
-#include "d3dDXGIManager.h"
-#include "d3dSwapchain.h"
+//#include "d3dDXGIManager.h"
 #include "d3dDepthStencil.h"
 #include "d3dRasterizerState.h"
 #include "GraphicsEngine.h"
@@ -60,72 +59,24 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, bool vsync, HW
 	
 
 	// Get the pointer to the back buffer.
-	result = engine.GetSwapchain()->GetSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
-	if (FAILED(result))
-	{
-		LOG(ERROR) << "failed to get back buffer ptr from swapchain";
-		return false;
-	}
+	//result = engine.GetSwapchain()->GetSwapChain()->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
+	//if (FAILED(result))
+	//{
+	//	LOG(ERROR) << "failed to get back buffer ptr from swapchain";
+	//	return false;
+	//}
 
 	// Create the render target view with the back buffer pointer.
-	result = engine.GetDevice()->CreateRenderTargetView(backBufferPtr, NULL, &mpRenderTargetView);
-	if (FAILED(result))
-	{
-		LOG(ERROR) << "failed to create render target view";
-		return false;
-	}
-
-	// Release pointer to the back buffer as we no longer need it.
-	backBufferPtr->Release();
-	backBufferPtr = 0;
-
-
-	mpDepthStencil = std::make_unique<d3dDepthStencil>(engine.GetDevice(), engine.GetDeviceContext());
-
-	mpDepthStencil->Create(screenWidth, screenHeight);
-
-	// Set the depth stencil state.
-	engine.GetDeviceContext()->OMSetDepthStencilState(mpDepthStencil->GetDepthStencilState(), 1);
-
-	// Bind the render target view and depth stencil buffer to the output render pipeline.
-	engine.GetDeviceContext()->OMSetRenderTargets(1, mpRenderTargetView.GetAddressOf(), mpDepthStencil->GetDepthStencilView());
-
-	mpRasterizerState = std::make_unique<d3dRasterizerState>(engine.GetDevice(), engine.GetDeviceContext());
-	mpRasterizerState->Create();
-
-	if (FAILED(result))
-	{
-		return false;
-	}
-
-	// Now set the rasterizer state.
-	engine.GetDeviceContext()->RSSetState(mpRasterizerState->m_rasterState.Get());
-
-	// Setup the viewport for rendering.
-	viewport.Width = (float)screenWidth;
-	viewport.Height = (float)screenHeight;
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	viewport.TopLeftX = 0.0f;
-	viewport.TopLeftY = 0.0f;
-
-
-	// Create the viewport.
-	engine.GetDeviceContext()->RSSetViewports(1, &viewport);
-
-	// Setup the projection matrix.
-	fieldOfView = 3.141592654f / 4.0f;
-	screenAspect = (float)screenWidth / (float)screenHeight;
-
-	// Create the projection matrix for 3D rendering.
-	XMStoreFloat4x4(&mProjectionmatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth));
-	// Initialize the world matrix to the identity matrix.
-
-
-
-	//Create an orthographic projection matrix for 2D rendering.
-	XMStoreFloat4x4(&mOrthoMatrix, XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth));
-
+	//result = engine.GetDevice()->CreateRenderTargetView(backBufferPtr, NULL, &mpRenderTargetView);
+	//if (FAILED(result))
+	//{
+	//	LOG(ERROR) << "failed to create render target view";
+	//	return false;
+	//}
+	//
+	//// Release pointer to the back buffer as we no longer need it.
+	//backBufferPtr->Release();
+	//backBufferPtr = 0;
 	return true;
 }
 
@@ -243,24 +194,7 @@ void GraphicsClass::UpdateObjectConstantBuffers(ID3D11DeviceContext* const aDevi
 void GraphicsClass::BeginScene(float red, float green, float blue, float alpha)
 {
 	GraphicsEngine& engine = GraphicsEngine::getInstance();
-	float color[4];
 
-	// Setup the color to clear the buffer to.
-	color[0] = red;
-	color[1] = green;
-	color[2] = blue;
-	color[3] = alpha;
-
-	// Clear the back buffer.
-	engine.GetDeviceContext()->ClearRenderTargetView(mpRenderTargetView.Get(), color);
-
-	// Clear the depth buffer.
-	engine.GetDeviceContext()->ClearDepthStencilView(mpDepthStencil->GetDepthStencilView(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-	// Set the depth stencil state.
-	engine.GetDeviceContext()->OMSetDepthStencilState(mpDepthStencil->GetDepthStencilState(), 1);
-
-	// Bind the render target view and depth stencil buffer to the output render pipeline.
-	engine.GetDeviceContext()->OMSetRenderTargets(1, mpRenderTargetView.GetAddressOf(), mpDepthStencil->GetDepthStencilView());
 
 	return;
 }
@@ -296,7 +230,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 
 	// Initialize the Direct3D object.
-	result = Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	result = Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_FAR, SCREEN_NEAR);
 	if(!result)
 	{
 		MessageBox(hwnd, L"Could not initialize Direct3D.", L"Error", MB_OK);
@@ -364,7 +298,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	mpD3LightClass->GenerateViewMatrix();
 
 	mpRenderTexture = std::make_unique<d3dRenderTexture>();
-	mpRenderTexture->Initialize(GetDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH);
+	mpRenderTexture->Initialize(GetDevice(), screenWidth, screenHeight, SCREEN_NEAR, SCREEN_FAR);
 
 
 	CreateConstantBuffers();
@@ -442,7 +376,16 @@ bool GraphicsClass::Render(IScene *const aScene)
 	aScene->GetCamera()->UpdateViewMatrix();
 
 	// Clear the buffers to begin the scene.
-	BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+	float color[4];
+
+	// Setup the color to clear the buffer to.
+	color[0] = 1.0f;
+	color[1] = 1.0f;
+	color[2] = 1.0f;
+	color[3] = 1.0f;
+
+
+
 
 	aScene->GetCamera()->GetViewMatrix(viewMatrix);
 	GetProjectionMatrix(projectionMatrix);
@@ -469,7 +412,7 @@ bool GraphicsClass::Render(IScene *const aScene)
 
 
 	// Present the rendered scene to the screen.
-	GraphicsEngine::getInstance().EndScene();
+//	mpSwapchain->Present((VSYNC_ENABLED ? 1 : 0), 0);
 
 	return true;
 }

@@ -33,7 +33,7 @@ class d3dRasterizerState;
 
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
-const float SCREEN_DEPTH = 1000.0f;
+const float SCREEN_FAR = 1000.0f;
 const float SCREEN_NEAR = 2.0f;
 
 class IScene;
@@ -87,7 +87,6 @@ private:
 	XMFLOAT4X4  mOrthoMatrix;
 
 	std::unique_ptr<d3dDepthStencil> mpDepthStencil;
-	std::unique_ptr<d3dRasterizerState> mpRasterizerState;
 
 };
 	

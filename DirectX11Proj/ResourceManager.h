@@ -32,11 +32,12 @@ public:
 
 	std::vector<ModelClass*> LoadModels(std::string aFilePath);
 
+	ID3D11Device* mpDevice;
+
 private:
 	ResourceManager();
 	
 	std::unique_ptr<ModelLoader> mpModelLoader;
-	ID3D11Device* mpDevice;
 
 	// Turn these into maps at one point
 	std::vector<std::unique_ptr<ModelClass>> mLoadedModels;
