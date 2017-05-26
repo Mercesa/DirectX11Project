@@ -3,7 +3,6 @@
 #include <cassert>
 #include "ConstantBuffers.h"
 
-#include "GraphicsEngine.h"
 #include "d3dShaderManager.h"
 depthshaderclass::depthshaderclass()
 {
@@ -17,15 +16,15 @@ depthshaderclass::~depthshaderclass()
 bool depthshaderclass::Initialize(ID3D11Device* const aDevice)
 {
 
-	d3dShaderManager*const shaderManager = GraphicsEngine::getInstance().GetShaderManager();
-
-	mpVSShader = shaderManager->GetVertexShader("Shaders\\VS_depth.hlsl");
-	mpPSShader = shaderManager->GetPixelShader("Shaders\\PS_depth.hlsl");
-	if (!InitializeShader(aDevice))
-	{
-		return false;
-	}
-
+	//d3dShaderManager*const shaderManager = GraphicsEngine::getInstance().GetShaderManager();
+	//
+	//mpVSShader = shaderManager->GetVertexShader("Shaders\\VS_depth.hlsl");
+	//mpPSShader = shaderManager->GetPixelShader("Shaders\\PS_depth.hlsl");
+	//if (!InitializeShader(aDevice))
+	//{
+	//	return false;
+	//}
+	//
 	return true;
 }
 

@@ -60,9 +60,6 @@
     <ClCompile Include="Application.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
-    <ClCompile Include="graphicsclass.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
     <ClCompile Include="PlayerSceneExample.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
@@ -132,9 +129,6 @@
     <ClCompile Include="ModelLoader.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="GraphicsEngine.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cameraclass.h">
@@ -148,9 +142,6 @@
     </ClInclude>
     <ClInclude Include="ModelData.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="graphicsclass.h">
-      <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="PlayerSceneExample.h">
       <Filter>NonFramework</Filter>
@@ -235,9 +226,6 @@
     </ClInclude>
     <ClInclude Include="ModelLoader.h">
       <Filter>Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="GraphicsEngine.h">
-      <Filter>D3DSetup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

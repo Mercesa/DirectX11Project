@@ -173,8 +173,6 @@
     <ClCompile Include="d3dVertexBuffer.cpp" />
     <ClCompile Include="depthshaderclass.cpp" />
     <ClCompile Include="EngineTimer.cpp" />
-    <ClCompile Include="graphicsclass.cpp" />
-    <ClCompile Include="GraphicsEngine.cpp" />
     <ClCompile Include="IApplication.cpp" />
     <ClCompile Include="inputclass.cpp" />
     <ClCompile Include="IObject.cpp" />
@@ -207,8 +205,6 @@
     <ClInclude Include="depthshaderclass.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EngineTimer.h" />
-    <ClInclude Include="graphicsclass.h" />
-    <ClInclude Include="GraphicsEngine.h" />
     <ClInclude Include="IApplication.h" />
     <ClInclude Include="inputclass.h" />
     <ClInclude Include="IObject.h" />

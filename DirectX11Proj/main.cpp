@@ -2,6 +2,12 @@
 
 //#include "systemclass.h"
 
+#pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "d3d11.lib")
+#pragma comment(lib, "d3dx11.lib")
+#pragma comment(lib, "d3dx10.lib")
+#pragma comment(lib, "d3dcompiler.lib")
+
 #include <memory>
 #include <cassert>
 
@@ -746,7 +752,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 void RenderScene(IScene* const aScene)
 {
-	float color[4]{ 0.0f, 0.0f, 0.0f, 1.0f };
+	float color[4]{ 0.6f, 0.6f, 0.6f, 1.0f };
 
 	mpDeviceContext->RSSetViewports(1, &gViewPort);
 	mpDeviceContext->RSSetState(grasterState.Get());
@@ -763,6 +769,12 @@ void RenderScene(IScene* const aScene)
 	d3dShaderPS*const tPS = mShaderManager->GetPixelShader("Shaders\\PS_texture.hlsl");
 
 	UpdateFrameConstantBuffers(aScene);
+	
+	// Set the vertex and pixel shaders that will be used to render this triangle.
+	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
+	mpDeviceContext->PSSetShader(tPS->GetPixelShader(), NULL, 0);
+	mpDeviceContext->PSSetSamplers(0, 1, mpAnisotropicWrapSampler.GetAddressOf());
+
 	for (int i = 0; i < aScene->mObjects.size(); ++i)
 	{
 		UpdateObjectConstantBuffers(aScene->mObjects[i].get(), aScene);
@@ -785,10 +797,7 @@ void RenderScene(IScene* const aScene)
 		// Set the sampler state in the pixel shader.
 		mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
 
-		// Set the vertex and pixel shaders that will be used to render this triangle.
-		mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
-		mpDeviceContext->PSSetShader(tPS->GetPixelShader(), NULL, 0);
-		mpDeviceContext->PSSetSamplers(0, 1, mpAnisotropicWrapSampler.GetAddressOf());
+	
 
 		// Render the triangle.
 		mpDeviceContext->DrawIndexed(indices, 0, 0);
