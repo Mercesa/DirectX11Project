@@ -136,16 +136,5 @@ bool TextureShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext,
 
 void TextureShaderClass::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
 {
-	// Set the vertex input layout.
-	deviceContext->IASetInputLayout(mpVSShader->mpLayout.Get());
-
-	// Set the vertex and pixel shaders that will be used to render this triangle.
-	deviceContext->VSSetShader(mpVSShader->GetVertexShader(), NULL, 0);
-	deviceContext->PSSetShader(mpPSShader->GetPixelShader(), NULL, 0);
-
-	// Set the sampler state in the pixel shader.
-	deviceContext->PSSetSamplers(0, 1, &mpSampleState);
-
-	// Render the triangle.
-	deviceContext->DrawIndexed(indexCount, 0, 0);
+	
 }

@@ -25,12 +25,17 @@ using namespace DirectX;
 #include "d3dConstantBuffer.h"
 #include "ConstantBuffers.h"
 #include "textureshaderclass.h"
+#include "colorshaderclass.h"
+#include "depthshaderclass.h"
+#include "d3dMaterial.h"
+#include "d3dShaderManager.h"
+#include "d3dShaderVS.h"
+#include "d3dShaderPS.h"
 
 std::unique_ptr<d3dConstantBuffer> mpMatrixCB;
 std::unique_ptr<d3dConstantBuffer> mpMaterialCB;
 std::unique_ptr<d3dConstantBuffer> mpLightCB;
 
-std::unique_ptr<TextureShaderClass> mTextureShader;
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -73,6 +78,7 @@ Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;
 Microsoft::WRL::ComPtr<IDXGIAdapter> mAdapter;
 Microsoft::WRL::ComPtr<IDXGIOutput> mAdapterOutput;
 
+std::unique_ptr<d3dShaderManager> mShaderManager;
 
 // Depth stencil state, buffer and view
 Microsoft::WRL::ComPtr<ID3D11Texture2D> mDepthStencilBufferTexture;
@@ -85,7 +91,7 @@ Microsoft::WRL::ComPtr<ID3D11SamplerState> mpAnisotropicWrapSampler;
 D3D11_VIEWPORT gViewPort;
 
 XMFLOAT4X4 gProjectionMatrix;
-XMFLOAT4X4 gOrthoMatrix;
+//XMFLOAT4X4 gOrthoMatrix;
 
 std::unique_ptr<InputClass> mpInput;
 
@@ -170,12 +176,20 @@ void RenderScene(IScene* const aScene);
 
 void UpdateFrameConstantBuffers(IScene* const aScene);
 void UpdateObjectConstantBuffers(IObject* const aObject, IScene* const aScene);
-void CreateConstantBuffers();
+void CreateConstantBuffers()
+{
+	// Create constant buffers
+	mpMatrixCB = std::make_unique<d3dConstantBuffer>(sizeof(MatrixBufferType), nullptr, mpDevice.Get());
+	mpMaterialCB = std::make_unique<d3dConstantBuffer>(sizeof(MaterialBufferType), nullptr, mpDevice.Get());
+	mpLightCB = std::make_unique<d3dConstantBuffer>(sizeof(LightBufferType), nullptr, mpDevice.Get());
+	LOG(INFO) << "Constant buffers created";
+}
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
 	std::unique_ptr<WindowsProcessClass> mWProc = std::make_unique<WindowsProcessClass>();
+	mShaderManager = std::make_unique<d3dShaderManager>();
 	mpInput = std::make_unique<InputClass>();
 	mpInput->Initialize();
 
@@ -192,9 +206,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
 	
-	int screenWidth, screenHeight;
-	screenWidth = 0;
-	screenHeight = 0;
 
 	WNDCLASSEX wc;
 	DEVMODE dmScreenSettings;
@@ -231,7 +242,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 
 	// Setup the screen settings depending on whether it is running in full screen or in windowed mode.
-	if (FULL_SCREEN)
+	/*if (FULL_SCREEN)
 	{
 		// Determine the resolution of the clients desktop screen.
 		screenWidth = GetSystemMetrics(SM_CXSCREEN);
@@ -258,6 +269,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	}
 	else
 	{
+	*/
 		// Place the window in the middle of the screen.
 		posX = (GetSystemMetrics(SM_CXSCREEN) - SCREEN_WIDTH) / 2;
 		posY = (GetSystemMetrics(SM_CYSCREEN) - SCREEN_HEIGHT) / 2;
@@ -265,7 +277,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 		m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, applicationName, applicationName,
 			WS_OVERLAPPEDWINDOW,
 			posX, posY, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, NULL, m_hinstance, NULL);
-	}
+	//}
 
 
 
@@ -377,9 +389,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	// When a match is found store the numerator and denominator of the refresh rate for that monitor.
 	for (i = 0; i < numModes; i++)
 	{
-		if (displayModeList[i].Width == (unsigned int)screenWidth)
+		if (displayModeList[i].Width == (unsigned int)SCREEN_WIDTH)
 		{
-			if (displayModeList[i].Height == (unsigned int)screenHeight)
+			if (displayModeList[i].Height == (unsigned int)SCREEN_HEIGHT)
 			{
 				numerator = displayModeList[i].RefreshRate.Numerator;
 				denominator = displayModeList[i].RefreshRate.Denominator;
@@ -486,6 +498,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	/************************************************************************/
 	/* STOP SWAPCHAIN INITIALIZATION                                                                     */
 	/************************************************************************/
+	ID3D11Texture2D* backBufferPtr;
+	result = mpSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
+	if (FAILED(result))
+	{
+		LOG(ERROR) << "failed to get back buffer ptr from swapchain";
+		return false;
+	}
+
+	// Create the render target view with the back buffer pointer.
+	result = mpDevice->CreateRenderTargetView(backBufferPtr, NULL, &mpRenderTargetView);
+	if (FAILED(result))
+	{
+		LOG(ERROR) << "failed to create render target view";
+		return false;
+	}
 
 	/************************************************************************/
 	/* START DEPTH STENCIL INITIALIZATION                                                                     */
@@ -604,8 +631,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	/************************************************************************/
 
 	// Setup the viewport for rendering.
-	gViewPort.Width = (float)screenWidth;
-	gViewPort.Height = (float)screenHeight;
+	gViewPort.Width = (float)SCREEN_WIDTH;
+	gViewPort.Height = (float)SCREEN_HEIGHT;
 	gViewPort.MinDepth = 0.0f;
 	gViewPort.MaxDepth = 1.0f;
 	gViewPort.TopLeftX = 0.0f;
@@ -613,7 +640,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 	float fieldOfView, screenAspect;
 	fieldOfView = 3.141592654f / 4.0f;
-	screenAspect = (float)screenWidth / (float)screenHeight;
+	screenAspect = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
 	XMStoreFloat4x4(&gProjectionMatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, SCREEN_NEAR, SCREEN_FAR));
 	//XMStoreFloat4x4(&gOrthoMatrix, XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, SCREEN_NEAR, SCREEN_FAR));
 
@@ -657,14 +684,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	/* END SAMPLER INITIALIZATION                                                                     */
 	/************************************************************************/
 
+	CreateConstantBuffers();
+
 	std::unique_ptr<PlayerSceneExample> mpPlayerScene = std::make_unique<PlayerSceneExample>();
 	mpPlayerScene->Init();
-
+	LOG(INFO) << "Scene initialized";
+	
+	mShaderManager = std::make_unique<d3dShaderManager>();
+	mShaderManager->InitializeShaders(mpDevice.Get());
 
 	// Loop until there is a quit message from the window or the user.
 	done = false;
 	while (!done)
 	{
+		mpInput->Frame();
+
 		// Handle the windows messages.
 		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
@@ -678,14 +712,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 			done = true;
 		}
 
-		mpInput->Frame();
 		if (mpInput->IsEscapePressed())
 		{
 			done = true;
 		}
-
+		mpPlayerScene->Tick(mpInput.get(), 1.0f);
+		RenderScene(mpPlayerScene.get());
 	}
 
+	ResourceManager::GetInstance().mpDevice = nullptr;
 	// Show the mouse cursor.
 	ShowCursor(true);
 
@@ -711,59 +746,53 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 void RenderScene(IScene* const aScene)
 {
-	float color[4]{ 1.0f, 1.0f, 1.0f, 1.0f };
-	// Set the depth stencil state.
-	mpDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
+	float color[4]{ 0.0f, 0.0f, 0.0f, 1.0f };
 
-	// Bind the render target view and depth stencil buffer to the output render pipeline.
-	mpDeviceContext->OMSetRenderTargets(1, mpRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
-
-	mpDeviceContext->RSSetState(grasterState.Get());
 	mpDeviceContext->RSSetViewports(1, &gViewPort);
-
+	mpDeviceContext->RSSetState(grasterState.Get());
 
 	mpDeviceContext->ClearRenderTargetView(mpRenderTargetView.Get(), color);
-
-
 	mpDeviceContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	mpDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
-
 	mpDeviceContext->OMSetRenderTargets(1, mpRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
-	
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	bool result;
-
-	
-
 
 	aScene->GetCamera()->UpdateViewMatrix();
+	
+	d3dShaderVS*const tVS = mShaderManager->GetVertexShader("Shaders\\VS_texture.hlsl");
+	d3dShaderPS*const tPS = mShaderManager->GetPixelShader("Shaders\\PS_texture.hlsl");
 
+	UpdateFrameConstantBuffers(aScene);
+	for (int i = 0; i < aScene->mObjects.size(); ++i)
+	{
+		UpdateObjectConstantBuffers(aScene->mObjects[i].get(), aScene);
+		aScene->mObjects[i]->mpModel->Render(mpDeviceContext.Get());
 
+		int indices = aScene->mObjects[i]->mpModel->GetIndexCount();
 
+		d3dMaterial* const aMaterial = aScene->mObjects[i]->mpModel->mMaterial.get();
 
-	//aScene->GetCamera()->GetViewMatrix(viewMatrix);
-	//GetProjectionMatrix(projectionMatrix);
-	//// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	//
-	//UpdateFrameConstantBuffers(tpContext, aScene);
-	//for (int i = 0; i < aScene->mObjects.size(); ++i)
-	//{
-	//	UpdateObjectConstantBuffers(tpContext, aScene->mObjects[i].get(), aScene);
-	//	aScene->mObjects[i]->mpModel->Render(GetDeviceContext());
-	//
-	//	// Get the world matrix from the object, maybe set the shader stuff once instead of per object
-	//	worldMatrix = XMLoadFloat4x4(&aScene->mObjects[i]->mWorldMatrix);
-	//	if (aScene->mObjects[i]->mpModel->mMaterial->mpDiffuse->exists)
-	//	{
-	//		mTextureShader->Render(GetDeviceContext(), aScene->mObjects[i]->mpModel->GetIndexCount(), aScene->mObjects[i]->mpModel->mMaterial.get());
-	//	}
-	//
-	//	else
-	//	{
-	//		result = mpColorShader->Render(GetDeviceContext(), aScene->mObjects[i]->mpModel->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix);
-	//	}
-	//}
+		ID3D11ShaderResourceView* aView = aMaterial->mpDiffuse->GetTexture();
+		mpDeviceContext->PSSetShaderResources(0, 1, &aView);
+
+		ID3D11ShaderResourceView* aView2 = aMaterial->mpSpecular->GetTexture();
+		mpDeviceContext->PSSetShaderResources(1, 1, &aView2);
+
+		ID3D11ShaderResourceView* aView3 = aMaterial->mpNormal->GetTexture();
+		mpDeviceContext->PSSetShaderResources(2, 1, &aView3);
+		// Set the vertex input layout.
+
+		// Set the sampler state in the pixel shader.
+		mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
+
+		// Set the vertex and pixel shaders that will be used to render this triangle.
+		mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
+		mpDeviceContext->PSSetShader(tPS->GetPixelShader(), NULL, 0);
+		mpDeviceContext->PSSetSamplers(0, 1, mpAnisotropicWrapSampler.GetAddressOf());
+
+		// Render the triangle.
+		mpDeviceContext->DrawIndexed(indices, 0, 0);
+	}
 
 
 	// Present the rendered scene to the screen.
@@ -774,10 +803,8 @@ void RenderScene(IScene* const aScene)
 
 void UpdateFrameConstantBuffers(IScene* const aScene)
 {
-
 	// Update light constant buffer
 
-	HRESULT result;
 	static LightBufferType* dataPtr = new LightBufferType();
 	uint32_t bufferNumber;
 
@@ -807,7 +834,6 @@ void UpdateFrameConstantBuffers(IScene* const aScene)
 
 void UpdateObjectConstantBuffers(IObject* const aObject, IScene* const aScene)
 {
-	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	static MaterialBufferType* dataPtr = new MaterialBufferType();
 	uint32_t bufferNumber;
@@ -832,11 +858,11 @@ void UpdateObjectConstantBuffers(IObject* const aObject, IScene* const aScene)
 	// very bad code but will fix later either way
 	MatrixBufferType* dataPtr2 = new MatrixBufferType();
 
-
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	worldMatrix = XMLoadFloat4x4(&aObject->mWorldMatrix);
 	projectionMatrix = XMLoadFloat4x4(&gProjectionMatrix);
 	aScene->GetCamera()->GetViewMatrix(viewMatrix);
+
 
 	// Transpose the matrices to prepare them for the shader.
 	XMMATRIX worldMatrix2 = XMMatrixTranspose(worldMatrix);

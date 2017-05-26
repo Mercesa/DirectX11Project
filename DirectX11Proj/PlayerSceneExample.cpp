@@ -54,7 +54,6 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 		mpCamera->m_positionY += 100.0f * aDT;
 	}
 
-	std::cout << mpCamera->m_positionY << std::endl;
 }
 
 void PlayerSceneExample::Init()
