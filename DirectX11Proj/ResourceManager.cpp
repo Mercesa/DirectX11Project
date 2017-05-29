@@ -18,6 +18,7 @@ void ResourceManager::Shutdown()
 {
 	mLoadedModels.clear();
 	mLoadedTextures.clear();
+	
 }
 
 
@@ -47,8 +48,7 @@ std::unique_ptr<d3dMaterial> ResourceManager::LoadTexturesFromMaterial(const Mes
 	tpMat->mpSpecular = LoadTexture(aMeshData.specularData);
 	tpMat->mpNormal = LoadTexture(aMeshData.normalData);
 
-	return tpMat;
-	//mLoadedTextures.push_back(std::move(tpTextureClass));
+	return std::move(tpMat);
 }
 
 // TODO, create a function for model loader which just asks for the next model, this removes it from the model list
@@ -58,7 +58,6 @@ std::vector<ModelClass*> ResourceManager::LoadModels(std::string aFilePath)
 	std::vector<ModelClass*> tModels;
 
 	std::unique_ptr<ModelClass> tpModelClass = nullptr;
-	std::unique_ptr<d3dTexture> tpTextureClass = nullptr;
 
 	const std::vector<MeshData>& tMeshes = mpModelLoader->GetMeshesToBeProcessed();
 

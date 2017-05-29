@@ -31,9 +31,6 @@
     <Filter Include="D3DSetup\DXGI">
       <UniqueIdentifier>{a49f142c-2c65-4524-901e-5eb59ab70156}</UniqueIdentifier>
     </Filter>
-    <Filter Include="D3DSetup\Shaderclasses">
-      <UniqueIdentifier>{9e312e10-0cb7-4f63-89e8-bf29bd194cac}</UniqueIdentifier>
-    </Filter>
     <Filter Include="NonFramework\Interfaces">
       <UniqueIdentifier>{51a44c7a-bb86-4352-821b-16ba45b14fd7}</UniqueIdentifier>
     </Filter>
@@ -56,9 +53,6 @@
     </ClCompile>
     <ClCompile Include="modelclass.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Application.cpp">
-      <Filter>NonFramework</Filter>
     </ClCompile>
     <ClCompile Include="PlayerSceneExample.cpp">
       <Filter>NonFramework</Filter>
@@ -84,17 +78,8 @@
     <ClCompile Include="d3dShaderPS.cpp">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClCompile>
-    <ClCompile Include="colorshaderclass.cpp">
-      <Filter>D3DSetup\Shaderclasses</Filter>
-    </ClCompile>
-    <ClCompile Include="textureshaderclass.cpp">
-      <Filter>D3DSetup\Shaderclasses</Filter>
-    </ClCompile>
     <ClCompile Include="d3dRenderTexture.cpp">
       <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="IApplication.cpp">
-      <Filter>NonFramework\Interfaces</Filter>
     </ClCompile>
     <ClCompile Include="IObject.cpp">
       <Filter>NonFramework\Interfaces</Filter>
@@ -105,16 +90,7 @@
     <ClCompile Include="Transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="depthshaderclass.cpp">
-      <Filter>D3DSetup\Shaderclasses</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dLightClass.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
     <ClCompile Include="d3dConstantBuffer.cpp">
-      <Filter>D3DSetup\SetupClasses</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dDepthStencil.cpp">
       <Filter>D3DSetup\SetupClasses</Filter>
     </ClCompile>
     <ClCompile Include="d3dVertexBuffer.cpp">
@@ -129,6 +105,9 @@
     <ClCompile Include="ModelLoader.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
+    <ClCompile Include="d3dGraphicsEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cameraclass.h">
@@ -136,9 +115,6 @@
     </ClInclude>
     <ClInclude Include="modelclass.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Application.h">
-      <Filter>NonFramework</Filter>
     </ClInclude>
     <ClInclude Include="ModelData.h">
       <Filter>Source Files</Filter>
@@ -170,9 +146,6 @@
     <ClInclude Include="d3dShaderManager.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
-    <ClInclude Include="d3dShaderInterface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="d3dShaderVS.h">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClInclude>
@@ -182,17 +155,8 @@
     <ClInclude Include="d3dShaderPS.h">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClInclude>
-    <ClInclude Include="colorshaderclass.h">
-      <Filter>D3DSetup\Shaderclasses</Filter>
-    </ClInclude>
-    <ClInclude Include="textureshaderclass.h">
-      <Filter>D3DSetup\Shaderclasses</Filter>
-    </ClInclude>
     <ClInclude Include="d3dRenderTexture.h">
       <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="IApplication.h">
-      <Filter>NonFramework\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="IObject.h">
       <Filter>NonFramework\Interfaces</Filter>
@@ -202,15 +166,6 @@
     </ClInclude>
     <ClInclude Include="Transform.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="depthshaderclass.h">
-      <Filter>D3DSetup\Shaderclasses</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dLightClass.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dDepthStencil.h">
-      <Filter>D3DSetup\SetupClasses</Filter>
     </ClInclude>
     <ClInclude Include="d3dConstantBuffer.h">
       <Filter>D3DSetup\SetupClasses</Filter>
@@ -226,6 +181,9 @@
     </ClInclude>
     <ClInclude Include="ModelLoader.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dGraphicsEngine.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

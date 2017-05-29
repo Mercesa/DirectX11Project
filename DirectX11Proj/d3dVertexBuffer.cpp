@@ -1,4 +1,4 @@
-#include "d3dVertexBuffer.h"
+	#include "d3dVertexBuffer.h"
 
 #include <iostream>
 
