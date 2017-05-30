@@ -7,7 +7,7 @@
 #include "ShaderHelperFunctions.h"
 #include "d3dShaderVS.h"
 #include "d3dShaderPS.h"
-#include "d3dGraphicsEngine.h"
+
 
 d3dShaderManager::d3dShaderManager()
 {
@@ -16,15 +16,11 @@ d3dShaderManager::d3dShaderManager()
 
 d3dShaderManager::~d3dShaderManager()
 {
-	this->mPixelShaders.clear();
-	this->mVertexShaders.clear();
 }
 
 
-bool d3dShaderManager::InitializeShaders(ID3D11Device* const aDevice)
+bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 {
-	
-
 	// Load vertex and pixel shader
 	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_texture.hlsl", "TextureVertexShader", "vs_5_0", EVERTEX));
 	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_texture.hlsl", "TexturePixelShader", "ps_5_0", EPIXEL));
@@ -42,7 +38,7 @@ bool d3dShaderManager::InitializeShaders(ID3D11Device* const aDevice)
 	LOG(INFO) << "ShaderManager: Finished initializing all shaders";
 
 	// Load actual shaders
-	if (LoadShaders(aDevice) == false)
+	if (LoadShaders(apDevice) == false)
 	{
 		LOG(FATAL) << "Shader loading failed!";
 		return false;
