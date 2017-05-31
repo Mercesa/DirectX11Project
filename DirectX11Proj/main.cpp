@@ -1,6 +1,7 @@
 #include <vld.h>
 
 //#include "systemclass.h"
+#define _CRT_SECURE_NO_DEPRECATE
 
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3d11.lib")
@@ -25,23 +26,7 @@ using namespace DirectX;
 // And its nice to have a central place for the logging library
 #include "easylogging++.h"
 #include "inputclass.h"
-#include "IScene.h"
-#include "ResourceManager.h"
-#include "PlayerSceneExample.h"
-#include "d3dConstantBuffer.h"
-#include "ConstantBuffers.h"
-#include "textureshaderclass.h"
-#include "colorshaderclass.h"
-#include "depthshaderclass.h"
-#include "d3dMaterial.h"
-#include "d3dShaderManager.h"
-#include "d3dShaderVS.h"
-#include "d3dShaderPS.h"
-
-std::unique_ptr<d3dConstantBuffer> mpMatrixCB;
-std::unique_ptr<d3dConstantBuffer> mpMaterialCB;
-std::unique_ptr<d3dConstantBuffer> mpLightCB;
-
+#include "GraphicsSettings.h"
 
 INITIALIZE_EASYLOGGINGPP
 
@@ -57,8 +42,6 @@ private:
 
 };
 
-const bool FULL_SCREEN = false;
-const bool VSYNC_ENABLED = true;
 const float SCREEN_FAR = 1000.0f;
 const float SCREEN_NEAR = 2.0f;
 
@@ -66,11 +49,7 @@ int gVideoCardMemoryAmount;
 char gVideoCardDescription[128];
 
 
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
-
 int gnumerator, gdenominator;
-
 
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 static WindowsProcessClass* ApplicationHandle = 0;
@@ -84,15 +63,14 @@ Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;
 Microsoft::WRL::ComPtr<IDXGIAdapter> mAdapter;
 Microsoft::WRL::ComPtr<IDXGIOutput> mAdapterOutput;
 
-std::unique_ptr<d3dShaderManager> mShaderManager;
-
-// Depth stencil state, buffer and view
-Microsoft::WRL::ComPtr<ID3D11Texture2D> mDepthStencilBufferTexture;
-Microsoft::WRL::ComPtr<ID3D11DepthStencilState> mDepthStencilState;
-Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mDepthStencilView;
+Microsoft::WRL::ComPtr<ID3D11Texture2D> mpDepthStencilBufferTexture;
+Microsoft::WRL::ComPtr<ID3D11DepthStencilState> mpDepthStencilState;
+Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mpDepthStencilView;
 Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mpRenderTargetView;
-Microsoft::WRL::ComPtr<ID3D11RasterizerState> grasterState;
+Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRasterState;
 Microsoft::WRL::ComPtr<ID3D11SamplerState> mpAnisotropicWrapSampler;
+
+HWND windowHandle;
 
 D3D11_VIEWPORT gViewPort;
 
@@ -101,6 +79,9 @@ XMFLOAT4X4 gProjectionMatrix;
 
 std::unique_ptr<InputClass> mpInput;
 
+
+bool InitializeDirectX();
+bool DestroyDirectX();
 
 LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
@@ -170,37 +151,17 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 		}
 	}
 }
-void GetVideoCardInfo(char* cardName, int& memory)
-{
-	strcpy_s(cardName, 128, gVideoCardDescription);
-	memory = gVideoCardMemoryAmount;
-	return;
-}
-
-void RenderScene(IScene* const aScene);
-
-
-void UpdateFrameConstantBuffers(IScene* const aScene);
-void UpdateObjectConstantBuffers(IObject* const aObject, IScene* const aScene);
-void CreateConstantBuffers()
-{
-	// Create constant buffers
-	mpMatrixCB = std::make_unique<d3dConstantBuffer>(sizeof(MatrixBufferType), nullptr, mpDevice.Get());
-	mpMaterialCB = std::make_unique<d3dConstantBuffer>(sizeof(MaterialBufferType), nullptr, mpDevice.Get());
-	mpLightCB = std::make_unique<d3dConstantBuffer>(sizeof(LightBufferType), nullptr, mpDevice.Get());
-	LOG(INFO) << "Constant buffers created";
-}
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
 	std::unique_ptr<WindowsProcessClass> mWProc = std::make_unique<WindowsProcessClass>();
-	mShaderManager = std::make_unique<d3dShaderManager>();
 	mpInput = std::make_unique<InputClass>();
 	mpInput->Initialize();
 
-	
 
+
+	
 	// This is for the console window
 	AllocConsole();
 	freopen("conin$", "r", stdin);
@@ -211,14 +172,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 #if defined(DEBUG) | defined(_DEBUG)
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-	
+
 
 	WNDCLASSEX wc;
 	DEVMODE dmScreenSettings;
 	int posX, posY;
 	LPCWSTR applicationName;
 	HINSTANCE m_hinstance;
-	HWND m_hwnd;
 
 	// Get an external pointer to this object.	
 	ApplicationHandle = mWProc.get();
@@ -248,17 +208,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 
 	// Setup the screen settings depending on whether it is running in full screen or in windowed mode.
-	/*if (FULL_SCREEN)
+	if (GraphicsSettings::gIsApplicationFullScreen)
 	{
 		// Determine the resolution of the clients desktop screen.
-		screenWidth = GetSystemMetrics(SM_CXSCREEN);
-		screenHeight = GetSystemMetrics(SM_CYSCREEN);
+		GraphicsSettings::gCurrentScreenWidth = GetSystemMetrics(SM_CXSCREEN);
+		GraphicsSettings::gCurrentScreenHeight = GetSystemMetrics(SM_CYSCREEN);
 
 		// If full screen set the screen to maximum size of the users desktop and 32bit.
 		memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
 		dmScreenSettings.dmSize = sizeof(dmScreenSettings);
-		dmScreenSettings.dmPelsWidth = (unsigned long)screenWidth;
-		dmScreenSettings.dmPelsHeight = (unsigned long)screenHeight;
+		dmScreenSettings.dmPelsWidth = (unsigned long)GraphicsSettings::gCurrentScreenWidth;
+		dmScreenSettings.dmPelsHeight = (unsigned long)GraphicsSettings::gCurrentScreenHeight;
 		dmScreenSettings.dmBitsPerPel = 32;
 		dmScreenSettings.dmFields = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
@@ -269,44 +229,85 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 		posX = posY = 0;
 
 		// Create the window with the screen settings and get the handle to it.
-		m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, applicationName, applicationName,
+		windowHandle = CreateWindowEx(WS_EX_APPWINDOW, applicationName, applicationName,
 			WS_OVERLAPPEDWINDOW,
-			posX, posY, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, NULL, m_hinstance, NULL);
+			posX, posY, GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, NULL, NULL, m_hinstance, NULL);
 	}
 	else
 	{
-	*/
+	
 		// Place the window in the middle of the screen.
-		posX = (GetSystemMetrics(SM_CXSCREEN) - SCREEN_WIDTH) / 2;
-		posY = (GetSystemMetrics(SM_CYSCREEN) - SCREEN_HEIGHT) / 2;
+		posX = (GetSystemMetrics(SM_CXSCREEN) - GraphicsSettings::gCurrentScreenWidth) / 2;
+		posY = (GetSystemMetrics(SM_CYSCREEN) - GraphicsSettings::gCurrentScreenHeight) / 2;
 		// Create the window with the screen settings and get the handle to it.
-		m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, applicationName, applicationName,
-			WS_OVERLAPPEDWINDOW,
-			posX, posY, SCREEN_WIDTH, SCREEN_HEIGHT, NULL, NULL, m_hinstance, NULL);
-	//}
+		windowHandle = CreateWindowEx(WS_EX_APPWINDOW, applicationName, applicationName,
+		WS_OVERLAPPEDWINDOW,
+		posX, posY, GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, NULL, NULL, m_hinstance, NULL);
+	}
 
 
 
 	// Bring the window up on the screen and set it as main focus.
-	ShowWindow(m_hwnd, SW_SHOW);
-	SetForegroundWindow(m_hwnd);
-	SetFocus(m_hwnd);
+	ShowWindow(windowHandle, SW_SHOW);
+	SetForegroundWindow(windowHandle);
+	SetFocus(windowHandle);
 
 	// Hide the mouse cursor.
 	ShowCursor(true);
 
-	
+
+	InitializeDirectX();
+
 	MSG msg;
-	bool done;
+	bool done = false;
+	while (!done)
+	{
+		mpInput->Frame();
+	
+		// Handle the windows messages.
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	
+		// If windows signals to end the application then exit out.
+		if (msg.message == WM_QUIT)
+		{
+			done = true;
+		}
+	
+		if (mpInput->IsEscapePressed())
+		{
+			done = true;
+		}
+		//mpPlayerScene->Tick(mpInput.get(), 1.0f);
+		//RenderScene(mpPlayerScene.get());
+	}
 
-	// Initialize the message structure.
-	ZeroMemory(&msg, sizeof(MSG));
 
 
+	DestroyDirectX();
+	DestroyWindow(windowHandle);
+	windowHandle = NULL;
+	
+	if (GraphicsSettings::gIsApplicationFullScreen)
+	{
+		ChangeDisplaySettings(NULL, 0);
+	}
 
-	/************************************************************************/
-	/* DIRECTX INITIALIZATION                                                                     */
-	/************************************************************************/
+	// Remove the application instance.
+	UnregisterClass(applicationName, m_hinstance);
+	m_hinstance = NULL;
+	
+	// Release the pointer to this class.
+	ApplicationHandle = NULL;
+
+	return 0;
+}
+
+bool InitializeDeviceAndContext()
+{
 	assert(mpDevice.Get() == nullptr);
 
 	HRESULT result;
@@ -320,31 +321,94 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 	featureLevel = D3D_FEATURE_LEVEL_11_0;
 	result = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, creationFlags, 0, 0, D3D11_SDK_VERSION, &mpDevice, &featureLevel, &mpDeviceContext);
-	ResourceManager::GetInstance().mpDevice = mpDevice.Get();
 
 	if (FAILED(result))
 	{
-		LOG(ERROR) << "Device Creation failed";
+		return false;
+	}
+	return true;
+}
+
+bool InitializeSwapchain()
+{
+	DXGI_SWAP_CHAIN_DESC swapChainDesc;
+
+	// Initialize the swap chain description.
+	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
+
+	// Set to a single back buffer.
+	swapChainDesc.BufferCount = 1;
+
+	// Set the width and height of the back buffer.
+	swapChainDesc.BufferDesc.Width = GraphicsSettings::gCurrentScreenWidth;
+	swapChainDesc.BufferDesc.Height = GraphicsSettings::gCurrentScreenHeight;
+
+	// Set regular 32-bit surface for the back buffer.
+	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+	// Set the refresh rate of the back buffer.
+	if (GraphicsSettings::gIsVsyncEnabled)
+	{
+		swapChainDesc.BufferDesc.RefreshRate.Numerator = gnumerator;
+		swapChainDesc.BufferDesc.RefreshRate.Denominator = gdenominator;
 	}
 
 	else
 	{
-		LOG(INFO) << "Created graphics device and context";
+		swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
+		swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
 	}
-	/************************************************************************/
-	/* END DIRECTX INITIALIZATION                                                                     */
-	/************************************************************************/
 
-	/************************************************************************/
-	/* START DXGI INITIALIZATION                                                                     */
-	/************************************************************************/
+	// Set the usage of the back buffer.
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 
+	// Set the handle for the window to render to.
+	swapChainDesc.OutputWindow = windowHandle;
+
+	// Turn multi-sampling off.
+	swapChainDesc.SampleDesc.Count = 1;
+	swapChainDesc.SampleDesc.Quality = 0;
+
+	// Set to full screen or windowed mode.
+	if (GraphicsSettings::gIsApplicationFullScreen)
+	{
+		swapChainDesc.Windowed = false;
+	}
+	else
+	{
+		swapChainDesc.Windowed = true;
+	}
+
+	// Set the scan line ordering and scaling to unspecified.
+	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+
+	// Discard the back buffer contents after presenting.
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+
+	// Don't set the advanced flags.
+	swapChainDesc.Flags = 0;
+
+	HRESULT result;
+	IDXGISwapChain* tSC = mpSwapchain.Get();
+	result = mFactory->CreateSwapChain(mpDevice.Get(), &swapChainDesc, &mpSwapchain);
+
+	
+	if (FAILED(result))
+	{
+		LOG(INFO) << "Failed to create swapchain";
+	}
+	return true;
+}
+
+bool InitializeDXGI()
+{
 	unsigned int numModes, i, numerator, denominator;
 	unsigned long long stringLength;
 	DXGI_MODE_DESC* displayModeList;
 	DXGI_ADAPTER_DESC adapterDesc;
 	int error;
-
+	HRESULT result;
 	// Create a DirectX graphics interface factory.
 	result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&mFactory);
 	if (FAILED(result))
@@ -395,9 +459,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	// When a match is found store the numerator and denominator of the refresh rate for that monitor.
 	for (i = 0; i < numModes; i++)
 	{
-		if (displayModeList[i].Width == (unsigned int)SCREEN_WIDTH)
+		if (displayModeList[i].Width == (unsigned int)GraphicsSettings::gCurrentScreenWidth)
 		{
-			if (displayModeList[i].Height == (unsigned int)SCREEN_HEIGHT)
+			if (displayModeList[i].Height == (unsigned int)GraphicsSettings::gCurrentScreenHeight)
 			{
 				numerator = displayModeList[i].RefreshRate.Numerator;
 				denominator = displayModeList[i].RefreshRate.Denominator;
@@ -430,80 +494,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	delete[] displayModeList;
 	displayModeList = 0;
 
-	LOG(INFO) << "DXGI finished initialization";
+	return true;
+}
 
-	/************************************************************************/
-	/* END DXGI INITIALIZATION                                                                     */
-	/************************************************************************/
+bool InitializeBackBuffRTV()
+{
+	HRESULT result;
 
-	/************************************************************************/
-	/* START SWAPCHAIN INITIALIZATION                                                                     */
-	/************************************************************************/
-
-	DXGI_SWAP_CHAIN_DESC swapChainDesc;
-
-	// Initialize the swap chain description.
-	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
-
-	// Set to a single back buffer.
-	swapChainDesc.BufferCount = 1;
-
-	// Set the width and height of the back buffer.
-	swapChainDesc.BufferDesc.Width = SCREEN_WIDTH;
-	swapChainDesc.BufferDesc.Height = SCREEN_HEIGHT;
-
-	// Set regular 32-bit surface for the back buffer.
-	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-
-	// Set the refresh rate of the back buffer.
-	if (VSYNC_ENABLED)
-	{
-		swapChainDesc.BufferDesc.RefreshRate.Numerator = gnumerator;
-		swapChainDesc.BufferDesc.RefreshRate.Denominator = gdenominator;
-	}
-	else
-	{
-		swapChainDesc.BufferDesc.RefreshRate.Numerator = 0;
-		swapChainDesc.BufferDesc.RefreshRate.Denominator = 1;
-	}
-
-	// Set the usage of the back buffer.
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-
-	// Set the handle for the window to render to.
-	swapChainDesc.OutputWindow = m_hwnd;
-
-	// Turn multisampling off.
-	swapChainDesc.SampleDesc.Count = 1;
-	swapChainDesc.SampleDesc.Quality = 0;
-
-	// Set to full screen or windowed mode.
-	if (FULL_SCREEN)
-	{
-		swapChainDesc.Windowed = false;
-	}
-	else
-	{
-		swapChainDesc.Windowed = true;
-	}
-
-	// Set the scan line ordering and scaling to unspecified.
-	swapChainDesc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	swapChainDesc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-
-	// Discard the back buffer contents after presenting.
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-
-	// Don't set the advanced flags.
-	swapChainDesc.Flags = 0;
-
-	IDXGISwapChain* tSC = mpSwapchain.Get();
-	mFactory->CreateSwapChain(mpDevice.Get(), &swapChainDesc, &mpSwapchain);
-
-	LOG(INFO) << "Created swapchain";
-	/************************************************************************/
-	/* STOP SWAPCHAIN INITIALIZATION                                                                     */
-	/************************************************************************/
 	ID3D11Texture2D* backBufferPtr;
 	result = mpSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
@@ -520,21 +517,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 		return false;
 	}
 
-	/************************************************************************/
-	/* START DEPTH STENCIL INITIALIZATION                                                                     */
-	/************************************************************************/
+	// Release the backbuffer ptr
+	backBufferPtr->Release();
+	backBufferPtr = 0;
 
+	return true;
+}
 
+bool InitializeDepthStencilView()
+{
 	D3D11_TEXTURE2D_DESC depthBufferDesc;
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+	HRESULT result;
 
 	// Initialize the description of the depth buffer.
 	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
 
 	// Set up the description of the depth buffer.
-	depthBufferDesc.Width = SCREEN_WIDTH;
-	depthBufferDesc.Height = SCREEN_HEIGHT;
+	depthBufferDesc.Width = GraphicsSettings::gCurrentScreenWidth;
+	depthBufferDesc.Height = GraphicsSettings::gCurrentScreenHeight;
 	depthBufferDesc.MipLevels = 1;
 	depthBufferDesc.ArraySize = 1;
 	depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
@@ -546,7 +548,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	depthBufferDesc.MiscFlags = 0;
 
 	// Create the texture for the depth buffer using the filled out description.
-	result = mpDevice->CreateTexture2D(&depthBufferDesc, NULL, &mDepthStencilBufferTexture);
+	result = mpDevice->CreateTexture2D(&depthBufferDesc, NULL, &mpDepthStencilBufferTexture);
 	if (FAILED(result))
 	{
 		LOG(ERROR) << "Failed to create texture 2D";
@@ -577,7 +579,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
 	// Create the depth stencil state.
-	result = mpDevice->CreateDepthStencilState(&depthStencilDesc, &mDepthStencilState);
+	result = mpDevice->CreateDepthStencilState(&depthStencilDesc, &mpDepthStencilState);
 	if (FAILED(result))
 	{
 		LOG(ERROR) << "Failed to create depth stencil state";
@@ -591,24 +593,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 
-	result = mpDevice->CreateDepthStencilView(mDepthStencilBufferTexture.Get(), &depthStencilViewDesc, &mDepthStencilView);
+	result = mpDevice->CreateDepthStencilView(mpDepthStencilBufferTexture.Get(), &depthStencilViewDesc, &mpDepthStencilView);
 
 	if (FAILED(result))
 	{
 		LOG(ERROR) << "Failed to create depth stencil view";
 	}
+	return true;
+}
 
-	LOG(INFO) << "Depth stencil state, view and texture successfully initialized";
-	/************************************************************************/
-	/* END DEPTHSTENCIL INITIALIZATION                                                                     */
-	/************************************************************************/
-
-
-	/************************************************************************/
-	/* START RASTERIZER STATE INITIALIZATION                                                                     */
-	/************************************************************************/
-
+bool InitializeRasterstate()
+{
 	D3D11_RASTERIZER_DESC rasterDesc;
+	HRESULT result;
 
 	// Setup the raster description which will determine how and what polygons will be drawn.
 	rasterDesc.AntialiasedLineEnable = false;
@@ -622,45 +619,42 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	rasterDesc.ScissorEnable = false;
 	rasterDesc.SlopeScaledDepthBias = 0.0f;
 
-	result = mpDevice->CreateRasterizerState(&rasterDesc, &grasterState);
+	result = mpDevice->CreateRasterizerState(&rasterDesc, &mRasterState);
 	if (FAILED(result))
 	{
 		LOG(INFO) << "Rasterizer state failed to initialize";
+		return false;
 	}
 
-	else
+	return true;
+}
+
+bool DestroyDirectX()
+{
+	if (mpDevice.Get() != nullptr)
 	{
-		LOG(INFO) << "Rasterizer state initialized";
+		mpDevice.Reset();
+		mpDevice = nullptr;
 	}
-	/************************************************************************/
-	/* START RASTERIZER STATE INITIALIZATION                                                                     */
-	/************************************************************************/
 
-	// Setup the viewport for rendering.
-	gViewPort.Width = (float)SCREEN_WIDTH;
-	gViewPort.Height = (float)SCREEN_HEIGHT;
-	gViewPort.MinDepth = 0.0f;
-	gViewPort.MaxDepth = 1.0f;
-	gViewPort.TopLeftX = 0.0f;
-	gViewPort.TopLeftY = 0.0f;
+	if (mpDeviceContext.Get() != nullptr)
+	{
+		mpDeviceContext.Reset();
+		mpDeviceContext = nullptr;
+	}
 
-	float fieldOfView, screenAspect;
-	fieldOfView = 3.141592654f / 4.0f;
-	screenAspect = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
-	XMStoreFloat4x4(&gProjectionMatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, SCREEN_NEAR, SCREEN_FAR));
-	//XMStoreFloat4x4(&gOrthoMatrix, XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, SCREEN_NEAR, SCREEN_FAR));
+	if (mpRenderTargetView.Get() != nullptr)
+	{
+		mpRenderTargetView.Reset();
+		mpRenderTargetView = nullptr;
+	}
+	
+	return true;
+}
 
-	/************************************************************************/
-	/* END RASTERIZER STATE INITIALIZATION                                                                     */
-	/************************************************************************/
-
-	/************************************************************************/
-	/* SAMPLER INITIALIZATION                                                                     */
-	/************************************************************************/
-
-
-
-	ID3D10Blob* errorMessage;
+bool InitializeSamplerState()
+{
+	//ID3D10Blob* errorMessage;
 	D3D11_SAMPLER_DESC samplerDesc;
 
 	// Create a texture sampler state description.
@@ -679,227 +673,90 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
 	// Create the texture sampler state.
-	result = mpDevice->CreateSamplerState(&samplerDesc, &mpAnisotropicWrapSampler);
+	HRESULT result = mpDevice->CreateSamplerState(&samplerDesc, &mpAnisotropicWrapSampler);
 	if (FAILED(result))
 	{
 		LOG(WARNING) << "Failed to sampler states";
 		return false;
 	}
-
-	/************************************************************************/
-	/* END SAMPLER INITIALIZATION                                                                     */
-	/************************************************************************/
-
-	CreateConstantBuffers();
-
-	std::unique_ptr<PlayerSceneExample> mpPlayerScene = std::make_unique<PlayerSceneExample>();
-	mpPlayerScene->Init();
-	LOG(INFO) << "Scene initialized";
-	
-	mShaderManager = std::make_unique<d3dShaderManager>();
-	mShaderManager->InitializeShaders(mpDevice.Get());
-
-	// Loop until there is a quit message from the window or the user.
-	done = false;
-	while (!done)
-	{
-		mpInput->Frame();
-
-		// Handle the windows messages.
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-
-		// If windows signals to end the application then exit out.
-		if (msg.message == WM_QUIT)
-		{
-			done = true;
-		}
-
-		if (mpInput->IsEscapePressed())
-		{
-			done = true;
-		}
-		mpPlayerScene->Tick(mpInput.get(), 1.0f);
-		RenderScene(mpPlayerScene.get());
-	}
-
-	ResourceManager::GetInstance().mpDevice = nullptr;
-	// Show the mouse cursor.
-	ShowCursor(true);
-
-	// Fix the display settings if leaving full screen mode.
-	if (FULL_SCREEN)
-	{
-		ChangeDisplaySettings(NULL, 0);
-	}
-
-	// Remove the window.
-	DestroyWindow(m_hwnd);
-	m_hwnd = NULL;
-
-	// Remove the application instance.
-	UnregisterClass(applicationName, m_hinstance);
-	m_hinstance = NULL;
-
-	// Release the pointer to this class.
-	ApplicationHandle = NULL;
-
-	return 0;
+	return true;
 }
 
-void RenderScene(IScene* const aScene)
+bool InitializeViewportAndMatrices()
 {
-	float color[4]{ 0.6f, 0.6f, 0.6f, 1.0f };
+	gViewPort.Width = (float)GraphicsSettings::gCurrentScreenWidth;
+	gViewPort.Height = (float)GraphicsSettings::gCurrentScreenHeight;
+	gViewPort.MinDepth = 0.0f;
+	gViewPort.MaxDepth = 1.0f;
+	gViewPort.TopLeftX = 0.0f;
+	gViewPort.TopLeftY = 0.0f;
 
-	mpDeviceContext->RSSetViewports(1, &gViewPort);
-	mpDeviceContext->RSSetState(grasterState.Get());
-
-	mpDeviceContext->ClearRenderTargetView(mpRenderTargetView.Get(), color);
-	mpDeviceContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-
-	mpDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
-	mpDeviceContext->OMSetRenderTargets(1, mpRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
-
-	aScene->GetCamera()->UpdateViewMatrix();
-	
-	d3dShaderVS*const tVS = mShaderManager->GetVertexShader("Shaders\\VS_texture.hlsl");
-	d3dShaderPS*const tPS = mShaderManager->GetPixelShader("Shaders\\PS_texture.hlsl");
-
-	UpdateFrameConstantBuffers(aScene);
-	
-	// Set the vertex and pixel shaders that will be used to render this triangle.
-	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
-	mpDeviceContext->PSSetShader(tPS->GetPixelShader(), NULL, 0);
-	mpDeviceContext->PSSetSamplers(0, 1, mpAnisotropicWrapSampler.GetAddressOf());
-
-	for (int i = 0; i < aScene->mObjects.size(); ++i)
-	{
-		UpdateObjectConstantBuffers(aScene->mObjects[i].get(), aScene);
-		aScene->mObjects[i]->mpModel->Render(mpDeviceContext.Get());
-
-		int indices = aScene->mObjects[i]->mpModel->GetIndexCount();
-
-		d3dMaterial* const aMaterial = aScene->mObjects[i]->mpModel->mMaterial.get();
-
-		ID3D11ShaderResourceView* aView = aMaterial->mpDiffuse->GetTexture();
-		mpDeviceContext->PSSetShaderResources(0, 1, &aView);
-
-		ID3D11ShaderResourceView* aView2 = aMaterial->mpSpecular->GetTexture();
-		mpDeviceContext->PSSetShaderResources(1, 1, &aView2);
-
-		ID3D11ShaderResourceView* aView3 = aMaterial->mpNormal->GetTexture();
-		mpDeviceContext->PSSetShaderResources(2, 1, &aView3);
-		// Set the vertex input layout.
-
-		// Set the sampler state in the pixel shader.
-		mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
-
-	
-
-		// Render the triangle.
-		mpDeviceContext->DrawIndexed(indices, 0, 0);
-	}
-
-
-	// Present the rendered scene to the screen.
-	mpSwapchain->Present((VSYNC_ENABLED ? 1 : 0), 0);
-
+	float fieldOfView, screenAspect;
+	fieldOfView = 3.141592654f / 4.0f;
+	screenAspect = (float)GraphicsSettings::gCurrentScreenWidth / (float)GraphicsSettings::gCurrentScreenHeight;
+	XMStoreFloat4x4(&gProjectionMatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, SCREEN_NEAR, SCREEN_FAR));
+	return true;
 }
 
-
-void UpdateFrameConstantBuffers(IScene* const aScene)
+bool InitializeDirectX()
 {
-	// Update light constant buffer
-
-	static LightBufferType* dataPtr = new LightBufferType();
-	uint32_t bufferNumber;
-
-	// Get a pointer to the data in the constant buffer.
-
-	dataPtr->amountOfLights = static_cast<int>(aScene->mLights.size());
-
-	for (int i = 0; i < aScene->mLights.size(); ++i)
+	if (!InitializeDeviceAndContext())
 	{
-		dataPtr->arr[i].position = aScene->mLights[i]->position;
-		dataPtr->arr[i].diffuseColor = aScene->mLights[i]->diffuseColor;
+		LOG(INFO) << "Failed to create device and/or context";
+		return false;
 	}
+	LOG(INFO) << "Successfully initialized device and context";
 
-	dataPtr->directionalLight.diffuseColor = aScene->mDirectionalLight->diffuseColor;
-	dataPtr->directionalLight.specularColor = aScene->mDirectionalLight->specularColor;
-	dataPtr->directionalLight.position = aScene->mDirectionalLight->position;
+	if (!InitializeDXGI())
+	{
+		LOG(INFO) << "Failed to create DXGI";
+		return false;
+	}
+	LOG(INFO) << "Successfully initialized DXGI";
 
+	if (!InitializeSwapchain())
+	{
+		LOG(INFO) << "Failed to create Swapchain";
+		return false;
+	}
+	LOG(INFO) << "Successfully initialized Swapchain";	
 
-	mpLightCB->UpdateBuffer((void*)dataPtr, mpDeviceContext.Get());
+	if (!InitializeBackBuffRTV())
+	{
+		LOG(INFO) << "Failed to create RTV with back buffer";
+		return false;
+	}
+	LOG(INFO) << "Successfully initialized backbuffer rtv";
 
+	if (!InitializeDepthStencilView())
+	{
+		LOG(INFO) << "failed to create DSV";
+		return false;
+	}
+	LOG(INFO) << "Succesfully initialized dsv";
 
-	bufferNumber = 2;
-	ID3D11Buffer* tBuff = mpLightCB->GetBuffer();
+	if (!InitializeRasterstate())
+	{
+		LOG(INFO) << "Failed to create raster state";
+		return false;
+	}
+	LOG(INFO) << "Succesfully initialized raster state";
 
-	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
-}
+	if (!InitializeSamplerState())
+	{
+		LOG(INFO) << "Failed to create raster state";
+		return false;
+	}
+	LOG(INFO) << "Succesfully initialized raster state";
 
-void UpdateObjectConstantBuffers(IObject* const aObject, IScene* const aScene)
-{
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	static MaterialBufferType* dataPtr = new MaterialBufferType();
-	uint32_t bufferNumber;
+	if (!InitializeViewportAndMatrices())
+	{
+		LOG(INFO) << "Failed to create viewport";
+		return false;
+	}
+	LOG(INFO) << "Successfully initialized viewp and matrices";
 
-	// Update material
-	d3dMaterial* const tMat = aObject->mpModel->mMaterial.get();
+	LOG(INFO) << "Successfully initialized DirectX!";
 
-	dataPtr->hasDiffuse = (int)tMat->mpDiffuse->exists;
-	dataPtr->hasSpecular = (int)tMat->mpSpecular->exists;
-	dataPtr->hasNormal = (int)tMat->mpNormal->exists;
-
-
-	mpMaterialCB->UpdateBuffer((void*)dataPtr, mpDeviceContext.Get());
-	bufferNumber = 1;
-	ID3D11Buffer* tBuff = mpMaterialCB->GetBuffer();
-	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
-	// End update material
-
-
-	// Update matrix cb
-
-	// very bad code but will fix later either way
-	MatrixBufferType* dataPtr2 = new MatrixBufferType();
-
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	worldMatrix = XMLoadFloat4x4(&aObject->mWorldMatrix);
-	projectionMatrix = XMLoadFloat4x4(&gProjectionMatrix);
-	aScene->GetCamera()->GetViewMatrix(viewMatrix);
-
-
-	// Transpose the matrices to prepare them for the shader.
-	XMMATRIX worldMatrix2 = XMMatrixTranspose(worldMatrix);
-	XMMATRIX viewMatrix2 = XMMatrixTranspose(viewMatrix);
-	XMMATRIX projectionMatrix2 = XMMatrixTranspose(projectionMatrix);
-
-	// Get a pointer to the data in the constant buffer.
-
-	// Copy the matrices into the constant buffer.
-	dataPtr2->world = worldMatrix2;
-	dataPtr2->view = viewMatrix2;
-	dataPtr2->projection = projectionMatrix2;
-	dataPtr2->gEyePosX = aScene->GetCamera()->GetPosition().x;
-	dataPtr2->gEyePosY = aScene->GetCamera()->GetPosition().y;
-	dataPtr2->gEyePosZ = aScene->GetCamera()->GetPosition().z;
-
-
-	mpMatrixCB->UpdateBuffer((void*)dataPtr2, mpDeviceContext.Get());
-
-	// Set the position of the constant buffer in the vertex shader.
-	bufferNumber = 0;
-
-	tBuff = mpMatrixCB->GetBuffer();
-	// finally set the constant buffer in the vertex shader with the updated values.
-	mpDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
-	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
-
-
-	delete dataPtr2;
-	// end update matrix cb
+	return true;
 }
