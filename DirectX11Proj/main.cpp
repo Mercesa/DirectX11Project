@@ -14,11 +14,12 @@
 #include "inputclass.h"
 #include "GraphicsSettings.h"
 
-#include "d3dShaderManager.h"
 #include <windowsx.h>
 #include <wrl.h>
-#include "PlayerSceneExample.h"
 #include <fcntl.h>
+
+#include "PlayerSceneExample.h"
+
 INITIALIZE_EASYLOGGINGPP
 
 #include "Renderer.h"

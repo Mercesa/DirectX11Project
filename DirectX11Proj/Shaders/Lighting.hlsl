@@ -140,28 +140,28 @@ float4 PerformLighting(float3 aFragPosition, float3 aNormal, float4 aDiffMapSamp
 	float4 tResultCol = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Loop through all the lights(point lights in this case)
+	float3 eyeDir = normalize(gEyePos - aFragPosition);
+
 	for (float i = 0; i < amountOfLights; ++i)
 	{
-		// From frag position to eye 
-		float3 eyeDir = normalize(gEyePos - aFragPosition);
-		
+		// From frag position to eye 	
 		tResultCol += DoPointLight(arr[i], eyeDir, aFragPosition, normalize(aNormal), aDiffMapSample, aSpecMapSample);
 	}
-
-	return tResultCol;
-}
-
-float4 PerformDirectionalLight(float3 aFragPosition, float3 aNormal, float4 aDiffMapSample, float aSpecMapSample)
-{
-	float4 tResultCol = float4(0.0f, 0.0f, 0.0f, 0.0f);
-
-	// Loop through all the lights(point lights in this case)
-
-	// From frag position to eye 
-	float3 eyeDir = normalize(gEyePos - aFragPosition);
-	
 	tResultCol += DoDirectionalLight(directionalLight, eyeDir, aFragPosition, normalize(aNormal), aDiffMapSample, aSpecMapSample);
-	
 
 	return tResultCol;
 }
+
+//float4 PerformDirectionalLight(float3 aFragPosition, float3 aNormal, float4 aDiffMapSample, float aSpecMapSample)
+//{
+//	float4 tResultCol = float4(0.0f, 0.0f, 0.0f, 0.0f);
+//
+//	// Loop through all the lights(point lights in this case)
+//
+//	// From frag position to eye 
+//	float3 eyeDir = normalize(gEyePos - aFragPosition);
+//	
+//	
+//
+//	return tResultCol;
+//}

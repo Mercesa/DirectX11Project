@@ -163,39 +163,49 @@ void Renderer::RenderScene(IScene* const aScene)
 	// Set the vertex and pixel shaders that will be used to render this triangle.
 	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
 	mpDeviceContext->PSSetShader(tPS->GetPixelShader(), NULL, 0);
+
+
 	mpDeviceContext->PSSetSamplers(0, 1, mpAnisotropicWrapSampler.GetAddressOf());
+	// Set the sampler state in the pixel shader.
+	mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
+
 
 	for (int i = 0; i < aScene->mObjects.size(); ++i)
 	{
 		UpdateObjectConstantBuffers(aScene->mObjects[i].get(), aScene);
-		aScene->mObjects[i]->mpModel->Render(mpDeviceContext.Get());
-
-		int indices = aScene->mObjects[i]->mpModel->GetIndexCount();
-
-		d3dMaterial* const aMaterial = aScene->mObjects[i]->mpModel->mMaterial.get();
-
-		ID3D11ShaderResourceView* aView = aMaterial->mpDiffuse->GetTexture();
-		mpDeviceContext->PSSetShaderResources(0, 1, &aView);
-
-		ID3D11ShaderResourceView* aView2 = aMaterial->mpSpecular->GetTexture();
-		mpDeviceContext->PSSetShaderResources(1, 1, &aView2);
-
-		ID3D11ShaderResourceView* aView3 = aMaterial->mpNormal->GetTexture();
-		mpDeviceContext->PSSetShaderResources(2, 1, &aView3);
-		// Set the vertex input layout.
-
-		// Set the sampler state in the pixel shader.
-		mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
-
-
-
-		// Render the triangle.
-		mpDeviceContext->DrawIndexed(indices, 0, 0);
+		RenderObject(aScene->mObjects[i].get());
 	}
 
+	
 
 	// Present the rendered scene to the screen.
 	mpSwapchain->Present((GraphicsSettings::gIsVsyncEnabled ? 1 : 0), 0);
+}
+
+void Renderer::RenderObject(IObject* const aObject)
+{
+	// Bind vertex/index buffers
+	aObject->mpModel->Render(mpDeviceContext.Get());
+
+	int indices = aObject->mpModel->GetIndexCount();
+
+
+	// Bind textures from material
+	d3dMaterial* const aMaterial = aObject->mpModel->mMaterial.get();
+
+	ID3D11ShaderResourceView* aView = aMaterial->mpDiffuse->GetTexture();
+	mpDeviceContext->PSSetShaderResources(0, 1, &aView);
+
+	ID3D11ShaderResourceView* aView2 = aMaterial->mpSpecular->GetTexture();
+	mpDeviceContext->PSSetShaderResources(1, 1, &aView2);
+
+	ID3D11ShaderResourceView* aView3 = aMaterial->mpNormal->GetTexture();
+	mpDeviceContext->PSSetShaderResources(2, 1, &aView3);
+
+
+	// Render the model.
+	mpDeviceContext->DrawIndexed(indices, 0, 0);
+	
 }
 
 bool Renderer::InitializeDeviceAndContext()

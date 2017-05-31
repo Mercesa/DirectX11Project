@@ -36,22 +36,22 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 	
 	if (apInput->IsKeyDown(0x53))
 	{
-		mpCamera->m_positionZ += -100.0f * aDT;
+		mpCamera->m_positionZ += -1.0f * aDT;
 	}
 
 	if (apInput->IsKeyDown(0x57))
 	{
-		mpCamera->m_positionZ += 100.0f * aDT;
+		mpCamera->m_positionZ += 1.0f * aDT;
 	}
 
 	if (apInput->IsKeyDown(0x41))
 	{
-		mpCamera->m_positionY -= 100.0f * aDT;
+		mpCamera->m_positionY -= 1.0f * aDT;
 	}
 
 	if (apInput->IsKeyDown(0x44))
 	{
-		mpCamera->m_positionY += 100.0f * aDT;
+		mpCamera->m_positionY += 1.0f * aDT;
 	}
 
 }
@@ -64,7 +64,7 @@ void PlayerSceneExample::Init()
 	std::vector<ModelClass*> tModels = ResourceManager::GetInstance().LoadModels("Models\\Box\\cube.obj");
 
 	
-	XMMATRIX tScaleMat = tScaleMat = XMMatrixScaling(200.0f, 1.0f, 200.0f);
+	XMMATRIX tScaleMat = tScaleMat = XMMatrixScaling(800.0f, 1.0f, 800.0f);
 	XMMATRIX tTranslateMat = XMMatrixTranslation(0.0f, -5.0f, 0.0f);
 
 	// load models and translate them as game objects
@@ -103,8 +103,8 @@ void PlayerSceneExample::Init()
 
 	// Create light, set diffuse and position, add light to list
 	std::unique_ptr<Light> tpLight = std::make_unique<Light>();
-	tpLight->diffuseColor = XMFLOAT3(1.0f, 1.0f, 1.0f);
-	tpLight->position = XMFLOAT3(0.0f, 20, 0.0f);
+	tpLight->diffuseColor = XMFLOAT3(1.0f, 0.0f, 1.0f);
+	tpLight->position = XMFLOAT3(0.0f, 60.0f, 0.0f);
 	this->mLights.push_back(std::move(tpLight));
 
 	this->mDirectionalLight = std::make_unique<Light>();

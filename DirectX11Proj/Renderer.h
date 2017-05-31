@@ -44,6 +44,9 @@ private:
 
 	bool DestroyDirectX();
 
+	// Render functions
+	void RenderObject(IObject* const aObject);
+
 	const float SCREEN_FAR = 1000.0f;
 	const float SCREEN_NEAR = 2.0f;
 
