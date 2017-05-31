@@ -158,13 +158,12 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
     <ClCompile Include="cameraclass.cpp" />
-    <ClCompile Include="colorshaderclass.cpp" />
     <ClCompile Include="d3dConstantBuffer.cpp" />
     <ClCompile Include="d3dDepthStencil.cpp" />
     <ClCompile Include="d3dMaterial.cpp" />
@@ -173,7 +172,6 @@
     <ClCompile Include="d3dShaderVS.cpp" />
     <ClCompile Include="d3dTexture.cpp" />
     <ClCompile Include="d3dVertexBuffer.cpp" />
-    <ClCompile Include="depthshaderclass.cpp" />
     <ClCompile Include="EngineTimer.cpp" />
     <ClCompile Include="GraphicsSettings.cpp" />
     <ClCompile Include="IApplication.cpp" />
@@ -190,13 +188,11 @@
     <ClCompile Include="d3dRenderTexture.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
-    <ClCompile Include="textureshaderclass.cpp" />
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h" />
     <ClInclude Include="cameraclass.h" />
-    <ClInclude Include="colorshaderclass.h" />
     <ClInclude Include="ConstantBuffers.h" />
     <ClInclude Include="d3dConstantBuffer.h" />
     <ClInclude Include="d3dDepthStencil.h" />
@@ -207,7 +203,6 @@
     <ClInclude Include="d3dShaderVS.h" />
     <ClInclude Include="d3dTexture.h" />
     <ClInclude Include="d3dVertexBuffer.h" />
-    <ClInclude Include="depthshaderclass.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EngineTimer.h" />
     <ClInclude Include="GraphicsSettings.h" />
@@ -226,7 +221,6 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ShaderHelperFunctions.h" />
-    <ClInclude Include="textureshaderclass.h" />
     <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>

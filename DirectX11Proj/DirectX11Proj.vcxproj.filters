@@ -84,12 +84,6 @@
     <ClCompile Include="d3dShaderPS.cpp">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClCompile>
-    <ClCompile Include="colorshaderclass.cpp">
-      <Filter>D3DSetup\Shaderclasses</Filter>
-    </ClCompile>
-    <ClCompile Include="textureshaderclass.cpp">
-      <Filter>D3DSetup\Shaderclasses</Filter>
-    </ClCompile>
     <ClCompile Include="d3dRenderTexture.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
@@ -104,9 +98,6 @@
     </ClCompile>
     <ClCompile Include="Transform.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="depthshaderclass.cpp">
-      <Filter>D3DSetup\Shaderclasses</Filter>
     </ClCompile>
     <ClCompile Include="d3dLightClass.cpp">
       <Filter>D3DSetup</Filter>
@@ -191,12 +182,6 @@
     <ClInclude Include="d3dShaderPS.h">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClInclude>
-    <ClInclude Include="colorshaderclass.h">
-      <Filter>D3DSetup\Shaderclasses</Filter>
-    </ClInclude>
-    <ClInclude Include="textureshaderclass.h">
-      <Filter>D3DSetup\Shaderclasses</Filter>
-    </ClInclude>
     <ClInclude Include="d3dRenderTexture.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
@@ -211,9 +196,6 @@
     </ClInclude>
     <ClInclude Include="Transform.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="depthshaderclass.h">
-      <Filter>D3DSetup\Shaderclasses</Filter>
     </ClInclude>
     <ClInclude Include="d3dLightClass.h">
       <Filter>D3DSetup</Filter>

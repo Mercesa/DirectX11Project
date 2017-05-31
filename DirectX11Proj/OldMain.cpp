@@ -39,9 +39,9 @@
 //#include "d3dShaderVS.h"
 //#include "d3dShaderPS.h"
 //
-//std::unique_ptr<d3dConstantBuffer> mpMatrixCB;
-//std::unique_ptr<d3dConstantBuffer> mpMaterialCB;
-//std::unique_ptr<d3dConstantBuffer> mpLightCB;
+//
+//
+//
 //
 //
 //INITIALIZE_EASYLOGGINGPP
@@ -673,8 +673,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 //
 //	CreateConstantBuffers();
 //
-//	std::unique_ptr<PlayerSceneExample> mpPlayerScene = std::make_unique<PlayerSceneExample>();
-//	mpPlayerScene->Init();
+//	
+//	
 //	LOG(INFO) << "Scene initialized";
 //
 //	mShaderManager = std::make_unique<d3dShaderManager>();
@@ -700,156 +700,156 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 //	return 0;
 //}
 //
-//void RenderScene(IScene* const aScene)
-//{
-//	float color[4]{ 0.6f, 0.6f, 0.6f, 1.0f };
-//
-//	mpDeviceContext->RSSetViewports(1, &gViewPort);
-//	mpDeviceContext->RSSetState(grasterState.Get());
-//
-//	mpDeviceContext->ClearRenderTargetView(mpRenderTargetView.Get(), color);
-//	mpDeviceContext->ClearDepthStencilView(mDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
-//
-//	mpDeviceContext->OMSetDepthStencilState(mDepthStencilState.Get(), 1);
-//	mpDeviceContext->OMSetRenderTargets(1, mpRenderTargetView.GetAddressOf(), mDepthStencilView.Get());
-//
-//	aScene->GetCamera()->UpdateViewMatrix();
-//
-//	d3dShaderVS*const tVS = mShaderManager->GetVertexShader("Shaders\\VS_texture.hlsl");
-//	d3dShaderPS*const tPS = mShaderManager->GetPixelShader("Shaders\\PS_texture.hlsl");
-//
-//	UpdateFrameConstantBuffers(aScene);
-//
-//	// Set the vertex and pixel shaders that will be used to render this triangle.
-//	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
-//	mpDeviceContext->PSSetShader(tPS->GetPixelShader(), NULL, 0);
-//	mpDeviceContext->PSSetSamplers(0, 1, mpAnisotropicWrapSampler.GetAddressOf());
-//
-//	for (int i = 0; i < aScene->mObjects.size(); ++i)
-//	{
-//		UpdateObjectConstantBuffers(aScene->mObjects[i].get(), aScene);
-//		aScene->mObjects[i]->mpModel->Render(mpDeviceContext.Get());
-//
-//		int indices = aScene->mObjects[i]->mpModel->GetIndexCount();
-//
-//		d3dMaterial* const aMaterial = aScene->mObjects[i]->mpModel->mMaterial.get();
-//
-//		ID3D11ShaderResourceView* aView = aMaterial->mpDiffuse->GetTexture();
-//		mpDeviceContext->PSSetShaderResources(0, 1, &aView);
-//
-//		ID3D11ShaderResourceView* aView2 = aMaterial->mpSpecular->GetTexture();
-//		mpDeviceContext->PSSetShaderResources(1, 1, &aView2);
-//
-//		ID3D11ShaderResourceView* aView3 = aMaterial->mpNormal->GetTexture();
-//		mpDeviceContext->PSSetShaderResources(2, 1, &aView3);
-//		// Set the vertex input layout.
-//
-//		// Set the sampler state in the pixel shader.
-//		mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
 //
 //
 //
-//		// Render the triangle.
-//		mpDeviceContext->DrawIndexed(indices, 0, 0);
-//	}
 //
 //
-//	// Present the rendered scene to the screen.
-//	mpSwapchain->Present((VSYNC_ENABLED ? 1 : 0), 0);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //}
 //
 //
-//void UpdateFrameConstantBuffers(IScene* const aScene)
-//{
-//	// Update light constant buffer
-//
-//	static LightBufferType* dataPtr = new LightBufferType();
-//	uint32_t bufferNumber;
-//
-//	// Get a pointer to the data in the constant buffer.
-//
-//	dataPtr->amountOfLights = static_cast<int>(aScene->mLights.size());
-//
-//	for (int i = 0; i < aScene->mLights.size(); ++i)
-//	{
-//		dataPtr->arr[i].position = aScene->mLights[i]->position;
-//		dataPtr->arr[i].diffuseColor = aScene->mLights[i]->diffuseColor;
-//	}
-//
-//	dataPtr->directionalLight.diffuseColor = aScene->mDirectionalLight->diffuseColor;
-//	dataPtr->directionalLight.specularColor = aScene->mDirectionalLight->specularColor;
-//	dataPtr->directionalLight.position = aScene->mDirectionalLight->position;
 //
 //
-//	mpLightCB->UpdateBuffer((void*)dataPtr, mpDeviceContext.Get());
 //
 //
-//	bufferNumber = 2;
-//	ID3D11Buffer* tBuff = mpLightCB->GetBuffer();
-//
-//	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
-//}
-//
-//void UpdateObjectConstantBuffers(IObject* const aObject, IScene* const aScene)
-//{
-//	D3D11_MAPPED_SUBRESOURCE mappedResource;
-//	static MaterialBufferType* dataPtr = new MaterialBufferType();
-//	uint32_t bufferNumber;
-//
-//	// Update material
-//	d3dMaterial* const tMat = aObject->mpModel->mMaterial.get();
-//
-//	dataPtr->hasDiffuse = (int)tMat->mpDiffuse->exists;
-//	dataPtr->hasSpecular = (int)tMat->mpSpecular->exists;
-//	dataPtr->hasNormal = (int)tMat->mpNormal->exists;
 //
 //
-//	mpMaterialCB->UpdateBuffer((void*)dataPtr, mpDeviceContext.Get());
-//	bufferNumber = 1;
-//	ID3D11Buffer* tBuff = mpMaterialCB->GetBuffer();
-//	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
-//	// End update material
 //
 //
-//	// Update matrix cb
-//
-//	// very bad code but will fix later either way
-//	MatrixBufferType* dataPtr2 = new MatrixBufferType();
-//
-//	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-//	worldMatrix = XMLoadFloat4x4(&aObject->mWorldMatrix);
-//	projectionMatrix = XMLoadFloat4x4(&gProjectionMatrix);
-//	aScene->GetCamera()->GetViewMatrix(viewMatrix);
 //
 //
-//	// Transpose the matrices to prepare them for the shader.
-//	XMMATRIX worldMatrix2 = XMMatrixTranspose(worldMatrix);
-//	XMMATRIX viewMatrix2 = XMMatrixTranspose(viewMatrix);
-//	XMMATRIX projectionMatrix2 = XMMatrixTranspose(projectionMatrix);
-//
-//	// Get a pointer to the data in the constant buffer.
-//
-//	// Copy the matrices into the constant buffer.
-//	dataPtr2->world = worldMatrix2;
-//	dataPtr2->view = viewMatrix2;
-//	dataPtr2->projection = projectionMatrix2;
-//	dataPtr2->gEyePosX = aScene->GetCamera()->GetPosition().x;
-//	dataPtr2->gEyePosY = aScene->GetCamera()->GetPosition().y;
-//	dataPtr2->gEyePosZ = aScene->GetCamera()->GetPosition().z;
 //
 //
-//	mpMatrixCB->UpdateBuffer((void*)dataPtr2, mpDeviceContext.Get());
-//
-//	// Set the position of the constant buffer in the vertex shader.
-//	bufferNumber = 0;
-//
-//	tBuff = mpMatrixCB->GetBuffer();
-//	// finally set the constant buffer in the vertex shader with the updated values.
-//	mpDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
-//	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
 //
 //
-//	delete dataPtr2;
-//	// end update matrix cb
-//}
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
