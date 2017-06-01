@@ -179,7 +179,6 @@ void Renderer::RenderScene(IScene* const aScene)
 	
 
 	// Present the rendered scene to the screen.
-	mpSwapchain->Present((GraphicsSettings::gIsVsyncEnabled ? 1 : 0), 0);
 }
 
 void Renderer::RenderObject(IObject* const aObject)
@@ -188,7 +187,6 @@ void Renderer::RenderObject(IObject* const aObject)
 	aObject->mpModel->Render(mpDeviceContext.Get());
 
 	int indices = aObject->mpModel->GetIndexCount();
-
 
 	// Bind textures from material
 	d3dMaterial* const aMaterial = aObject->mpModel->mMaterial.get();

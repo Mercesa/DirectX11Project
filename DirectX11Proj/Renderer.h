@@ -23,9 +23,14 @@ public:
 	
 	void Initialize(HWND aHwnd);
 	void RenderScene(IScene* const aScene);
-	void Destory();
+	void Destroy();
 
 	void OnResize();
+	Microsoft::WRL::ComPtr<IDXGISwapChain> mpSwapchain;
+
+	Microsoft::WRL::ComPtr<ID3D11Device> mpDevice;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> mpDeviceContext;
+
 private:
 
 	bool InitializeDirectX();
@@ -64,11 +69,9 @@ private:
 	XMFLOAT4X4 gViewMatrix;
 
 
-	Microsoft::WRL::ComPtr<ID3D11Device> mpDevice;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> mpDeviceContext;
 
 
-	Microsoft::WRL::ComPtr<IDXGISwapChain> mpSwapchain;
+
 	Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;
 	Microsoft::WRL::ComPtr<IDXGIAdapter> mAdapter;
 	Microsoft::WRL::ComPtr<IDXGIOutput> mAdapterOutput;

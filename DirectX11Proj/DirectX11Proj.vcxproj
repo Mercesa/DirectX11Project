@@ -175,6 +175,10 @@
     <ClCompile Include="EngineTimer.cpp" />
     <ClCompile Include="GraphicsSettings.cpp" />
     <ClCompile Include="IApplication.cpp" />
+    <ClCompile Include="imgui.cpp" />
+    <ClCompile Include="ImguiImplementation.cpp" />
+    <ClCompile Include="imgui_demo.cpp" />
+    <ClCompile Include="imgui_draw.cpp" />
     <ClCompile Include="inputclass.cpp" />
     <ClCompile Include="IObject.cpp" />
     <ClCompile Include="IScene.cpp" />
@@ -207,6 +211,10 @@
     <ClInclude Include="EngineTimer.h" />
     <ClInclude Include="GraphicsSettings.h" />
     <ClInclude Include="IApplication.h" />
+    <ClInclude Include="imconfig.h" />
+    <ClInclude Include="imgui.h" />
+    <ClInclude Include="ImguiImplementation.h" />
+    <ClInclude Include="imgui_internal.h" />
     <ClInclude Include="inputclass.h" />
     <ClInclude Include="IObject.h" />
     <ClInclude Include="IScene.h" />
@@ -221,6 +229,9 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ShaderHelperFunctions.h" />
+    <ClInclude Include="stb_rect_pack.h" />
+    <ClInclude Include="stb_textedit.h" />
+    <ClInclude Include="stb_truetype.h" />
     <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>

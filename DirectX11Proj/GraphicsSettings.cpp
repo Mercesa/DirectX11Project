@@ -1,8 +1,8 @@
 #include "GraphicsSettings.h"
 
 
-uint32_t GraphicsSettings::gCurrentScreenWidth = 800;
-uint32_t GraphicsSettings::gCurrentScreenHeight = 600;
+uint32_t GraphicsSettings::gCurrentScreenWidth = 1024;
+uint32_t GraphicsSettings::gCurrentScreenHeight = 768;
 
 bool GraphicsSettings::gIsApplicationFullScreen = false;
 bool GraphicsSettings::gIsVsyncEnabled = true;

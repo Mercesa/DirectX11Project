@@ -10,6 +10,9 @@
 
 // Include and initialize easy logging here, while its part of the System, NO file will ever include main.
 // And its nice to have a central place for the logging library
+#define ELPP_DISABLE_DEFAULT_CRASH_HANDLING
+#undef ELPP_DEBUG_ASSERT_FAILURE
+
 #include "easylogging++.h"
 #include "inputclass.h"
 #include "GraphicsSettings.h"
@@ -23,7 +26,7 @@
 INITIALIZE_EASYLOGGINGPP
 
 #include "Renderer.h"
-
+#include "ImguiImplementation.h"
 HWND windowHandle;
 
 class WindowsProcessClass
@@ -87,9 +90,12 @@ LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARA
 
 }
 
-
+extern LRESULT ImGui_ImplDX11_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
+	ImGui_ImplDX11_WndProcHandler(hwnd, umessage, wparam, lparam);
+		//return true;
+
 	switch (umessage)
 	{
 		// Check if the window is being destroyed.
@@ -115,7 +121,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 	}
 }
 
-
+bool showTWindow = true;
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
@@ -221,6 +227,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 
 	mpRenderer->Initialize(windowHandle);
+	ImGui_ImplDX11_Init(windowHandle, mpRenderer->mpDevice.Get(), mpRenderer->mpDeviceContext.Get());
+
+	//unsigned char* pixels;
+	//int width, height;
+	//ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 	std::unique_ptr<PlayerSceneExample> mpPlayerScene = std::make_unique<PlayerSceneExample>();
 	mpPlayerScene->Init();
 
@@ -228,6 +239,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	bool done = false;
 	while (!done)
 	{
+		ImGui_ImplDX11_NewFrame();
 		mpInput->Frame();
 	
 		// Handle the windows messages.
@@ -249,9 +261,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 		}
 		mpPlayerScene->Tick(mpInput.get(), 1.0f);
 		mpRenderer->RenderScene(mpPlayerScene.get());
+		if(showTWindow)
+		{
+			static float f = 0.0f;
+			ImGui::Text("Hello, world!");
+			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+			//ImGui::ColorEdit3("clear color", (float*)&);
+			ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
+			ImGui::ShowTestWindow(&showTWindow);
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		}
+		ImGui::Render();
+		mpRenderer->mpSwapchain->Present((GraphicsSettings::gIsVsyncEnabled ? 1 : 0), 0);
+
 	}
 
 
+	ImGui_ImplDX11_Shutdown();
 
 	DestroyWindow(windowHandle);
 	windowHandle = NULL;
