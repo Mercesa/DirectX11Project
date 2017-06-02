@@ -71,7 +71,7 @@ float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, floa
 float DoAttenuation(Light light, float d)
 {
 	// Calculates attenuation, currently fixed attenuation amounts
-	return 1.0f / (1.0f + 0.022* d + (0.0019*d *d));
+	return 1.0f / (1.0f + 0.022* d + (0.2*d *d));
 }
 
 float4 DoDiffuse(Light light, float3 L, float3 N)

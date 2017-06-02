@@ -90,11 +90,16 @@ LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARA
 
 }
 
+
 extern LRESULT ImGui_ImplDX11_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
-	ImGui_ImplDX11_WndProcHandler(hwnd, umessage, wparam, lparam);
-		//return true;
+	if (GraphicsSettings::gShowDebugWindow)
+	{
+		ImGui_ImplDX11_WndProcHandler(hwnd, umessage, wparam, lparam);
+		return true;
+	}
+		
 
 	switch (umessage)
 	{
@@ -122,6 +127,77 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 }
 
 bool showTWindow = true;
+
+static void ShowExampleMenuFile()
+{
+	ImGui::MenuItem("(dummy menu)", NULL, false, false);
+	if (ImGui::MenuItem("New")) {}
+	if (ImGui::MenuItem("Open", "Ctrl+O")) {}
+	if (ImGui::BeginMenu("Open Recent"))
+	{
+		ImGui::MenuItem("fish_hat.c");
+		ImGui::MenuItem("fish_hat.inl");
+		ImGui::MenuItem("fish_hat.h");
+		if (ImGui::BeginMenu("More.."))
+		{
+			ImGui::MenuItem("Hello");
+			ImGui::MenuItem("Sailor");
+			if (ImGui::BeginMenu("Recurse.."))
+			{
+				ShowExampleMenuFile();
+				ImGui::EndMenu();
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenu();
+	}
+	if (ImGui::MenuItem("Save", "Ctrl+S")) {}
+	if (ImGui::MenuItem("Save As..")) {}
+	ImGui::Separator();
+	if (ImGui::BeginMenu("Options"))
+	{
+		static bool enabled = true;
+		ImGui::MenuItem("Enabled", "", &enabled);
+		ImGui::BeginChild("child", ImVec2(0, 60), true);
+		for (int i = 0; i < 10; i++)
+			ImGui::Text("Scrolling Text %d", i);
+		ImGui::EndChild();
+		static float f = 0.5f;
+		static int n = 0;
+		ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
+		ImGui::InputFloat("Input", &f, 0.1f);
+		ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
+		ImGui::EndMenu();
+	}
+	if (ImGui::BeginMenu("Colors"))
+	{
+		for (int i = 0; i < ImGuiCol_COUNT; i++)
+			ImGui::MenuItem(ImGui::GetStyleColName((ImGuiCol)i));
+		ImGui::EndMenu();
+	}
+	if (ImGui::BeginMenu("Disabled", false)) // Disabled
+	{
+		IM_ASSERT(0);
+	}
+	if (ImGui::MenuItem("Checked", NULL, true)) {}
+	if (ImGui::MenuItem("Quit", "Alt+F4")) {
+		GraphicsSettings::gShowDebugWindow = false;
+	}
+}
+
+void ShowTitleMenu()
+{
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("Menu"))
+		{
+			ShowExampleMenuFile();
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMainMenuBar();
+	}
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
@@ -243,7 +319,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 		mpInput->Frame();
 	
 		// Handle the windows messages.
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -259,18 +335,46 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 		{
 			done = true;
 		}
+
+		if (mpInput->IsKeyDown(VK_F5))
+		{
+			GraphicsSettings::gShowDebugWindow = !GraphicsSettings::gShowDebugWindow;
+		}
 		mpPlayerScene->Tick(mpInput.get(), 1.0f);
 		mpRenderer->RenderScene(mpPlayerScene.get());
-		if(showTWindow)
+
+
+		bool hasBeenSelected = false;
+		if(GraphicsSettings::gShowDebugWindow)
 		{
+			ShowTitleMenu();
+
+
 			static float f = 0.0f;
 			ImGui::Text("Hello, world!");
 			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-			//ImGui::ColorEdit3("clear color", (float*)&);
-			ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-			ImGui::ShowTestWindow(&showTWindow);
+
+			for (int i = 0; i < mpPlayerScene->mLights.size(); ++i)
+			{
+			
+				ImGui::ColorEdit3("color point light", (float*)&mpPlayerScene->mLights[i]->diffuseColor);
+
+				ImGui::ColorEditMode(ImGuiColorEditMode_UserSelect);
+				static float pos[3] = { 0.0, 0.0, 0.0 };
+				ImGui::ColorEdit3("position point light", (float*)&pos);
+				std::cout << pos[0] << std::endl;
+				mpPlayerScene->mLights[i]->position = XMFLOAT3(pos);
+			}
+			ImGui::ColorEditMode(ImGuiColorEditMode_RGB);
+			ImGui::ColorEdit3("color directional light", (float*)&mpPlayerScene->mDirectionalLight->diffuseColor);
+			ImGui::ColorEdit3("position directional light", (float*)&mpPlayerScene->mDirectionalLight->position);
+
+
+			ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		}
+
+
 		ImGui::Render();
 		mpRenderer->mpSwapchain->Present((GraphicsSettings::gIsVsyncEnabled ? 1 : 0), 0);
 

@@ -9,6 +9,8 @@ public:
 	static uint32_t gCurrentScreenHeight;
 	static bool gIsApplicationFullScreen;
 	static bool gIsVsyncEnabled;
+
+	static bool gShowDebugWindow;
 private:
 	GraphicsSettings();
 	~GraphicsSettings();

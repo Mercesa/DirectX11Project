@@ -25,47 +25,50 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 	static int x = 0;
 	static int y = 0;
 
+	
 	int mouseRelX = 0;
 	int mouseRelY = 0;
 	apInput->GetMouseRelativeLocation(mouseRelX, mouseRelY);
 
-	x += mouseRelX;
-	y += mouseRelY;
+	x = mouseRelX;
+	y = mouseRelY;
 
-	mpCamera->SetRotation(y, x, 0);
+	mpCamera->Pitch(y);
+	mpCamera->RotateY(x);
 	
-	if (apInput->IsKeyDown(0x53))
-	{
-		mpCamera->m_positionZ += -1.0f * aDT;
-	}
-
-	if (apInput->IsKeyDown(0x57))
-	{
-		mpCamera->m_positionZ += 1.0f * aDT;
-	}
-
-	if (apInput->IsKeyDown(0x41))
-	{
-		mpCamera->m_positionY -= 1.0f * aDT;
-	}
-
-	if (apInput->IsKeyDown(0x44))
-	{
-		mpCamera->m_positionY += 1.0f * aDT;
-	}
-
+	//if (apInput->IsKeyHeld(0x53))
+	//{
+	//	mpCamera->Walk(-0.1f * aDT);
+	//}
+	//
+	//if (apInput->IsKeyHeld(0x57))
+	//{
+	//	mpCamera->Walk(0.1f * aDT);
+	//}
+	//
+	//if (apInput->IsKeyHeld(0x41))
+	//{
+	//	mpCamera->Strafe(-0.1f * aDT);
+	//}
+	//
+	//if (apInput->IsKeyHeld(0x44))
+	//{
+	//	mpCamera->Strafe(0.1f * aDT);
+	//}
+	mpCamera->LookAt(XMFLOAT3(0.0f, 10.0f, -5.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	//std::cout << mpCamera->GetPosition3f().z << std::endl;
 }
 
 void PlayerSceneExample::Init()
 {
-	mpCamera->SetPosition(0.0f, 15.0f, -100.0f);
+	mpCamera->SetPosition(0.0f, 2.0f, -1.0f);
 	
 	
 	std::vector<ModelClass*> tModels = ResourceManager::GetInstance().LoadModels("Models\\Box\\cube.obj");
 
 	
-	XMMATRIX tScaleMat = tScaleMat = XMMatrixScaling(800.0f, 1.0f, 800.0f);
-	XMMATRIX tTranslateMat = XMMatrixTranslation(0.0f, -5.0f, 0.0f);
+	XMMATRIX tScaleMat = tScaleMat = XMMatrixScaling(1.0f, 1.0f, 1.0f);
+	XMMATRIX tTranslateMat = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 
 	// load models and translate them as game objects
 	for (int i = 0; i < tModels.size(); ++i)
@@ -79,24 +82,24 @@ void PlayerSceneExample::Init()
 
 	// Load cube
 	tModels = ResourceManager::GetInstance().LoadModels("Models\\Box\\cube.obj");
-	tTranslateMat = XMMatrixTranslation(25.0f, 25.0f, 0.0f);
+	tTranslateMat = XMMatrixTranslation(1.0f, 1.0f, 1.0f);
 	for (int i = 0; i < tModels.size(); ++i)
 	{
 		std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
 		tpObject->mpModel = tModels[i];
-		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(10.0f, 10.0f, 10.0f), tTranslateMat));
+		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixScaling(10.0, 1.0, 10.0f));
 
 		this->mObjects.push_back(std::move(tpObject));
 	}
 
 	// Load sphere
 	tModels = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\sphere.obj");
-	tTranslateMat = XMMatrixTranslation(0.0f, 25.0f, 0.0f);
+	tTranslateMat = XMMatrixTranslation(0.0f, 2.0f, 0.0f);
 	for (int i = 0; i < tModels.size(); ++i)
 	{
 		std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
 		tpObject->mpModel = tModels[i];
-		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(10.0f, 10.0f, 10.0f), tTranslateMat ));
+		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(tTranslateMat, XMMatrixScaling(1.0f, 1.0f, 1.0f)));
 
 		this->mObjects.push_back(std::move(tpObject));
 	}
@@ -104,7 +107,7 @@ void PlayerSceneExample::Init()
 	// Create light, set diffuse and position, add light to list
 	std::unique_ptr<Light> tpLight = std::make_unique<Light>();
 	tpLight->diffuseColor = XMFLOAT3(1.0f, 0.0f, 1.0f);
-	tpLight->position = XMFLOAT3(0.0f, 60.0f, 0.0f);
+	tpLight->position = XMFLOAT3(0.0f, 0.0f, 0.0f);
 	this->mLights.push_back(std::move(tpLight));
 
 	this->mDirectionalLight = std::make_unique<Light>();

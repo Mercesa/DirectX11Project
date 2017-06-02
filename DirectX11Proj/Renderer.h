@@ -15,6 +15,9 @@
 #include "d3dShaderManager.h"
 #include "d3dConstantBuffer.h"
 #include "IScene.h"
+
+class d3dRenderTexture;
+
 class Renderer
 {
 public:
@@ -31,6 +34,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11Device> mpDevice;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> mpDeviceContext;
 
+	float clearColor[3] = { 0.0f, 0.0f, 0.0f };
 private:
 
 	bool InitializeDirectX();
@@ -69,17 +73,11 @@ private:
 	XMFLOAT4X4 gViewMatrix;
 
 
-
-
-
 	Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;
 	Microsoft::WRL::ComPtr<IDXGIAdapter> mAdapter;
 	Microsoft::WRL::ComPtr<IDXGIOutput> mAdapterOutput;
 
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> mpDepthStencilBufferTexture;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> mpDepthStencilState;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mpDepthStencilView;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mpRenderTargetView;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRasterState;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpAnisotropicWrapSampler;
 
@@ -88,6 +86,8 @@ private:
 	std::unique_ptr<d3dConstantBuffer> mpLightCB;
 
 	std::unique_ptr<d3dShaderManager> mpShaderManager;
+
+	std::unique_ptr<d3dRenderTexture> mBackBufferRenderTexture;
 
 };
 

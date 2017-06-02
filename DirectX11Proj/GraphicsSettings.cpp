@@ -7,6 +7,8 @@ uint32_t GraphicsSettings::gCurrentScreenHeight = 768;
 bool GraphicsSettings::gIsApplicationFullScreen = false;
 bool GraphicsSettings::gIsVsyncEnabled = true;
 
+bool GraphicsSettings::gShowDebugWindow = false;
+
 GraphicsSettings::GraphicsSettings()
 {
 }

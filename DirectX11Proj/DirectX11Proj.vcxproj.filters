@@ -37,7 +37,7 @@
     <Filter Include="Utility">
       <UniqueIdentifier>{1578abde-7f40-4936-90cb-27fbb939e80a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Utility\IMGUI">
+    <Filter Include="Libs\IMGUI">
       <UniqueIdentifier>{ee975a26-cde9-4b1e-90cd-016fbccacbd5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -45,14 +45,8 @@
     <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="cameraclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="modelclass.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Application.cpp">
-      <Filter>NonFramework</Filter>
     </ClCompile>
     <ClCompile Include="PlayerSceneExample.cpp">
       <Filter>NonFramework</Filter>
@@ -77,12 +71,6 @@
     </ClCompile>
     <ClCompile Include="d3dShaderPS.cpp">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dRenderTexture.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="IApplication.cpp">
-      <Filter>NonFramework\Interfaces</Filter>
     </ClCompile>
     <ClCompile Include="IObject.cpp">
       <Filter>NonFramework\Interfaces</Filter>
@@ -114,37 +102,37 @@
     <ClCompile Include="ModelLoader.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
-    <ClCompile Include="OldMain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="GraphicsSettings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ImguiImplementation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="imgui.cpp">
-      <Filter>Utility\IMGUI</Filter>
+      <Filter>Libs\IMGUI</Filter>
     </ClCompile>
     <ClCompile Include="imgui_draw.cpp">
-      <Filter>Utility\IMGUI</Filter>
+      <Filter>Libs\IMGUI</Filter>
     </ClCompile>
     <ClCompile Include="imgui_demo.cpp">
-      <Filter>Utility\IMGUI</Filter>
+      <Filter>Libs\IMGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MathHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImguiImplementation.cpp">
+      <Filter>Libs\IMGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dRenderTexture.cpp">
+      <Filter>D3DSetup\SetupClasses</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cameraclass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="modelclass.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Application.h">
-      <Filter>NonFramework</Filter>
     </ClInclude>
     <ClInclude Include="ModelData.h">
       <Filter>Source Files</Filter>
@@ -188,12 +176,6 @@
     <ClInclude Include="d3dShaderPS.h">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClInclude>
-    <ClInclude Include="d3dRenderTexture.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="IApplication.h">
-      <Filter>NonFramework\Interfaces</Filter>
-    </ClInclude>
     <ClInclude Include="IObject.h">
       <Filter>NonFramework\Interfaces</Filter>
     </ClInclude>
@@ -230,26 +212,35 @@
     <ClInclude Include="Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImguiImplementation.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="imgui.h">
-      <Filter>Utility\IMGUI</Filter>
+      <Filter>Libs\IMGUI</Filter>
     </ClInclude>
     <ClInclude Include="imgui_internal.h">
-      <Filter>Utility\IMGUI</Filter>
+      <Filter>Libs\IMGUI</Filter>
     </ClInclude>
     <ClInclude Include="imconfig.h">
-      <Filter>Utility\IMGUI</Filter>
+      <Filter>Libs\IMGUI</Filter>
     </ClInclude>
     <ClInclude Include="stb_rect_pack.h">
-      <Filter>Utility\IMGUI</Filter>
+      <Filter>Libs\IMGUI</Filter>
     </ClInclude>
     <ClInclude Include="stb_textedit.h">
-      <Filter>Utility\IMGUI</Filter>
+      <Filter>Libs\IMGUI</Filter>
     </ClInclude>
     <ClInclude Include="stb_truetype.h">
-      <Filter>Utility\IMGUI</Filter>
+      <Filter>Libs\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MathHelper.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImguiImplementation.h">
+      <Filter>Libs\IMGUI</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dRenderTexture.h">
+      <Filter>D3DSetup\SetupClasses</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

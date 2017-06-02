@@ -2,7 +2,7 @@
 
 #include "LightStruct.h"
 
-struct MatrixBufferType
+struct cbMatrixBuffer
 {
 	float gEyePosX;
 	float gEyePosY;
@@ -13,14 +13,14 @@ struct MatrixBufferType
 	XMMATRIX projection;
 };
 
-struct LightMatrixBufferType
+struct cbLightMatrix
 {
 	XMMATRIX worldMatrix;
 	XMMATRIX lightViewMatrix;
 	XMMATRIX lightProjectionMatrix;
 };
 
-struct MaterialBufferType
+struct cbMaterial
 {
 	int hasDiffuse; // 4 bytes
 	int hasSpecular;// 8 bytes
@@ -28,7 +28,7 @@ struct MaterialBufferType
 	int padding0;	// 16 bytes, 16 bytes aligned :)
 };
 
-struct LightBufferType
+struct cbLights
 {
 	int amountOfLights;
 	int padLB01;

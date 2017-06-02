@@ -7,13 +7,19 @@
 #include "d3dShaderManager.h"
 #include "d3dShaderVS.h"
 #include "d3dShaderPS.h"
+#include "d3dTexture.h"
+
 #include "ResourceManager.h"
 #include "d3dMaterial.h"
 #include "LightStruct.h"
 #include "ConstantBuffers.h"
 #include "IObject.h"
 #include "GraphicsSettings.h"
+#include "d3dRenderTexture.h"
+
 using namespace DirectX;
+
+#include "camera.h"
 
 Renderer::Renderer()
 {
@@ -37,6 +43,7 @@ void Renderer::Initialize(HWND aHwnd)
 
 }
 
+
 void Renderer::CreateConstantBuffers()
 {
 	// Create constant buffers
@@ -46,11 +53,14 @@ void Renderer::CreateConstantBuffers()
 	LOG(INFO) << "Constant buffers created";
 }
 
+static std::unique_ptr<LightBufferType> dataPtr = std::make_unique<LightBufferType>();
+static std::unique_ptr<MaterialBufferType> materialBufferDataPtr = std::make_unique<MaterialBufferType>();
+static std::unique_ptr<MatrixBufferType> gMatrixBufferDataPtr = std::make_unique<MatrixBufferType>();
+
 void Renderer::UpdateFrameConstantBuffers(IScene* const aScene)
 {
 	// Update light constant buffer
 
-	static LightBufferType* dataPtr = new LightBufferType();
 	uint32_t bufferNumber;
 
 	// Get a pointer to the data in the constant buffer.
@@ -68,7 +78,7 @@ void Renderer::UpdateFrameConstantBuffers(IScene* const aScene)
 	dataPtr->directionalLight.position = aScene->mDirectionalLight->position;
 
 
-	mpLightCB->UpdateBuffer((void*)dataPtr, mpDeviceContext.Get());
+	mpLightCB->UpdateBuffer((void*)dataPtr.get(), mpDeviceContext.Get());
 
 
 	bufferNumber = 2;
@@ -77,21 +87,20 @@ void Renderer::UpdateFrameConstantBuffers(IScene* const aScene)
 	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
 }
 
+
 void Renderer::UpdateObjectConstantBuffers(IObject* const aObject, IScene* const aScene)
 {
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	static MaterialBufferType* dataPtr = new MaterialBufferType();
 	uint32_t bufferNumber;
 
 	// Update material
 	d3dMaterial* const tMat = aObject->mpModel->mMaterial.get();
 
-	dataPtr->hasDiffuse = (int)tMat->mpDiffuse->exists;
-	dataPtr->hasSpecular = (int)tMat->mpSpecular->exists;
-	dataPtr->hasNormal = (int)tMat->mpNormal->exists;
+	materialBufferDataPtr->hasDiffuse = (int)tMat->mpDiffuse->exists;
+	materialBufferDataPtr->hasSpecular = (int)tMat->mpSpecular->exists;
+	materialBufferDataPtr->hasNormal = (int)tMat->mpNormal->exists;
 
 
-	mpMaterialCB->UpdateBuffer((void*)dataPtr, mpDeviceContext.Get());
+	mpMaterialCB->UpdateBuffer((void*)materialBufferDataPtr.get(), mpDeviceContext.Get());
 	bufferNumber = 1;
 	ID3D11Buffer* tBuff = mpMaterialCB->GetBuffer();
 	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
@@ -101,12 +110,11 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject, IScene* const
 	// Update matrix cb
 
 	// very bad code but will fix later either way
-	MatrixBufferType* dataPtr2 = new MatrixBufferType();
 
 	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 	worldMatrix = XMLoadFloat4x4(&aObject->mWorldMatrix);
-	projectionMatrix = XMLoadFloat4x4(&gProjectionMatrix);
-	aScene->GetCamera()->GetViewMatrix(viewMatrix);
+	projectionMatrix = aScene->GetCamera()->GetProj();
+	viewMatrix = aScene->GetCamera()->GetView();
 
 
 	// Transpose the matrices to prepare them for the shader.
@@ -117,15 +125,15 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject, IScene* const
 	// Get a pointer to the data in the constant buffer.
 
 	// Copy the matrices into the constant buffer.
-	dataPtr2->world = worldMatrix2;
-	dataPtr2->view = viewMatrix2;
-	dataPtr2->projection = projectionMatrix2;
-	dataPtr2->gEyePosX = aScene->GetCamera()->GetPosition().x;
-	dataPtr2->gEyePosY = aScene->GetCamera()->GetPosition().y;
-	dataPtr2->gEyePosZ = aScene->GetCamera()->GetPosition().z;
+	gMatrixBufferDataPtr->world = worldMatrix2;
+	gMatrixBufferDataPtr->view = viewMatrix2;
+	gMatrixBufferDataPtr->projection = projectionMatrix2;
+	gMatrixBufferDataPtr->gEyePosX = aScene->GetCamera()->GetPosition3f().x;
+	gMatrixBufferDataPtr->gEyePosY = aScene->GetCamera()->GetPosition3f().y;
+	gMatrixBufferDataPtr->gEyePosZ = aScene->GetCamera()->GetPosition3f().z;
 
 	
-	mpMatrixCB->UpdateBuffer((void*)dataPtr2, mpDeviceContext.Get());
+	mpMatrixCB->UpdateBuffer((void*)gMatrixBufferDataPtr.get(), mpDeviceContext.Get());
 
 	// Set the position of the constant buffer in the vertex shader.
 	bufferNumber = 0;
@@ -136,22 +144,22 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject, IScene* const
 	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
 
 
-	delete dataPtr2;
 	// end update matrix cb
 }
 
+
 void Renderer::RenderScene(IScene* const aScene)
 {
-	float color[4]{ 0.6f, 0.6f, 0.6f, 1.0f };
+	float color[4]{ clearColor[0], clearColor[1], clearColor[2], 1.0f };
 
 	mpDeviceContext->RSSetViewports(1, &gViewPort);
 	mpDeviceContext->RSSetState(mRasterState.Get());
 
-	mpDeviceContext->ClearRenderTargetView(mpRenderTargetView.Get(), color);
-	mpDeviceContext->ClearDepthStencilView(mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+	mpDeviceContext->ClearRenderTargetView(this->mBackBufferRenderTexture->mpRenderTargetView.Get(), clearColor);
+	mpDeviceContext->ClearDepthStencilView(this->mBackBufferRenderTexture->mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
-	mpDeviceContext->OMSetRenderTargets(1, mpRenderTargetView.GetAddressOf(), mpDepthStencilView.Get());
+	mpDeviceContext->OMSetRenderTargets(1, this->mBackBufferRenderTexture->mpRenderTargetView.GetAddressOf(), this->mBackBufferRenderTexture->mpDepthStencilView.Get());
 
 	aScene->GetCamera()->UpdateViewMatrix();
 
@@ -175,11 +183,8 @@ void Renderer::RenderScene(IScene* const aScene)
 		UpdateObjectConstantBuffers(aScene->mObjects[i].get(), aScene);
 		RenderObject(aScene->mObjects[i].get());
 	}
-
-	
-
-	// Present the rendered scene to the screen.
 }
+
 
 void Renderer::RenderObject(IObject* const aObject)
 {
@@ -200,10 +205,8 @@ void Renderer::RenderObject(IObject* const aObject)
 	ID3D11ShaderResourceView* aView3 = aMaterial->mpNormal->GetTexture();
 	mpDeviceContext->PSSetShaderResources(2, 1, &aView3);
 
-
 	// Render the model.
 	mpDeviceContext->DrawIndexed(indices, 0, 0);
-	
 }
 
 bool Renderer::InitializeDeviceAndContext()
@@ -399,60 +402,16 @@ bool Renderer::InitializeDXGI()
 
 bool Renderer::InitializeBackBuffRTV()
 {
-	HRESULT result;
-
-	ID3D11Texture2D* backBufferPtr;
-	result = mpSwapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
-	if (FAILED(result))
-	{
-		LOG(ERROR) << "failed to get back buffer ptr from swapchain";
-		return false;
-	}
-
-	// Create the render target view with the back buffer pointer.
-	result = mpDevice->CreateRenderTargetView(backBufferPtr, NULL, &mpRenderTargetView);
-	if (FAILED(result))
-	{
-		LOG(ERROR) << "failed to create render target view";
-		return false;
-	}
-
-	// Release the backbuffer ptr
-	backBufferPtr->Release();
-	backBufferPtr = 0;
-
+	mBackBufferRenderTexture = std::make_unique<d3dRenderTexture>();
+	mBackBufferRenderTexture->InitializeWithBackbuffer(mpDevice.Get(), mpSwapchain.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, SCREEN_NEAR, SCREEN_FAR);
 	return true;
 }
 
 bool  Renderer::InitializeDepthStencilView()
 {
-	D3D11_TEXTURE2D_DESC depthBufferDesc;
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	HRESULT result;
 
-	// Initialize the description of the depth buffer.
-	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
-
-	// Set up the description of the depth buffer.
-	depthBufferDesc.Width = GraphicsSettings::gCurrentScreenWidth;
-	depthBufferDesc.Height = GraphicsSettings::gCurrentScreenHeight;
-	depthBufferDesc.MipLevels = 1;
-	depthBufferDesc.ArraySize = 1;
-	depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthBufferDesc.SampleDesc.Count = 1;
-	depthBufferDesc.SampleDesc.Quality = 0;
-	depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	depthBufferDesc.CPUAccessFlags = 0;
-	depthBufferDesc.MiscFlags = 0;
-
-	// Create the texture for the depth buffer using the filled out description.
-	result = mpDevice->CreateTexture2D(&depthBufferDesc, NULL, &mpDepthStencilBufferTexture);
-	if (FAILED(result))
-	{
-		LOG(ERROR) << "Failed to create texture 2D";
-	}
 
 	// Initialize the description of the stencil state.
 	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
@@ -478,27 +437,13 @@ bool  Renderer::InitializeDepthStencilView()
 	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-	// Create the depth stencil state.
-	result = mpDevice->CreateDepthStencilState(&depthStencilDesc, &mpDepthStencilState);
-	if (FAILED(result))
-	{
-		LOG(ERROR) << "Failed to create depth stencil state";
-	}
-
-	// Initialize the depth stencil view.
-	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
-
-	// Set up the depth stencil view description.
-	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	depthStencilViewDesc.Texture2D.MipSlice = 0;
-
-	result = mpDevice->CreateDepthStencilView(mpDepthStencilBufferTexture.Get(), &depthStencilViewDesc, &mpDepthStencilView);
+	result = mpDevice->CreateDepthStencilState(&depthStencilDesc, mpDepthStencilState.GetAddressOf());
 
 	if (FAILED(result))
 	{
-		LOG(ERROR) << "Failed to create depth stencil view";
+		LOG(ERROR) << "Failed to create depth-stencil state";
 	}
+
 	return true;
 }
 
@@ -541,12 +486,6 @@ bool Renderer::DestroyDirectX()
 	{
 		mpDeviceContext.Reset();
 		mpDeviceContext = nullptr;
-	}
-
-	if (mpRenderTargetView.Get() != nullptr)
-	{
-		mpRenderTargetView.Reset();
-		mpRenderTargetView = nullptr;
 	}
 
 	return true;
@@ -648,21 +587,21 @@ bool Renderer::InitializeDirectX()
 		LOG(INFO) << "failed to create DSV";
 		return false;
 	}
-	LOG(INFO) << "Succesfully initialized dsv";
+	LOG(INFO) << "Successfully initialized dsv";
 
 	if (!InitializeRasterstate())
 	{
 		LOG(INFO) << "Failed to create raster state";
 		return false;
 	}
-	LOG(INFO) << "Succesfully initialized raster state";
+	LOG(INFO) << "Successfully initialized raster state";
 
 	if (!InitializeSamplerState())
 	{
 		LOG(INFO) << "Failed to create raster state";
 		return false;
 	}
-	LOG(INFO) << "Succesfully initialized raster state";
+	LOG(INFO) << "Successfully initialized raster state";
 
 	if (!InitializeViewportAndMatrices())
 	{

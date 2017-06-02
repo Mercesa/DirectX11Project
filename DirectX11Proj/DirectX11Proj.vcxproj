@@ -162,8 +162,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
-    <ClCompile Include="cameraclass.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="d3dConstantBuffer.cpp" />
     <ClCompile Include="d3dDepthStencil.cpp" />
     <ClCompile Include="d3dMaterial.cpp" />
@@ -174,7 +173,6 @@
     <ClCompile Include="d3dVertexBuffer.cpp" />
     <ClCompile Include="EngineTimer.cpp" />
     <ClCompile Include="GraphicsSettings.cpp" />
-    <ClCompile Include="IApplication.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="ImguiImplementation.cpp" />
     <ClCompile Include="imgui_demo.cpp" />
@@ -184,10 +182,10 @@
     <ClCompile Include="IScene.cpp" />
     <ClCompile Include="d3dLightClass.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="modelclass.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ObjectExample.cpp" />
-    <ClCompile Include="OldMain.cpp" />
     <ClCompile Include="PlayerSceneExample.cpp" />
     <ClCompile Include="d3dRenderTexture.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -195,8 +193,7 @@
     <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h" />
-    <ClInclude Include="cameraclass.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="ConstantBuffers.h" />
     <ClInclude Include="d3dConstantBuffer.h" />
     <ClInclude Include="d3dDepthStencil.h" />
@@ -210,7 +207,6 @@
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EngineTimer.h" />
     <ClInclude Include="GraphicsSettings.h" />
-    <ClInclude Include="IApplication.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="ImguiImplementation.h" />
@@ -220,6 +216,7 @@
     <ClInclude Include="IScene.h" />
     <ClInclude Include="d3dLightClass.h" />
     <ClInclude Include="LightStruct.h" />
+    <ClInclude Include="MathHelper.h" />
     <ClInclude Include="modelclass.h" />
     <ClInclude Include="ModelData.h" />
     <ClInclude Include="ModelLoader.h" />

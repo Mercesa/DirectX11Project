@@ -1,6 +1,8 @@
 #ifndef _MODELCLASS_H_
 #define _MODELCLASS_H_
 
+#include <cstdint>
+
 #include <d3d11.h>
 #include <directxmath.h>
 using namespace DirectX;
@@ -25,7 +27,7 @@ public:
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 
-	int GetIndexCount();
+	int32_t GetIndexCount();
 
 
 	std::unique_ptr<d3dMaterial> mMaterial;
@@ -38,7 +40,7 @@ private:
 
 
 private:
-	int tIndiceSize = 0;
+	int32_t tIndiceSize = 0;
 	std::unique_ptr<d3dVertexBuffer> mVertexBuffer;
 	std::unique_ptr<d3dVertexBuffer> mIndexBuffer;
 

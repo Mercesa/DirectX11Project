@@ -5,10 +5,10 @@
 #include <vector>
 
 
-#include "cameraclass.h"
 #include "inputclass.h"
 #include "LightStruct.h"
 #include "IObject.h"
+#include "Camera.h"
 
 class IScene
 {
@@ -28,10 +28,10 @@ public:
 
 	bool HasBeenInitialized() { return mInitialized; }
 
-	CameraClass* const GetCamera() { return mpCamera.get(); }
+	Camera* const GetCamera() { return mpCamera.get(); }
 
 protected:
-	std::unique_ptr<CameraClass> mpCamera;
+	std::unique_ptr<Camera> mpCamera;
 
 private:
 	bool mInitialized;

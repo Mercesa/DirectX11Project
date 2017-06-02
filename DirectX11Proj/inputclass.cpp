@@ -24,8 +24,6 @@ InputClass::~InputClass()
 bool InputClass::Initialize()
 {
 	HRESULT result;
-
-
 	
 	mMouseX = 0;
 	mMouseY = 0;
@@ -36,6 +34,7 @@ bool InputClass::Initialize()
 	for (int i = 0; i < 256; ++i)
 	{
 		mKeys[i] = false;
+		mKeysC[i] = false;
 	}
 
 	return true;
@@ -59,7 +58,10 @@ void InputClass::ProcessInput()
 {
 	mMouseRelX = 0;
 	mMouseRelY = 0;
-
+	for (int i = 0; i < 256; ++i)
+	{
+		mKeys[i] = false;
+	}
 }
 
 
