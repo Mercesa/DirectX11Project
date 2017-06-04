@@ -29,7 +29,6 @@ public:
 
 	int32_t GetIndexCount();
 
-
 	std::unique_ptr<d3dMaterial> mMaterial;
 
 private:
@@ -43,7 +42,6 @@ private:
 	int32_t tIndiceSize = 0;
 	std::unique_ptr<d3dVertexBuffer> mVertexBuffer;
 	std::unique_ptr<d3dVertexBuffer> mIndexBuffer;
-
 };
 
 #endif

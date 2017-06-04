@@ -16,6 +16,7 @@
 #include "IObject.h"
 #include "GraphicsSettings.h"
 #include "d3dRenderTexture.h"
+#include "Imgui.h"
 
 using namespace DirectX;
 
@@ -47,15 +48,15 @@ void Renderer::Initialize(HWND aHwnd)
 void Renderer::CreateConstantBuffers()
 {
 	// Create constant buffers
-	mpMatrixCB = std::make_unique<d3dConstantBuffer>(sizeof(MatrixBufferType), nullptr, mpDevice.Get());
-	mpMaterialCB = std::make_unique<d3dConstantBuffer>(sizeof(MaterialBufferType), nullptr, mpDevice.Get());
-	mpLightCB = std::make_unique<d3dConstantBuffer>(sizeof(LightBufferType), nullptr, mpDevice.Get());
+	mpMatrixCB = std::make_unique<d3dConstantBuffer>(sizeof(cbMatrixBuffer), nullptr, mpDevice.Get());
+	mpMaterialCB = std::make_unique<d3dConstantBuffer>(sizeof(cbMaterial), nullptr, mpDevice.Get());
+	mpLightCB = std::make_unique<d3dConstantBuffer>(sizeof(cbLights), nullptr, mpDevice.Get());
 	LOG(INFO) << "Constant buffers created";
 }
 
-static std::unique_ptr<LightBufferType> dataPtr = std::make_unique<LightBufferType>();
-static std::unique_ptr<MaterialBufferType> materialBufferDataPtr = std::make_unique<MaterialBufferType>();
-static std::unique_ptr<MatrixBufferType> gMatrixBufferDataPtr = std::make_unique<MatrixBufferType>();
+static std::unique_ptr<cbLights> dataPtr = std::make_unique<cbLights>();
+static std::unique_ptr<cbMaterial> materialBufferDataPtr = std::make_unique<cbMaterial>();
+static std::unique_ptr<cbMatrixBuffer> gMatrixBufferDataPtr = std::make_unique<cbMatrixBuffer>();
 
 void Renderer::UpdateFrameConstantBuffers(IScene* const aScene)
 {
@@ -143,7 +144,6 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject, IScene* const
 	mpDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
 	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
 
-
 	// end update matrix cb
 }
 
@@ -155,11 +155,11 @@ void Renderer::RenderScene(IScene* const aScene)
 	mpDeviceContext->RSSetViewports(1, &gViewPort);
 	mpDeviceContext->RSSetState(mRasterState.Get());
 
-	mpDeviceContext->ClearRenderTargetView(this->mBackBufferRenderTexture->mpRenderTargetView.Get(), clearColor);
-	mpDeviceContext->ClearDepthStencilView(this->mBackBufferRenderTexture->mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+	mpDeviceContext->ClearRenderTargetView(this->mSceneRenderTexture->mpRenderTargetView.Get(), clearColor);
+	mpDeviceContext->ClearDepthStencilView(this->mSceneRenderTexture->mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
-	mpDeviceContext->OMSetRenderTargets(1, this->mBackBufferRenderTexture->mpRenderTargetView.GetAddressOf(), this->mBackBufferRenderTexture->mpDepthStencilView.Get());
+	mpDeviceContext->OMSetRenderTargets(1, this->mSceneRenderTexture->mpRenderTargetView.GetAddressOf(), this->mSceneRenderTexture->mpDepthStencilView.Get());
 
 	aScene->GetCamera()->UpdateViewMatrix();
 
@@ -183,8 +183,37 @@ void Renderer::RenderScene(IScene* const aScene)
 		UpdateObjectConstantBuffers(aScene->mObjects[i].get(), aScene);
 		RenderObject(aScene->mObjects[i].get());
 	}
+
+	RenderFullScreenQuad();
+	ImGui::Render();
+
+	mpDeviceContext->ClearState();
 }
 
+void Renderer::RenderFullScreenQuad()
+{
+	// Get the fullscreen shaders
+	d3dShaderVS*const tFVS = mpShaderManager->GetVertexShader("Shaders\\fullScreenQuad_VS.hlsl");
+	d3dShaderPS*const tFPS = mpShaderManager->GetPixelShader("Shaders\\fullScreenQuad_PS.hlsl");
+
+
+	mpDeviceContext->RSSetViewports(1, &gViewPort);
+	mpDeviceContext->RSSetState(mRasterState.Get());
+
+
+	mpDeviceContext->ClearDepthStencilView(this->mBackBufferRenderTexture->mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
+	mpDeviceContext->OMSetRenderTargets(1, this->mBackBufferRenderTexture->mpRenderTargetView.GetAddressOf(), this->mBackBufferRenderTexture->mpDepthStencilView.Get());
+
+	// Draw full screen quad
+	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	mpDeviceContext->VSSetShader(tFVS->GetVertexShader(), NULL, 0);
+	mpDeviceContext->PSSetShader(tFPS->GetPixelShader(), NULL, 0);
+	mpDeviceContext->PSSetShaderResources(0, 1, mSceneRenderTexture->mpShaderResourceView.GetAddressOf());
+	mpDeviceContext->PSSetSamplers(0, 1, mpPointClampSampler.GetAddressOf());
+	mpDeviceContext->Draw(4, 0);
+}
 
 void Renderer::RenderObject(IObject* const aObject)
 {
@@ -296,7 +325,6 @@ bool Renderer::InitializeSwapchain()
 	IDXGISwapChain* tSC = mpSwapchain.Get();
 	result = mFactory->CreateSwapChain(mpDevice.Get(), &swapChainDesc, &mpSwapchain);
 
-
 	if (FAILED(result))
 	{
 		LOG(INFO) << "Failed to create swapchain";
@@ -404,6 +432,10 @@ bool Renderer::InitializeBackBuffRTV()
 {
 	mBackBufferRenderTexture = std::make_unique<d3dRenderTexture>();
 	mBackBufferRenderTexture->InitializeWithBackbuffer(mpDevice.Get(), mpSwapchain.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, SCREEN_NEAR, SCREEN_FAR);
+
+	mSceneRenderTexture = std::make_unique<d3dRenderTexture>();
+	mSceneRenderTexture->Initialize(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, SCREEN_NEAR, SCREEN_FAR);
+
 	return true;
 }
 
@@ -515,9 +547,33 @@ bool  Renderer::InitializeSamplerState()
 	HRESULT result = mpDevice->CreateSamplerState(&samplerDesc, &mpAnisotropicWrapSampler);
 	if (FAILED(result))
 	{
-		LOG(WARNING) << "Failed to sampler states";
+		LOG(WARNING) << "Failed to create anisotropic sampler";
 		return false;
 	}
+
+
+	// Create a texture sampler state description.
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.BorderColor[0] = 0;
+	samplerDesc.BorderColor[1] = 0;
+	samplerDesc.BorderColor[2] = 0;
+	samplerDesc.BorderColor[3] = 0;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	result = mpDevice->CreateSamplerState(&samplerDesc, &mpPointClampSampler);
+
+	if (FAILED(result))
+	{
+		LOG(WARNING) << "Failed to create point sampler";
+	}
+
 	return true;
 }
 

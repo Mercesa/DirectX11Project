@@ -13,18 +13,12 @@ ModelClass::ModelClass()
 	mIndexBuffer = std::make_unique<d3dVertexBuffer>();
 }
 
-Microsoft::WRL::ComPtr<ID3D11Buffer> mVertexBufferB;
-Microsoft::WRL::ComPtr<ID3D11Buffer> mIndexBufferB;
-
 ModelClass::ModelClass(const ModelClass& other)
 {
 }
 
-
 ModelClass::~ModelClass()
-{
-}
-
+{}
 
 
 bool ModelClass::Initialize(ID3D11Device* const apDevice, const MeshData& acMesh)
@@ -65,6 +59,7 @@ int ModelClass::GetIndexCount()
 	return mIndexBuffer->GetAmountOfElements();
 }
 
+
 void ModelClass::ShutdownBuffers()
 {
 	// Release the index buffer.
@@ -72,7 +67,7 @@ void ModelClass::ShutdownBuffers()
 	//mVertexBuffer.release();
 }
 
-// Function for if we have any modeldata
+
 bool ModelClass::InitializeBuffers(ID3D11Device* aDevice, const MeshData& aData)
 {	
 	

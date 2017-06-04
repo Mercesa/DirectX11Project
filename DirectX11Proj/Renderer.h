@@ -55,6 +55,7 @@ private:
 
 	// Render functions
 	void RenderObject(IObject* const aObject);
+	void RenderFullScreenQuad();
 
 	const float SCREEN_FAR = 1000.0f;
 	const float SCREEN_NEAR = 2.0f;
@@ -80,6 +81,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> mpDepthStencilState;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRasterState;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpAnisotropicWrapSampler;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpPointClampSampler;
 
 	std::unique_ptr<d3dConstantBuffer> mpMatrixCB;
 	std::unique_ptr<d3dConstantBuffer> mpMaterialCB;
@@ -88,6 +90,6 @@ private:
 	std::unique_ptr<d3dShaderManager> mpShaderManager;
 
 	std::unique_ptr<d3dRenderTexture> mBackBufferRenderTexture;
-
+	std::unique_ptr<d3dRenderTexture> mSceneRenderTexture;
 };
 

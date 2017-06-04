@@ -190,7 +190,6 @@
     <ClCompile Include="d3dRenderTexture.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
-    <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
@@ -198,7 +197,6 @@
     <ClInclude Include="d3dConstantBuffer.h" />
     <ClInclude Include="d3dDepthStencil.h" />
     <ClInclude Include="d3dMaterial.h" />
-    <ClInclude Include="d3dShaderInterface.h" />
     <ClInclude Include="d3dShaderManager.h" />
     <ClInclude Include="d3dShaderPS.h" />
     <ClInclude Include="d3dShaderVS.h" />
@@ -229,7 +227,6 @@
     <ClInclude Include="stb_rect_pack.h" />
     <ClInclude Include="stb_textedit.h" />
     <ClInclude Include="stb_truetype.h" />
-    <ClInclude Include="Transform.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Lighting.hlsl">
@@ -261,6 +258,14 @@
       <FileType>Document</FileType>
     </None>
     <None Include="Shaders\VS_depth.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\fullScreenQuad_PS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shaders\fullScreenQuad_VS.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

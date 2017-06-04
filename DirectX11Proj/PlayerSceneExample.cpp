@@ -32,30 +32,32 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 
 	x = mouseRelX;
 	y = mouseRelY;
-
-	mpCamera->Pitch(y);
-	mpCamera->RotateY(x);
 	
-	//if (apInput->IsKeyHeld(0x53))
-	//{
-	//	mpCamera->Walk(-0.1f * aDT);
-	//}
-	//
-	//if (apInput->IsKeyHeld(0x57))
-	//{
-	//	mpCamera->Walk(0.1f * aDT);
-	//}
-	//
-	//if (apInput->IsKeyHeld(0x41))
-	//{
-	//	mpCamera->Strafe(-0.1f * aDT);
-	//}
-	//
-	//if (apInput->IsKeyHeld(0x44))
-	//{
-	//	mpCamera->Strafe(0.1f * aDT);
-	//}
-	mpCamera->LookAt(XMFLOAT3(0.0f, 10.0f, -5.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	std::cout << x << std::endl;
+	mpCamera->Pitch(y/360.0f);
+	mpCamera->RotateY(x / 360.0f);
+	
+	if (apInput->IsKeyHeld(0x53))
+	{
+		mpCamera->Walk(-0.1f * aDT);
+	}
+	
+	if (apInput->IsKeyHeld(0x57))
+	{
+		mpCamera->Walk(0.1f * aDT);
+	}
+	
+	if (apInput->IsKeyHeld(0x41))
+	{
+		mpCamera->Strafe(-0.1f * aDT);
+	}
+	
+	if (apInput->IsKeyHeld(0x44))
+	{
+		mpCamera->Strafe(0.1f * aDT);
+	}
+	//mpCamera->LookAt(XMFLOAT3(0.0f, 10.0f, -5.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+	mpCamera->UpdateViewMatrix();
 	//std::cout << mpCamera->GetPosition3f().z << std::endl;
 }
 

@@ -52,7 +52,7 @@ bool d3dRenderTexture::Initialize(ID3D11Device*const device, int textureWidth, i
 	// Setup the description of the render target view.
 	renderTargetViewDesc.Format = textureDesc.Format;
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-	renderTargetViewDesc.Texture2D.MipSlice = 0;
+	renderTargetViewDesc.Texture2D.MipSlice = 0;	
 
 	// Create the render target view.
 	result = device->CreateRenderTargetView(mpRenderTargetTexture.Get(), &renderTargetViewDesc, &mpRenderTargetView);
@@ -191,7 +191,7 @@ bool d3dRenderTexture::InitializeWithBackbuffer(ID3D11Device*const aDevice, IDXG
 }
 
 
-void d3dRenderTexture::SetRenderTarget(ID3D11DeviceContext* deviceContext)
+void d3dRenderTexture::SetRenderTarget(ID3D11DeviceContext* const deviceContext)
 {
 	// Bind the render target view and depth stencil buffer to the output render pipeline.
 	deviceContext->OMSetRenderTargets(1, &mpRenderTargetView, mpDepthStencilView.Get());
@@ -203,7 +203,7 @@ void d3dRenderTexture::SetRenderTarget(ID3D11DeviceContext* deviceContext)
 }
 
 
-void d3dRenderTexture::ClearRenderTarget(ID3D11DeviceContext* deviceContext, float red, float green, float blue, float alpha)
+void d3dRenderTexture::ClearRenderTarget(ID3D11DeviceContext* const deviceContext, float red, float green, float blue, float alpha)
 {
 	float color[4];
 

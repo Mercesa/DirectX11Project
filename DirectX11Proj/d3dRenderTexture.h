@@ -25,16 +25,16 @@ public:
 	bool Initialize(ID3D11Device*const, int aTextureWidth, int aTextureHeight, float aScreenNear, float aScreenFar);
 	bool InitializeWithBackbuffer(ID3D11Device* const aDevice, IDXGISwapChain* const aSwapChain, int, int, float, float);
 
-	void SetRenderTarget(ID3D11DeviceContext*);
-	void ClearRenderTarget(ID3D11DeviceContext*, float, float, float, float);
+	void SetRenderTarget(ID3D11DeviceContext*const aRenderTarget);
+	void ClearRenderTarget(ID3D11DeviceContext*const aDevice, float r, float g, float b, float a);
 	ID3D11ShaderResourceView*const GetShaderResourceView();
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mpDepthStencilView;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> mpRenderTargetView;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mpShaderResourceView;
 
 private:
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> mpRenderTargetTexture;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mpShaderResourceView;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> mpDepthStencilBuffer;
 	
 	D3D11_VIEWPORT m_viewport;

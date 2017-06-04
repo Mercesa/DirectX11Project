@@ -341,7 +341,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 			GraphicsSettings::gShowDebugWindow = !GraphicsSettings::gShowDebugWindow;
 		}
 		mpPlayerScene->Tick(mpInput.get(), 1.0f);
-		mpRenderer->RenderScene(mpPlayerScene.get());
 
 
 		bool hasBeenSelected = false;
@@ -374,8 +373,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		}
 
+		mpRenderer->RenderScene(mpPlayerScene.get());
 
-		ImGui::Render();
 		mpRenderer->mpSwapchain->Present((GraphicsSettings::gIsVsyncEnabled ? 1 : 0), 0);
 
 	}
