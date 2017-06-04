@@ -200,11 +200,11 @@ void Renderer::RenderFullScreenQuad()
 	mpDeviceContext->RSSetViewports(1, &gViewPort);
 	mpDeviceContext->RSSetState(mRasterState.Get());
 
+	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
+	mpDeviceContext->OMSetRenderTargets(1, this->mBackBufferRenderTexture->mpRenderTargetView.GetAddressOf(), this->mBackBufferRenderTexture->mpDepthStencilView.Get());
 
 	mpDeviceContext->ClearDepthStencilView(this->mBackBufferRenderTexture->mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
-	mpDeviceContext->OMSetRenderTargets(1, this->mBackBufferRenderTexture->mpRenderTargetView.GetAddressOf(), this->mBackBufferRenderTexture->mpDepthStencilView.Get());
 
 	// Draw full screen quad
 	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);

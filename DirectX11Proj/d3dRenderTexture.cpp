@@ -17,7 +17,7 @@ d3dRenderTexture::~d3dRenderTexture()
 }
 
 
-bool d3dRenderTexture::Initialize(ID3D11Device*const device, int textureWidth, int textureHeight, float screenDepth, float screenNear)
+bool d3dRenderTexture::Initialize(ID3D11Device*const device, uint32_t textureWidth, uint32_t textureHeight, float screenDepth, float screenNear)
 {
 	D3D11_TEXTURE2D_DESC textureDesc;
 	HRESULT result;
@@ -124,7 +124,7 @@ bool d3dRenderTexture::Initialize(ID3D11Device*const device, int textureWidth, i
 }
 
 
-bool d3dRenderTexture::InitializeWithBackbuffer(ID3D11Device*const aDevice, IDXGISwapChain* const aSwapChain, int aTextureWidth, int aTextureHeight, float aNear, float aDepth)
+bool d3dRenderTexture::InitializeWithBackbuffer(ID3D11Device*const aDevice, IDXGISwapChain* const aSwapChain, uint32_t aTextureWidth, uint32_t aTextureHeight, float aNear, float aDepth)
 {
 	D3D11_TEXTURE2D_DESC depthBufferDesc;
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;	

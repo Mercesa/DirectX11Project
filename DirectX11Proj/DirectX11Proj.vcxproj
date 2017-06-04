@@ -166,6 +166,7 @@
     <ClCompile Include="d3dConstantBuffer.cpp" />
     <ClCompile Include="d3dDepthStencil.cpp" />
     <ClCompile Include="d3dMaterial.cpp" />
+    <ClCompile Include="d3dRenderDepthTexture.cpp" />
     <ClCompile Include="d3dShaderManager.cpp" />
     <ClCompile Include="d3dShaderPS.cpp" />
     <ClCompile Include="d3dShaderVS.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="d3dConstantBuffer.h" />
     <ClInclude Include="d3dDepthStencil.h" />
     <ClInclude Include="d3dMaterial.h" />
+    <ClInclude Include="d3dRenderDepthTexture.h" />
     <ClInclude Include="d3dShaderManager.h" />
     <ClInclude Include="d3dShaderPS.h" />
     <ClInclude Include="d3dShaderVS.h" />
@@ -204,6 +206,7 @@
     <ClInclude Include="d3dVertexBuffer.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EngineTimer.h" />
+    <ClInclude Include="FormatConversionHelper.h" />
     <ClInclude Include="GraphicsSettings.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />

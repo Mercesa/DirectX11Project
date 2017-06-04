@@ -12,6 +12,7 @@
 #include <fcntl.h>
 #include <d3d11.h>	
 #include <directxmath.h>
+#include <cstdint>
 
 using namespace DirectX;
 
@@ -22,8 +23,8 @@ public:
 	d3dRenderTexture(const d3dRenderTexture&);
 	~d3dRenderTexture();
 
-	bool Initialize(ID3D11Device*const, int aTextureWidth, int aTextureHeight, float aScreenNear, float aScreenFar);
-	bool InitializeWithBackbuffer(ID3D11Device* const aDevice, IDXGISwapChain* const aSwapChain, int, int, float, float);
+	bool Initialize(ID3D11Device* const aDevice, uint32_t aTextureWidth, uint32_t aTextureHeight, float aScreenNear, float aScreenFar);
+	bool InitializeWithBackbuffer(ID3D11Device* const aDevice, IDXGISwapChain* const aSwapChain, uint32_t aTextureWidth, uint32_t aTextureHeight, float aScreenNear, float aScreenFar);
 
 	void SetRenderTarget(ID3D11DeviceContext*const aRenderTarget);
 	void ClearRenderTarget(ID3D11DeviceContext*const aDevice, float r, float g, float b, float a);

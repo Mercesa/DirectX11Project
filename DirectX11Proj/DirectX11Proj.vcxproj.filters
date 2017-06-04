@@ -122,6 +122,9 @@
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="d3dRenderDepthTexture.cpp">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modelclass.h">
@@ -228,6 +231,12 @@
     </ClInclude>
     <ClInclude Include="ResourceManager.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dRenderDepthTexture.h">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="FormatConversionHelper.h">
+      <Filter>D3DSetup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
