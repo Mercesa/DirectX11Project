@@ -4,6 +4,7 @@ struct VSQuadOut {
 	float4 position : SV_Position;
 	float2 texcoord: TexCoord;
 };
+
 VSQuadOut VertShader(uint VertexID: SV_VertexID) {// ouputs a full screen quad with tex coords
 	VSQuadOut Out;
 	Out.texcoord = float2((VertexID << 1) & 2, VertexID & 2);

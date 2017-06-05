@@ -33,7 +33,6 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 	x = mouseRelX;
 	y = mouseRelY;
 	
-	std::cout << x << std::endl;
 	mpCamera->Pitch(y/360.0f);
 	mpCamera->RotateY(x / 360.0f);
 	

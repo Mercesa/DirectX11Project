@@ -44,7 +44,6 @@ void Renderer::Initialize(HWND aHwnd)
 
 }
 
-
 void Renderer::CreateConstantBuffers()
 {
 	// Create constant buffers
@@ -190,6 +189,11 @@ void Renderer::RenderScene(IScene* const aScene)
 	mpDeviceContext->ClearState();
 }
 
+void Renderer::RenderSceneDepthPrePass()
+{
+
+}
+
 void Renderer::RenderFullScreenQuad()
 {
 	// Get the fullscreen shaders
@@ -205,13 +209,11 @@ void Renderer::RenderFullScreenQuad()
 
 	mpDeviceContext->ClearDepthStencilView(this->mBackBufferRenderTexture->mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-
 	// Draw full screen quad
 	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	mpDeviceContext->VSSetShader(tFVS->GetVertexShader(), NULL, 0);
 	mpDeviceContext->PSSetShader(tFPS->GetPixelShader(), NULL, 0);
 	mpDeviceContext->PSSetShaderResources(0, 1, mSceneRenderTexture->mpShaderResourceView.GetAddressOf());
-	mpDeviceContext->PSSetSamplers(0, 1, mpPointClampSampler.GetAddressOf());
 	mpDeviceContext->Draw(4, 0);
 }
 

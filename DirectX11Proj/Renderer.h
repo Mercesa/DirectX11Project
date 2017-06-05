@@ -56,6 +56,7 @@ private:
 	// Render functions
 	void RenderObject(IObject* const aObject);
 	void RenderFullScreenQuad();
+	void RenderScenePrePass();
 
 	const float SCREEN_FAR = 1000.0f;
 	const float SCREEN_NEAR = 2.0f;

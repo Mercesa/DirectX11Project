@@ -40,7 +40,6 @@ public:
 		// If a key is pressed then save that state in the key array.
 		if (mKeysC[input] == false)
 		{
-			std::cout << "Key pressed " << input << std::endl;
 			mKeys[input] = true;
 		}
 

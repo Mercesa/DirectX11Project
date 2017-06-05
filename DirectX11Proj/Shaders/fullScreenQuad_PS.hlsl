@@ -1,8 +1,4 @@
-
-
-Texture2D diffuseTexture : register(t0);
-
-SamplerState SamplerPointWrap;
+Texture2D renderedSceneTexture : register(t0);
 
 struct VSQuadOut {
 	float4 position : SV_Position;
@@ -10,6 +6,6 @@ struct VSQuadOut {
 };
 float4 PixShader(VSQuadOut quadIn) : SV_TARGET
 { 
-	//return float4(1.0f, 0.0f, 1.0f, 1.0f);
-	return diffuseTexture.Sample(SamplerPointWrap, quadIn.texcoord); //the red color
+	// Loads a texture with the x and y screen position
+	return renderedSceneTexture.Load(int3(quadIn.position.xy, 0));
 }

@@ -291,8 +291,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 		posX, posY, GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, NULL, NULL, m_hinstance, NULL);
 	}
 
-
-
 	// Bring the window up on the screen and set it as main focus.
 	ShowWindow(windowHandle, SW_SHOW);
 	SetForegroundWindow(windowHandle);
