@@ -98,8 +98,8 @@ void d3dLightClass::GenerateProjectionMatrix(float screenDepth, float screenNear
 	fieldOfView = (float)D3DX_PI / 2.0f;
 	screenAspect = 1.0f;
 
-	XMStoreFloat4x4(&mProjectionmatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth));
-
+	//XMStoreFloat4x4(&mProjectionmatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth));
+	XMStoreFloat4x4(&mProjectionmatrix, XMMatrixOrthographicLH(32, 32, screenNear, screenDepth));
 	return;
 }
 

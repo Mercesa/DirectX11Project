@@ -11,15 +11,15 @@ struct Light
 	int lightType;
 };
 
+
+
 cbuffer MatrixBuffer : register(b0)
 {
 	float3 gEyePos;
 	float1 pad0;
 
-	matrix worldMatrix;
 	matrix viewMatrix;
 	matrix projectionMatrix;
-
 };
 
 // integers are 32 bit in HLSL
@@ -45,9 +45,13 @@ cbuffer LightBuffer : register(b2)
 
 cbuffer LightMatrixBuffer : register (b3)
 {
-	matrix worldMatrix2;
 	matrix lightViewMatrix;
 	matrix lightProjectionMatrix;
+}
+
+cbuffer PerObjectBuffer : register(b4)
+{
+	matrix worldMatrix;
 }
 
 float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangentW)
@@ -129,7 +133,7 @@ float4 DoDirectionalLight(Light light, float3 V, float3 P, float3 N, float4 diff
 	float4 specularCol = specTextureColor  *	DoSpecular(light, V, L, N)  * float4(light.colour.rgb, 1.0f);
 
 
-	float4 combined = ambientCol + diffuseCol + specularCol;
+	float4 combined = (diffuseCol + specularCol);
 
 
 	return combined;

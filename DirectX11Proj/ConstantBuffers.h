@@ -8,14 +8,13 @@ struct cbMatrixBuffer
 	float gEyePosY;
 	float gEyePosZ;
 	float pad0;
-	XMMATRIX world;
+
 	XMMATRIX view;
 	XMMATRIX projection;
 };
 
 struct cbLightMatrix
 {
-	XMMATRIX worldMatrix;
 	XMMATRIX lightViewMatrix;
 	XMMATRIX lightProjectionMatrix;
 };
@@ -38,4 +37,9 @@ struct cbLights
 	Light directionalLight;
 
 	Light arr[16];
+};
+
+struct cbPerObject
+{
+	XMMATRIX worldMatrix;
 };

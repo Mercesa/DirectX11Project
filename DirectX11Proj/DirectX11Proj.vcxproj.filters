@@ -5,10 +5,6 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
     <Filter Include="NonFramework">
       <UniqueIdentifier>{4e955b5b-fc21-4d4c-a79d-eb2dd2a0b945}</UniqueIdentifier>
     </Filter>
@@ -23,9 +19,6 @@
     </Filter>
     <Filter Include="D3DSetup\D3DShaderTypes">
       <UniqueIdentifier>{e810992e-765c-44da-9774-6b792bf4a10f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="NonFramework\Interfaces">
-      <UniqueIdentifier>{51a44c7a-bb86-4352-821b-16ba45b14fd7}</UniqueIdentifier>
     </Filter>
     <Filter Include="D3DSetup\SetupClasses">
       <UniqueIdentifier>{4017dcef-3591-4572-a99e-065d2b1580db}</UniqueIdentifier>
@@ -64,12 +57,6 @@
     </ClCompile>
     <ClCompile Include="d3dShaderPS.cpp">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
-    </ClCompile>
-    <ClCompile Include="IObject.cpp">
-      <Filter>NonFramework\Interfaces</Filter>
-    </ClCompile>
-    <ClCompile Include="IScene.cpp">
-      <Filter>NonFramework\Interfaces</Filter>
     </ClCompile>
     <ClCompile Include="d3dLightClass.cpp">
       <Filter>D3DSetup</Filter>
@@ -110,9 +97,6 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MathHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ImguiImplementation.cpp">
       <Filter>Libs\IMGUI</Filter>
     </ClCompile>
@@ -124,6 +108,15 @@
     </ClCompile>
     <ClCompile Include="d3dRenderDepthTexture.cpp">
       <Filter>D3DSetup\SetupClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="MathHelper.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="IObject.cpp">
+      <Filter>NonFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="IScene.cpp">
+      <Filter>NonFramework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -165,12 +158,6 @@
     </ClInclude>
     <ClInclude Include="d3dShaderPS.h">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject.h">
-      <Filter>NonFramework\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="IScene.h">
-      <Filter>NonFramework\Interfaces</Filter>
     </ClInclude>
     <ClInclude Include="d3dLightClass.h">
       <Filter>D3DSetup</Filter>
@@ -214,9 +201,6 @@
     <ClInclude Include="camera.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="MathHelper.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImguiImplementation.h">
       <Filter>Libs\IMGUI</Filter>
     </ClInclude>
@@ -235,8 +219,17 @@
     <ClInclude Include="d3dRenderDepthTexture.h">
       <Filter>D3DSetup\SetupClasses</Filter>
     </ClInclude>
+    <ClInclude Include="MathHelper.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
     <ClInclude Include="FormatConversionHelper.h">
-      <Filter>D3DSetup</Filter>
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="IScene.h">
+      <Filter>NonFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject.h">
+      <Filter>NonFramework</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

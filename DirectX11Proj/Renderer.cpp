@@ -1,6 +1,7 @@
 #include "Renderer.h"
 
 #include "easylogging++.h"
+#include "Imgui.h"
 
 #include "IScene.h"
 #include "d3dConstantBuffer.h"
@@ -8,15 +9,16 @@
 #include "d3dShaderVS.h"
 #include "d3dShaderPS.h"
 #include "d3dTexture.h"
+#include "d3dRenderTexture.h"
+#include "d3dRenderDepthTexture.h"
+#include "d3dMaterial.h"
 
 #include "ResourceManager.h"
-#include "d3dMaterial.h"
 #include "LightStruct.h"
 #include "ConstantBuffers.h"
 #include "IObject.h"
 #include "GraphicsSettings.h"
-#include "d3dRenderTexture.h"
-#include "Imgui.h"
+
 
 using namespace DirectX;
 
@@ -42,7 +44,14 @@ void Renderer::Initialize(HWND aHwnd)
 	mpShaderManager = std::make_unique<d3dShaderManager>();
 	mpShaderManager->InitializeShaders(mpDevice.Get());
 
+	mpShadowLight = std::make_unique<d3dLightClass>();
+	mpShadowLight->SetLookAt(0.0f, 0.0f, 0.00f);
+	mpShadowLight->GenerateProjectionMatrix(SCREEN_NEAR, SCREEN_FAR);
+	mpShadowLight->SetPosition(0.0f, -30.0f, 0.1f);
+	mpShadowLight->GenerateViewMatrix();
+	
 }
+
 
 void Renderer::CreateConstantBuffers()
 {
@@ -50,89 +59,66 @@ void Renderer::CreateConstantBuffers()
 	mpMatrixCB = std::make_unique<d3dConstantBuffer>(sizeof(cbMatrixBuffer), nullptr, mpDevice.Get());
 	mpMaterialCB = std::make_unique<d3dConstantBuffer>(sizeof(cbMaterial), nullptr, mpDevice.Get());
 	mpLightCB = std::make_unique<d3dConstantBuffer>(sizeof(cbLights), nullptr, mpDevice.Get());
+	mpPerObjectCB = std::make_unique<d3dConstantBuffer>(sizeof(cbPerObject), nullptr, mpDevice.Get());
+	mpLightMatrixCB = std::make_unique<d3dConstantBuffer>(sizeof(cbLightMatrix), nullptr, mpDevice.Get());
 	LOG(INFO) << "Constant buffers created";
 }
 
-static std::unique_ptr<cbLights> dataPtr = std::make_unique<cbLights>();
-static std::unique_ptr<cbMaterial> materialBufferDataPtr = std::make_unique<cbMaterial>();
+
+// Data ptrs for constant buffer data
+static std::unique_ptr<cbLights> gLightBufferDataPtr = std::make_unique<cbLights>();
+static std::unique_ptr<cbMaterial> gMaterialBufferDataPtr = std::make_unique<cbMaterial>();
 static std::unique_ptr<cbMatrixBuffer> gMatrixBufferDataPtr = std::make_unique<cbMatrixBuffer>();
+static std::unique_ptr<cbLightMatrix> gLightMatrixBufferDataPtr = std::make_unique<cbLightMatrix>();
+static std::unique_ptr<cbPerObject> gPerObjectMatrixBufferDataPtr = std::make_unique<cbPerObject>();
+
 
 void Renderer::UpdateFrameConstantBuffers(IScene* const aScene)
 {
-	// Update light constant buffer
 
+	// Update light constant buffers
 	uint32_t bufferNumber;
 
-	// Get a pointer to the data in the constant buffer.
-
-	dataPtr->amountOfLights = static_cast<int>(aScene->mLights.size());
+	gLightBufferDataPtr->amountOfLights = static_cast<int>(aScene->mLights.size());
 
 	for (int i = 0; i < aScene->mLights.size(); ++i)
 	{
-		dataPtr->arr[i].position = aScene->mLights[i]->position;
-		dataPtr->arr[i].diffuseColor = aScene->mLights[i]->diffuseColor;
+		gLightBufferDataPtr->arr[i].position = aScene->mLights[i]->position;
+		gLightBufferDataPtr->arr[i].diffuseColor = aScene->mLights[i]->diffuseColor;
 	}
 
-	dataPtr->directionalLight.diffuseColor = aScene->mDirectionalLight->diffuseColor;
-	dataPtr->directionalLight.specularColor = aScene->mDirectionalLight->specularColor;
-	dataPtr->directionalLight.position = aScene->mDirectionalLight->position;
+	gLightBufferDataPtr->directionalLight.diffuseColor = aScene->mDirectionalLight->diffuseColor;
+	gLightBufferDataPtr->directionalLight.specularColor = aScene->mDirectionalLight->specularColor;
+	gLightBufferDataPtr->directionalLight.position = aScene->mDirectionalLight->position;
 
 
-	mpLightCB->UpdateBuffer((void*)dataPtr.get(), mpDeviceContext.Get());
-
+	mpLightCB->UpdateBuffer((void*)gLightBufferDataPtr.get(), mpDeviceContext.Get());
 
 	bufferNumber = 2;
 	ID3D11Buffer* tBuff = mpLightCB->GetBuffer();
 
 	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
-}
 
 
-void Renderer::UpdateObjectConstantBuffers(IObject* const aObject, IScene* const aScene)
-{
-	uint32_t bufferNumber;
-
-	// Update material
-	d3dMaterial* const tMat = aObject->mpModel->mMaterial.get();
-
-	materialBufferDataPtr->hasDiffuse = (int)tMat->mpDiffuse->exists;
-	materialBufferDataPtr->hasSpecular = (int)tMat->mpSpecular->exists;
-	materialBufferDataPtr->hasNormal = (int)tMat->mpNormal->exists;
-
-
-	mpMaterialCB->UpdateBuffer((void*)materialBufferDataPtr.get(), mpDeviceContext.Get());
-	bufferNumber = 1;
-	ID3D11Buffer* tBuff = mpMaterialCB->GetBuffer();
-	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
-	// End update material
-
-
-	// Update matrix cb
-
-	// very bad code but will fix later either way
-
-	XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-	worldMatrix = XMLoadFloat4x4(&aObject->mWorldMatrix);
+	XMMATRIX viewMatrix, projectionMatrix;
 	projectionMatrix = aScene->GetCamera()->GetProj();
 	viewMatrix = aScene->GetCamera()->GetView();
 
 
 	// Transpose the matrices to prepare them for the shader.
-	XMMATRIX worldMatrix2 = XMMatrixTranspose(worldMatrix);
 	XMMATRIX viewMatrix2 = XMMatrixTranspose(viewMatrix);
 	XMMATRIX projectionMatrix2 = XMMatrixTranspose(projectionMatrix);
 
 	// Get a pointer to the data in the constant buffer.
 
 	// Copy the matrices into the constant buffer.
-	gMatrixBufferDataPtr->world = worldMatrix2;
 	gMatrixBufferDataPtr->view = viewMatrix2;
 	gMatrixBufferDataPtr->projection = projectionMatrix2;
 	gMatrixBufferDataPtr->gEyePosX = aScene->GetCamera()->GetPosition3f().x;
 	gMatrixBufferDataPtr->gEyePosY = aScene->GetCamera()->GetPosition3f().y;
 	gMatrixBufferDataPtr->gEyePosZ = aScene->GetCamera()->GetPosition3f().z;
 
-	
+
 	mpMatrixCB->UpdateBuffer((void*)gMatrixBufferDataPtr.get(), mpDeviceContext.Get());
 
 	// Set the position of the constant buffer in the vertex shader.
@@ -143,7 +129,60 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject, IScene* const
 	mpDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
 	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
 
-	// end update matrix cb
+	UpdateShadowLightConstantBuffers(aScene);
+
+}
+
+
+void Renderer::UpdateShadowLightConstantBuffers(IScene* const aScene)
+{
+	uint32_t bufferNumber = 3;
+	XMMATRIX viewMatrix, projectionMatrix;
+	mpShadowLight->GetViewMatrix(viewMatrix);
+	mpShadowLight->GetProjectionMatrix(projectionMatrix);
+
+	gLightMatrixBufferDataPtr->lightViewMatrix = XMMatrixTranspose(viewMatrix);
+	gLightMatrixBufferDataPtr->lightProjectionMatrix = XMMatrixTranspose(projectionMatrix);
+
+	this->mpLightMatrixCB->UpdateBuffer((void*)gLightMatrixBufferDataPtr.get(), mpDeviceContext.Get());
+
+	ID3D11Buffer* tBuff = mpLightMatrixCB->GetBuffer();
+	mpDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
+	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
+}
+
+void Renderer::UpdateObjectConstantBuffers(IObject* const aObject, IScene* const aScene)
+{
+	uint32_t bufferNumber;
+
+	// Update material
+	d3dMaterial* const tMat = aObject->mpModel->mMaterial.get();
+
+	gMaterialBufferDataPtr->hasDiffuse = (int)tMat->mpDiffuse->exists;
+	gMaterialBufferDataPtr->hasSpecular = (int)tMat->mpSpecular->exists;
+	gMaterialBufferDataPtr->hasNormal = (int)tMat->mpNormal->exists;
+
+
+	mpMaterialCB->UpdateBuffer((void*)gMaterialBufferDataPtr.get(), mpDeviceContext.Get());
+	bufferNumber = 1;
+	ID3D11Buffer* tBuff = mpMaterialCB->GetBuffer();
+	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
+	// End update material
+
+
+	XMMATRIX worldMatrix;
+	worldMatrix = XMLoadFloat4x4(&aObject->mWorldMatrix);
+
+	XMMATRIX worldMatrix2 = XMMatrixTranspose(worldMatrix);
+	gPerObjectMatrixBufferDataPtr->worldMatrix = worldMatrix2;
+	
+	mpPerObjectCB->UpdateBuffer((void*)gPerObjectMatrixBufferDataPtr.get(), mpDeviceContext.Get());
+
+	bufferNumber = 4;
+
+	tBuff = mpPerObjectCB->GetBuffer();
+	mpDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
+	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
 }
 
 
@@ -151,7 +190,14 @@ void Renderer::RenderScene(IScene* const aScene)
 {
 	float color[4]{ clearColor[0], clearColor[1], clearColor[2], 1.0f };
 
-	mpDeviceContext->RSSetViewports(1, &gViewPort);
+	// Update frame constant buffers  
+	UpdateFrameConstantBuffers(aScene);
+
+	RenderSceneDepthPrePass(aScene);
+	
+	
+	// Scene prep
+	mpDeviceContext->RSSetViewports(1, &mViewport);
 	mpDeviceContext->RSSetState(mRasterState.Get());
 
 	mpDeviceContext->ClearRenderTargetView(this->mSceneRenderTexture->mpRenderTargetView.Get(), clearColor);
@@ -162,17 +208,59 @@ void Renderer::RenderScene(IScene* const aScene)
 
 	aScene->GetCamera()->UpdateViewMatrix();
 
-	d3dShaderVS*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_texture.hlsl");
-	d3dShaderPS*const tPS = mpShaderManager->GetPixelShader("Shaders\\PS_texture.hlsl");
+	d3dShaderVS*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_shadow.hlsl");
+	d3dShaderPS*const tPS = mpShaderManager->GetPixelShader("Shaders\\PS_shadow.hlsl");
 
-	UpdateFrameConstantBuffers(aScene);
+
+	// Set samplers
+	mpDeviceContext->PSSetSamplers(0, 1, mpPointClampSampler.GetAddressOf());
+	mpDeviceContext->PSSetSamplers(1, 1, mpLinearWrapSampler.GetAddressOf());
 
 	// Set the vertex and pixel shaders that will be used to render this triangle.
 	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
 	mpDeviceContext->PSSetShader(tPS->GetPixelShader(), NULL, 0);
 
+	
+	// Set the sampler state in the pixel shader.
+	mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
 
-	mpDeviceContext->PSSetSamplers(0, 1, mpAnisotropicWrapSampler.GetAddressOf());
+	ID3D11ShaderResourceView* aView = mSceneDepthPrepassTexture->mpShaderResourceView.Get();
+	mpDeviceContext->PSSetShaderResources(3, 1, &aView);
+
+	// Render objects
+	for (int i = 0; i < aScene->mObjects.size(); ++i)
+	{
+		UpdateObjectConstantBuffers(aScene->mObjects[i].get(), aScene);
+		RenderObject(aScene->mObjects[i].get());
+	}
+
+	// Render post processing quad
+	RenderFullScreenQuad();
+	ImGui::Render();
+
+	mpDeviceContext->ClearState();
+}
+
+
+// Render the scene to a depth map texture
+void Renderer::RenderSceneDepthPrePass(IScene* const aScene)
+{
+	mpDeviceContext->RSSetViewports(1, &mShadowLightViewport);
+	mpDeviceContext->RSSetState(mRasterState.Get());
+
+	mpDeviceContext->ClearDepthStencilView(this->mSceneDepthPrepassTexture->mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
+	mpDeviceContext->OMSetRenderTargets(0, nullptr, this->mSceneDepthPrepassTexture->mpDepthStencilView.Get());
+
+	d3dShaderVS*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_depth.hlsl");
+	//d3dShaderPS*const tPS = mpShaderManager->GetPixelShader("Shaders\\PS_depth.hlsl");
+
+	//UpdateFrameConstantBuffers(aScene);
+
+	// Set the vertex and pixel shaders that will be used to render this triangle.
+	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
+
 	// Set the sampler state in the pixel shader.
 	mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
 
@@ -182,18 +270,10 @@ void Renderer::RenderScene(IScene* const aScene)
 		UpdateObjectConstantBuffers(aScene->mObjects[i].get(), aScene);
 		RenderObject(aScene->mObjects[i].get());
 	}
-
-	RenderFullScreenQuad();
-	ImGui::Render();
-
-	mpDeviceContext->ClearState();
 }
 
-void Renderer::RenderSceneDepthPrePass()
-{
 
-}
-
+// Render scene to full sceren quad
 void Renderer::RenderFullScreenQuad()
 {
 	// Get the fullscreen shaders
@@ -201,7 +281,7 @@ void Renderer::RenderFullScreenQuad()
 	d3dShaderPS*const tFPS = mpShaderManager->GetPixelShader("Shaders\\fullScreenQuad_PS.hlsl");
 
 
-	mpDeviceContext->RSSetViewports(1, &gViewPort);
+	mpDeviceContext->RSSetViewports(1, &mViewport);
 	mpDeviceContext->RSSetState(mRasterState.Get());
 
 	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
@@ -210,6 +290,7 @@ void Renderer::RenderFullScreenQuad()
 	mpDeviceContext->ClearDepthStencilView(this->mBackBufferRenderTexture->mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	// Draw full screen quad
+	mpDeviceContext->PSSetSamplers(0, 1, this->mpPointClampSampler.GetAddressOf());
 	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	mpDeviceContext->VSSetShader(tFVS->GetVertexShader(), NULL, 0);
 	mpDeviceContext->PSSetShader(tFPS->GetPixelShader(), NULL, 0);
@@ -217,6 +298,8 @@ void Renderer::RenderFullScreenQuad()
 	mpDeviceContext->Draw(4, 0);
 }
 
+
+// Render the object
 void Renderer::RenderObject(IObject* const aObject)
 {
 	// Bind vertex/index buffers
@@ -239,6 +322,7 @@ void Renderer::RenderObject(IObject* const aObject)
 	// Render the model.
 	mpDeviceContext->DrawIndexed(indices, 0, 0);
 }
+
 
 bool Renderer::InitializeDeviceAndContext()
 {
@@ -263,6 +347,8 @@ bool Renderer::InitializeDeviceAndContext()
 	return true;
 }
 
+
+// Initialize swap chain
 bool Renderer::InitializeSwapchain()
 {
 	DXGI_SWAP_CHAIN_DESC swapChainDesc;
@@ -333,6 +419,7 @@ bool Renderer::InitializeSwapchain()
 	}
 	return true;
 }
+
 
 bool Renderer::InitializeDXGI()
 {
@@ -478,6 +565,9 @@ bool  Renderer::InitializeDepthStencilView()
 		LOG(ERROR) << "Failed to create depth-stencil state";
 	}
 
+	this->mSceneDepthPrepassTexture = std::make_unique<d3dRenderDepthTexture>();
+	this->mSceneDepthPrepassTexture->Initialize(mpDevice.Get(), 1024, 1024, SCREEN_NEAR, SCREEN_FAR);
+
 	return true;
 }
 
@@ -576,22 +666,53 @@ bool  Renderer::InitializeSamplerState()
 		LOG(WARNING) << "Failed to create point sampler";
 	}
 
+
+	// Create a texture sampler state description.
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	samplerDesc.MipLODBias = 0.0f;
+	samplerDesc.MaxAnisotropy = 1;
+	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	samplerDesc.BorderColor[0] = 0;
+	samplerDesc.BorderColor[1] = 0;
+	samplerDesc.BorderColor[2] = 0;
+	samplerDesc.BorderColor[3] = 0;
+	samplerDesc.MinLOD = 0;
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	result = mpDevice->CreateSamplerState(&samplerDesc, &mpLinearWrapSampler);
+
+	if (FAILED(result))
+	{
+		LOG(WARNING) << "Failed to linear clamp sampler";
+	}
+
+
 	return true;
 }
 
 bool Renderer::InitializeViewportAndMatrices()
 {
-	gViewPort.Width = (float)GraphicsSettings::gCurrentScreenWidth;
-	gViewPort.Height = (float)GraphicsSettings::gCurrentScreenHeight;
-	gViewPort.MinDepth = 0.0f;
-	gViewPort.MaxDepth = 1.0f;
-	gViewPort.TopLeftX = 0.0f;
-	gViewPort.TopLeftY = 0.0f;
+	mShadowLightViewport.Width = 1024.0f;
+	mShadowLightViewport.Height = 1024.0f;
+	mShadowLightViewport.MinDepth = 0.0f;
+	mShadowLightViewport.MaxDepth = 1.0f;
+	mShadowLightViewport.TopLeftX = 0.0f;
+	mShadowLightViewport.TopLeftY = 0.0f;
+
+	mViewport.Width = (float)GraphicsSettings::gCurrentScreenWidth;
+	mViewport.Height = (float)GraphicsSettings::gCurrentScreenHeight;
+	mViewport.MinDepth = 0.0f;
+	mViewport.MaxDepth = 1.0f;
+	mViewport.TopLeftX = 0.0f;
+	mViewport.TopLeftY = 0.0f;
 
 	float fieldOfView, screenAspect;
 	fieldOfView = 3.141592654f / 4.0f;
 	screenAspect = (float)GraphicsSettings::gCurrentScreenWidth / (float)GraphicsSettings::gCurrentScreenHeight;
-	XMStoreFloat4x4(&gProjectionMatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, SCREEN_NEAR, SCREEN_FAR));
+	XMStoreFloat4x4(&mProjectionMatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, SCREEN_NEAR, SCREEN_FAR));
 
 	XMFLOAT3 upF3, pF3, LF3;
 	XMVECTOR upVector, positionVector, lookAtVector;
@@ -605,7 +726,7 @@ bool Renderer::InitializeViewportAndMatrices()
 	lookAtVector = XMLoadFloat3(&LF3);
 
 
-	XMStoreFloat4x4(&gViewMatrix, XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
+	XMStoreFloat4x4(&mViewMatrix, XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
 
 	return true;
 }

@@ -14,9 +14,13 @@
 #include <directxmath.h>
 #include "d3dShaderManager.h"
 #include "d3dConstantBuffer.h"
+#include "d3dLightClass.h"
+
 #include "IScene.h"
 
+
 class d3dRenderTexture;
+class d3dRenderDepthTexture;
 
 class Renderer
 {
@@ -26,15 +30,16 @@ public:
 	
 	void Initialize(HWND aHwnd);
 	void RenderScene(IScene* const aScene);
-	void Destroy();
+	//void Destroy();
 
-	void OnResize();
+	//void OnResize();
+	
 	Microsoft::WRL::ComPtr<IDXGISwapChain> mpSwapchain;
-
 	Microsoft::WRL::ComPtr<ID3D11Device> mpDevice;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> mpDeviceContext;
 
 	float clearColor[3] = { 0.0f, 0.0f, 0.0f };
+
 private:
 
 	bool InitializeDirectX();
@@ -48,7 +53,9 @@ private:
 	bool InitializeViewportAndMatrices();
 
 	void UpdateObjectConstantBuffers(IObject* const aObject, IScene* const aScene);
+	void UpdateShadowLightConstantBuffers(IScene* const aScene);
 	void UpdateFrameConstantBuffers(IScene* const aScene);
+	
 	void CreateConstantBuffers();
 
 	bool DestroyDirectX();
@@ -56,7 +63,7 @@ private:
 	// Render functions
 	void RenderObject(IObject* const aObject);
 	void RenderFullScreenQuad();
-	void RenderScenePrePass();
+	void RenderSceneDepthPrePass(IScene* const aScene);
 
 	const float SCREEN_FAR = 1000.0f;
 	const float SCREEN_NEAR = 2.0f;
@@ -64,33 +71,46 @@ private:
 	int gVideoCardMemoryAmount;
 	char gVideoCardDescription[128];
 
-
 	int gnumerator, gdenominator;
 
 	HWND windowHandle;
 
-	D3D11_VIEWPORT gViewPort;
-
-	XMFLOAT4X4 gProjectionMatrix;
-	XMFLOAT4X4 gViewMatrix;
+	D3D11_VIEWPORT mViewport;
+	D3D11_VIEWPORT mShadowLightViewport;
 
 
+	XMFLOAT4X4 mProjectionMatrix;
+	XMFLOAT4X4 mViewMatrix;
+
+	// Shadow light
+	std::unique_ptr<d3dLightClass> mpShadowLight;
+
+	// IDXGI stuff
 	Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;
 	Microsoft::WRL::ComPtr<IDXGIAdapter> mAdapter;
 	Microsoft::WRL::ComPtr<IDXGIOutput> mAdapterOutput;
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> mpDepthStencilState;
 	Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRasterState;
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpAnisotropicWrapSampler;
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpPointClampSampler;
 
+	// Samplers
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpAnisotropicWrapSampler;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpLinearWrapSampler;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpPointClampSampler;
+	
+	// Constant buffers 
 	std::unique_ptr<d3dConstantBuffer> mpMatrixCB;
 	std::unique_ptr<d3dConstantBuffer> mpMaterialCB;
 	std::unique_ptr<d3dConstantBuffer> mpLightCB;
+	std::unique_ptr<d3dConstantBuffer> mpLightMatrixCB;
+	std::unique_ptr<d3dConstantBuffer> mpPerObjectCB;
 
+	// Shader manager
 	std::unique_ptr<d3dShaderManager> mpShaderManager;
 
+	// Render textures and render depth texture for shadow mapping
 	std::unique_ptr<d3dRenderTexture> mBackBufferRenderTexture;
 	std::unique_ptr<d3dRenderTexture> mSceneRenderTexture;
+	std::unique_ptr<d3dRenderDepthTexture> mSceneDepthPrepassTexture;
 };
 

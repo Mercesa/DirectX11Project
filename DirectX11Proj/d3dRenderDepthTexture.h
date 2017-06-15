@@ -15,9 +15,11 @@ public:
 
 	bool Initialize(ID3D11Device* const aDevice, uint32_t aTextureWidth, uint32_t aTextureHieght, float aScreenNear, float aScreenFar);
 
-private:
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mpDepthStenciLView;
+
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mpDepthStencilView;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mpShaderResourceView;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> mpDepthTexture;
+private:
+	
 };
 
