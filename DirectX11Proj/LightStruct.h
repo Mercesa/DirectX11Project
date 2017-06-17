@@ -6,7 +6,7 @@ using namespace DirectX;
 
 enum eLightTypes
 {
-	ePOINT, eDIRECTIONAL, eSPOT
+
 };
 
 struct Light
