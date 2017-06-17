@@ -33,9 +33,7 @@ public:
 
 private:
 	bool InitializeBuffers(ID3D11Device* const apDevice, const MeshData& aMeshData);
-
 	void RenderBuffers(ID3D11DeviceContext* const apDeviceContext);
-
 
 private:
 	int32_t tIndiceSize = 0;

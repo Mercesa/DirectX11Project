@@ -375,7 +375,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		}
 
-		mpRenderer->RenderScene(mpPlayerScene.get());
+		mpRenderer->RenderScene(mpPlayerScene->mObjects, mpPlayerScene->mLights, mpPlayerScene->mDirectionalLight.get(), mpPlayerScene->GetCamera());
 
 		mpRenderer->mpSwapchain->Present((GraphicsSettings::gIsVsyncEnabled ? 1 : 0), 0);
 

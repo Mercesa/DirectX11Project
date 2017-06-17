@@ -18,7 +18,6 @@
 
 #include "IScene.h"
 
-
 class d3dRenderTexture;
 class d3dRenderDepthTexture;
 
@@ -29,7 +28,9 @@ public:
 	~Renderer();
 	
 	void Initialize(HWND aHwnd);
-	void RenderScene(IScene* const aScene);
+
+	 
+	void RenderScene(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
 	//void Destroy();
 
 	//void OnResize();
@@ -41,7 +42,6 @@ public:
 	float clearColor[3] = { 0.0f, 0.0f, 0.0f };
 
 private:
-
 	bool InitializeDirectX();
 	bool InitializeDXGI();
 	bool InitializeDeviceAndContext();
@@ -52,9 +52,9 @@ private:
 	bool InitializeSamplerState();
 	bool InitializeViewportAndMatrices();
 
-	void UpdateObjectConstantBuffers(IObject* const aObject, IScene* const aScene);
-	void UpdateShadowLightConstantBuffers(IScene* const aScene);
-	void UpdateFrameConstantBuffers(IScene* const aScene);
+	void UpdateObjectConstantBuffers(IObject* const aObject);
+	void UpdateShadowLightConstantBuffers(d3dLightClass* const aDirectionalLight);
+	void UpdateFrameConstantBuffers(std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
 	
 	void CreateConstantBuffers();
 
@@ -62,8 +62,9 @@ private:
 
 	// Render functions
 	void RenderObject(IObject* const aObject);
+	void RenderMaterial(d3dMaterial* const aMaterial);
 	void RenderFullScreenQuad();
-	void RenderSceneDepthPrePass(IScene* const aScene);
+	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
 
 	const float SCREEN_FAR = 1000.0f;
 	const float SCREEN_NEAR = 2.0f;
