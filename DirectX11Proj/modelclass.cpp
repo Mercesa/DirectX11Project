@@ -38,9 +38,6 @@ bool ModelClass::Initialize(ID3D11Device* const apDevice, const MeshData& acMesh
 
 void ModelClass::Shutdown()
 {
-	// Shutdown the vertex and index buffers.
-	ShutdownBuffers();
-
 	return;
 }
 
@@ -58,15 +55,6 @@ int ModelClass::GetIndexCount()
 {
 	return mIndexBuffer->GetAmountOfElements();
 }
-
-
-void ModelClass::ShutdownBuffers()
-{
-	// Release the index buffer.
-	//mIndexBuffer.release();
-	//mVertexBuffer.release();
-}
-
 
 bool ModelClass::InitializeBuffers(ID3D11Device* aDevice, const MeshData& aData)
 {	

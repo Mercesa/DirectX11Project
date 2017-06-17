@@ -18,14 +18,14 @@ d3dLightClass::~d3dLightClass()
 
 void d3dLightClass::SetAmbientColor(float red, float green, float blue)
 {
-	m_ambientColor = XMFLOAT3(red, green, blue);
+	mAmbientColor = XMFLOAT3(red, green, blue);
 	return;
 }
 
 
 void d3dLightClass::SetDiffuseColor(float red, float green, float blue)
 {
-	m_diffuseColor = XMFLOAT3(red, green, blue);
+	mDiffuseColor = XMFLOAT3(red, green, blue);
 	return;
 }
 
@@ -48,43 +48,44 @@ void d3dLightClass::SetLookAt(float x, float y, float z)
 
 XMFLOAT3 d3dLightClass::GetAmbientColor()
 {
-	return m_ambientColor;
+	return mAmbientColor;
 }
 
 
 XMFLOAT3 d3dLightClass::GetDiffuseColor()
 {
-	return m_diffuseColor;
+	return mDiffuseColor;
 }
 
 
 XMFLOAT3 d3dLightClass::GetPosition()
 {
-	return m_position;
+	return mPosition;
 }
 
-
+	
 void d3dLightClass::GenerateViewMatrix()
 {
 	XMFLOAT3 up;
 
-
-	// Setup the vector that points upwards.
-	up.x = 0.0f;
-	up.y = 1.0f;
-	up.z = 0.0f;
-
 	// Create the view matrix from the three vectors.
-	
 	XMVECTOR upVector, positionVector, lookAtVector;
 
+	// Up, position, look at
 	upVector = XMLoadFloat3(&up);
 	positionVector = XMLoadFloat3(&mPosition);
 	lookAtVector = XMLoadFloat3(&mLookAt);
-
-	//D3DXMatrixLookAtLH(&m_viewMatrix, &m_position, &m_lookAt, &up);
 	
-	XMStoreFloat4x4(&mViewMatrix, XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
+	// direction matrix
+	XMMATRIX directionMatrix = XMMatrixRotationRollPitchYaw(mPosition.x, mPosition.y, mPosition.z);
+	XMStoreFloat4x4(&mViewMatrix, directionMatrix);
+
+	// Direction vector
+	XMFLOAT3 dir = XMFLOAT3(0.0f, 0.0f, 1.0f);
+	XMVECTOR dirVec = XMLoadFloat3(&dir);
+	dirVec = XMVector3Transform(dirVec, directionMatrix);
+	XMStoreFloat3(&this->mDirectionVector, dirVec);
+
 	return;
 }
 
@@ -99,7 +100,8 @@ void d3dLightClass::GenerateProjectionMatrix(float screenDepth, float screenNear
 	screenAspect = 1.0f;
 
 	//XMStoreFloat4x4(&mProjectionmatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth));
-	XMStoreFloat4x4(&mProjectionmatrix, XMMatrixOrthographicLH(32, 32, screenNear, screenDepth));
+	XMStoreFloat4x4(&mProjectionmatrix, XMMatrixOrthographicLH(32.0f, 32.0f, -32.0f, 32.0f));
+
 	return;
 }
 

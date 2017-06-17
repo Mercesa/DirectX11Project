@@ -72,35 +72,36 @@ void PlayerSceneExample::Init()
 	XMMATRIX tTranslateMat = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 
 	// load models and translate them as game objects
-	for (int i = 0; i < tModels.size(); ++i)
-	{
-		std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
-		tpObject->mpModel = tModels[i];
-		XMStoreFloat4x4(&tpObject->mWorldMatrix, tScaleMat);
-	
-		this->mObjects.push_back(std::move(tpObject));
-	}
+	//for (int i = 0; i < tModels.size(); ++i)
+	//{
+	//	std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
+	//	tpObject->mpModel = tModels[i];
+	//	XMStoreFloat4x4(&tpObject->mWorldMatrix, tScaleMat);
+	//
+	//	this->mObjects.push_back(std::move(tpObject));
+	//}
 
 	// Load cube
-	tModels = ResourceManager::GetInstance().LoadModels("Models\\Box\\cube.obj");
-	tTranslateMat = XMMatrixTranslation(1.0f, 1.0f, 1.0f);
-	for (int i = 0; i < tModels.size(); ++i)
-	{
-		std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
-		tpObject->mpModel = tModels[i];
-		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixScaling(10.0, 1.0, 10.0f));
-	
-		this->mObjects.push_back(std::move(tpObject));
-	}
+	//tModels = ResourceManager::GetInstance().LoadModels("Models\\Box\\cube.obj");
+	//tTranslateMat = XMMatrixTranslation(1.0f, 1.0f, 1.0f);
+	//for (int i = 0; i < tModels.size(); ++i)
+	//{
+	//	std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
+	//	tpObject->mpModel = tModels[i];
+	//	XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixScaling(10.0, 1.0, 10.0f));
+	//
+	//	this->mObjects.push_back(std::move(tpObject));
+	//}
 	
 	// Load sphere
-	tModels = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\sphere.obj");
-	tTranslateMat = XMMatrixTranslation(0.0f, 2.0f, 0.0f);
+	tModels = ResourceManager::GetInstance().LoadModels("Models\\Lucy\\lucy_box.obj");
+	tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
+	XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f/2.0f);
 	for (int i = 0; i < tModels.size(); ++i)
 	{
 		std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
 		tpObject->mpModel = tModels[i];
-		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(tTranslateMat, XMMatrixScaling(1.0f, 1.0f, 1.0f)));
+		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixScaling(5.0f, 5.0f, 5.0f));
 	
 		this->mObjects.push_back(std::move(tpObject));
 	}
@@ -109,10 +110,14 @@ void PlayerSceneExample::Init()
 	std::unique_ptr<Light> tpLight = std::make_unique<Light>();
 	tpLight->diffuseColor = XMFLOAT3(1.0f, 0.0f, 1.0f);
 	tpLight->position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+
 	this->mLights.push_back(std::move(tpLight));
 
-	this->mDirectionalLight = std::make_unique<Light>();
-	this->mDirectionalLight->position = XMFLOAT3(0.0f, -1.0f, 7.0f);
+	mDirectionalLight = std::make_unique<d3dLightClass>();
+	mDirectionalLight->SetLookAt(0.0f, 0.0f, 0.00f);
+	mDirectionalLight->GenerateProjectionMatrix(-32.0f, -32.0f);
+	mDirectionalLight->SetPosition(0.0f, 0.0f, 0.0f);
+	mDirectionalLight->GenerateViewMatrix();
 	//throw std::logic_error("The method or operation is not implemented.");
 }
 

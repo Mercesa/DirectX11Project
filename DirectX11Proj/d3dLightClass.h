@@ -31,12 +31,14 @@ public:
 	void GetViewMatrix(XMMATRIX&);
 	void GetProjectionMatrix(XMMATRIX&);
 
-private:
-	XMFLOAT3 m_ambientColor;
-	XMFLOAT3 m_diffuseColor;
-	XMFLOAT3 m_position;
 
+	XMFLOAT3 mDirectionVector;
+	XMFLOAT3 mAmbientColor;
+	XMFLOAT3 mDiffuseColor;
+	XMFLOAT3 mSpecularColor;
 	XMFLOAT3 mPosition;
+private:
+
 	XMFLOAT3 mLookAt;
 
 

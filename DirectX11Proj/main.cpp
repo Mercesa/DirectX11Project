@@ -363,8 +363,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 				mpPlayerScene->mLights[i]->position = XMFLOAT3(pos);
 			}
 			ImGui::ColorEditMode(ImGuiColorEditMode_RGB);
-			ImGui::ColorEdit3("color directional light", (float*)&mpPlayerScene->mDirectionalLight->diffuseColor);
-			ImGui::ColorEdit3("position directional light", (float*)&mpPlayerScene->mDirectionalLight->position);
+			ImGui::ColorEdit3("color directional light", (float*)&mpPlayerScene->mDirectionalLight->mDiffuseColor);
+			//ImGui::ColorEdit3("position directional light", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
+			//ImGui::InputFloat3("PITCH   YAW    ROLL", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
+			ImGui::DragFloat3("Pitch Yaw Roll", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
+			
+			mpPlayerScene->mDirectionalLight->GenerateViewMatrix();
 
 
 			ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!

@@ -44,11 +44,7 @@ void Renderer::Initialize(HWND aHwnd)
 	mpShaderManager = std::make_unique<d3dShaderManager>();
 	mpShaderManager->InitializeShaders(mpDevice.Get());
 
-	mpShadowLight = std::make_unique<d3dLightClass>();
-	mpShadowLight->SetLookAt(0.0f, 0.0f, 0.00f);
-	mpShadowLight->GenerateProjectionMatrix(SCREEN_NEAR, SCREEN_FAR);
-	mpShadowLight->SetPosition(0.0f, -30.0f, 0.1f);
-	mpShadowLight->GenerateViewMatrix();
+
 	
 }
 
@@ -87,9 +83,9 @@ void Renderer::UpdateFrameConstantBuffers(IScene* const aScene)
 		gLightBufferDataPtr->arr[i].diffuseColor = aScene->mLights[i]->diffuseColor;
 	}
 
-	gLightBufferDataPtr->directionalLight.diffuseColor = aScene->mDirectionalLight->diffuseColor;
-	gLightBufferDataPtr->directionalLight.specularColor = aScene->mDirectionalLight->specularColor;
-	gLightBufferDataPtr->directionalLight.position = aScene->mDirectionalLight->position;
+	gLightBufferDataPtr->directionalLight.diffuseColor = aScene->mDirectionalLight->mDiffuseColor;
+	gLightBufferDataPtr->directionalLight.specularColor = aScene->mDirectionalLight->mSpecularColor;
+	gLightBufferDataPtr->directionalLight.position = aScene->mDirectionalLight->mDirectionVector;
 
 
 	mpLightCB->UpdateBuffer((void*)gLightBufferDataPtr.get(), mpDeviceContext.Get());
@@ -138,8 +134,8 @@ void Renderer::UpdateShadowLightConstantBuffers(IScene* const aScene)
 {
 	uint32_t bufferNumber = 3;
 	XMMATRIX viewMatrix, projectionMatrix;
-	mpShadowLight->GetViewMatrix(viewMatrix);
-	mpShadowLight->GetProjectionMatrix(projectionMatrix);
+	aScene->mDirectionalLight->GetViewMatrix(viewMatrix);
+	aScene->mDirectionalLight->GetProjectionMatrix(projectionMatrix);
 
 	gLightMatrixBufferDataPtr->lightViewMatrix = XMMatrixTranspose(viewMatrix);
 	gLightMatrixBufferDataPtr->lightProjectionMatrix = XMMatrixTranspose(projectionMatrix);
@@ -566,7 +562,7 @@ bool  Renderer::InitializeDepthStencilView()
 	}
 
 	this->mSceneDepthPrepassTexture = std::make_unique<d3dRenderDepthTexture>();
-	this->mSceneDepthPrepassTexture->Initialize(mpDevice.Get(), 1024, 1024, SCREEN_NEAR, SCREEN_FAR);
+	this->mSceneDepthPrepassTexture->Initialize(mpDevice.Get(), 2048, 2048, SCREEN_NEAR, SCREEN_FAR);
 
 	return true;
 }
@@ -695,8 +691,8 @@ bool  Renderer::InitializeSamplerState()
 
 bool Renderer::InitializeViewportAndMatrices()
 {
-	mShadowLightViewport.Width = 1024.0f;
-	mShadowLightViewport.Height = 1024.0f;
+	mShadowLightViewport.Width = 2048.0f;
+	mShadowLightViewport.Height = 2048.0f;
 	mShadowLightViewport.MinDepth = 0.0f;
 	mShadowLightViewport.MaxDepth = 1.0f;
 	mShadowLightViewport.TopLeftX = 0.0f;

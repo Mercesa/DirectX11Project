@@ -20,21 +20,18 @@
     <Filter Include="D3DSetup\D3DShaderTypes">
       <UniqueIdentifier>{e810992e-765c-44da-9774-6b792bf4a10f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="D3DSetup\SetupClasses">
-      <UniqueIdentifier>{4017dcef-3591-4572-a99e-065d2b1580db}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Utility">
       <UniqueIdentifier>{1578abde-7f40-4936-90cb-27fbb939e80a}</UniqueIdentifier>
     </Filter>
     <Filter Include="Libs\IMGUI">
       <UniqueIdentifier>{ee975a26-cde9-4b1e-90cd-016fbccacbd5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Model">
+      <UniqueIdentifier>{9b50e867-2fd5-481b-94a9-c063e5253ea8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="modelclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PlayerSceneExample.cpp">
@@ -42,12 +39,6 @@
     </ClCompile>
     <ClCompile Include="ObjectExample.cpp">
       <Filter>NonFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dTexture.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dMaterial.cpp">
-      <Filter>D3DSetup</Filter>
     </ClCompile>
     <ClCompile Include="d3dShaderManager.cpp">
       <Filter>D3DSetup</Filter>
@@ -60,15 +51,6 @@
     </ClCompile>
     <ClCompile Include="d3dLightClass.cpp">
       <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dConstantBuffer.cpp">
-      <Filter>D3DSetup\SetupClasses</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dDepthStencil.cpp">
-      <Filter>D3DSetup\SetupClasses</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dVertexBuffer.cpp">
-      <Filter>D3DSetup\SetupClasses</Filter>
     </ClCompile>
     <ClCompile Include="inputclass.cpp">
       <Filter>Utility</Filter>
@@ -94,20 +76,11 @@
     <ClCompile Include="imgui_demo.cpp">
       <Filter>Libs\IMGUI</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ImguiImplementation.cpp">
       <Filter>Libs\IMGUI</Filter>
     </ClCompile>
-    <ClCompile Include="d3dRenderTexture.cpp">
-      <Filter>D3DSetup\SetupClasses</Filter>
-    </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dRenderDepthTexture.cpp">
-      <Filter>D3DSetup\SetupClasses</Filter>
     </ClCompile>
     <ClCompile Include="MathHelper.cpp">
       <Filter>Utility</Filter>
@@ -118,11 +91,35 @@
     <ClCompile Include="IScene.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
+    <ClCompile Include="d3dConstantBuffer.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dDepthStencil.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dRenderDepthTexture.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dRenderTexture.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dVertexBuffer.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dMaterial.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dTexture.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="modelclass.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>NonFramework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="modelclass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="ModelData.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -134,12 +131,6 @@
     </ClInclude>
     <ClInclude Include="easylogging++.h">
       <Filter>Libs</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dTexture.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dMaterial.h">
-      <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="LightStruct.h">
       <Filter>D3DSetup</Filter>
@@ -161,15 +152,6 @@
     </ClInclude>
     <ClInclude Include="d3dLightClass.h">
       <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dDepthStencil.h">
-      <Filter>D3DSetup\SetupClasses</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dConstantBuffer.h">
-      <Filter>D3DSetup\SetupClasses</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dVertexBuffer.h">
-      <Filter>D3DSetup\SetupClasses</Filter>
     </ClInclude>
     <ClInclude Include="inputclass.h">
       <Filter>Utility</Filter>
@@ -198,14 +180,8 @@
     <ClInclude Include="stb_truetype.h">
       <Filter>Libs\IMGUI</Filter>
     </ClInclude>
-    <ClInclude Include="camera.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="ImguiImplementation.h">
       <Filter>Libs\IMGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dRenderTexture.h">
-      <Filter>D3DSetup\SetupClasses</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
       <Filter>Source Files</Filter>
@@ -215,9 +191,6 @@
     </ClInclude>
     <ClInclude Include="ResourceManager.h">
       <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dRenderDepthTexture.h">
-      <Filter>D3DSetup\SetupClasses</Filter>
     </ClInclude>
     <ClInclude Include="MathHelper.h">
       <Filter>Utility</Filter>
@@ -229,6 +202,33 @@
       <Filter>NonFramework</Filter>
     </ClInclude>
     <ClInclude Include="IObject.h">
+      <Filter>NonFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dConstantBuffer.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dDepthStencil.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dRenderDepthTexture.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dRenderTexture.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dVertexBuffer.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dMaterial.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dTexture.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="modelclass.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
       <Filter>NonFramework</Filter>
     </ClInclude>
   </ItemGroup>

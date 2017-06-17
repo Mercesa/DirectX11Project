@@ -82,8 +82,6 @@ private:
 	XMFLOAT4X4 mProjectionMatrix;
 	XMFLOAT4X4 mViewMatrix;
 
-	// Shadow light
-	std::unique_ptr<d3dLightClass> mpShadowLight;
 
 	// IDXGI stuff
 	Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;

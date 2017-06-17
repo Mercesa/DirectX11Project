@@ -4,11 +4,13 @@
 #include <memory>
 #include <vector>
 
-
 #include "inputclass.h"
 #include "LightStruct.h"
 #include "IObject.h"
 #include "Camera.h"
+#include "d3dLightClass.h"
+
+
 
 class IScene
 {
@@ -24,7 +26,7 @@ public:
 	std::vector <std::unique_ptr<IObject>> mObjects;
 	std::vector <std::unique_ptr<Light>> mLights;
 	
-	std::unique_ptr<Light> mDirectionalLight;
+	std::unique_ptr<d3dLightClass> mDirectionalLight;
 
 	bool HasBeenInitialized() { return mInitialized; }
 
