@@ -7,7 +7,7 @@
 #pragma comment(lib, "dxguid.lib")
 
 #include <dinput.h>
-
+#include <iostream>
 
 class InputClass
 {
@@ -32,20 +32,28 @@ public:
 		mMouseY = aY;
 	}
 
+	// Don't want my if statements to be compiled away
+#pragma optimize( "", off )
+
 	void KeyDown(unsigned int input)
 	{
 		// If a key is pressed then save that state in the key array.
-		mKeys[input] = true;
-		return;
-	}
+		if (mKeysC[input] == false)
+		{
+			mKeys[input] = true;
+		}
 
+		mKeysC[input] = true;
+	}
 
 	void KeyUp(unsigned int input)
 	{
 		// If a key is released then clear that state in the key array.
 		mKeys[input] = false;
-		return;
+		mKeysC[input] = false;
 	}
+#pragma optimize( "", on ) 
+
 
 
 	bool IsKeyDown(unsigned int key)
@@ -54,16 +62,19 @@ public:
 		return mKeys[key];
 	}
 
+	bool IsKeyHeld(unsigned int key)
+	{
+		return mKeysC[key];
+	}
 
 private:
 	void ProcessInput();
-
-	DIMOUSESTATE mMouseState;
 
 	int mMouseX, mMouseY;
 	int mMouseRelX, mMouseRelY;
 
 	bool mKeys[256];
+	bool mKeysC[256];
 };
 
 #endif

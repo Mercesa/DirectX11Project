@@ -6,7 +6,7 @@
 IScene::IScene() 
 	: mInitialized(false)
 {
-	mpCamera = std::make_unique<CameraClass>();
+	mpCamera = std::make_unique<Camera>();
 }
 
 

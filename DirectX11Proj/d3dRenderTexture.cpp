@@ -1,15 +1,10 @@
 
 #include "d3dRenderTexture.h"
 
+#include "easylogging++.h"
 
 d3dRenderTexture::d3dRenderTexture()
-{
-	m_renderTargetTexture = 0;
-	m_renderTargetView = 0;
-	m_shaderResourceView = 0;
-	m_depthStencilBuffer = 0;
-	m_depthStencilView = 0;
-}
+{}
 
 
 d3dRenderTexture::d3dRenderTexture(const d3dRenderTexture& other)
@@ -22,7 +17,7 @@ d3dRenderTexture::~d3dRenderTexture()
 }
 
 
-bool d3dRenderTexture::Initialize(ID3D11Device* device, int textureWidth, int textureHeight, float screenDepth, float screenNear)
+bool d3dRenderTexture::Initialize(ID3D11Device*const device, uint32_t textureWidth, uint32_t textureHeight, float screenDepth, float screenNear)
 {
 	D3D11_TEXTURE2D_DESC textureDesc;
 	HRESULT result;
@@ -48,7 +43,7 @@ bool d3dRenderTexture::Initialize(ID3D11Device* device, int textureWidth, int te
     textureDesc.MiscFlags = 0;
 
 	// Create the render target texture.
-	result = device->CreateTexture2D(&textureDesc, NULL, &m_renderTargetTexture);
+	result = device->CreateTexture2D(&textureDesc, NULL, mpRenderTargetTexture.GetAddressOf());
 	if(FAILED(result))
 	{
 		return false;
@@ -57,10 +52,10 @@ bool d3dRenderTexture::Initialize(ID3D11Device* device, int textureWidth, int te
 	// Setup the description of the render target view.
 	renderTargetViewDesc.Format = textureDesc.Format;
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-	renderTargetViewDesc.Texture2D.MipSlice = 0;
+	renderTargetViewDesc.Texture2D.MipSlice = 0;	
 
 	// Create the render target view.
-	result = device->CreateRenderTargetView(m_renderTargetTexture, &renderTargetViewDesc, &m_renderTargetView);
+	result = device->CreateRenderTargetView(mpRenderTargetTexture.Get(), &renderTargetViewDesc, &mpRenderTargetView);
 	if(FAILED(result))
 	{
 		return false;
@@ -73,7 +68,7 @@ bool d3dRenderTexture::Initialize(ID3D11Device* device, int textureWidth, int te
 	shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
 	// Create the shader resource view.
-	result = device->CreateShaderResourceView(m_renderTargetTexture, &shaderResourceViewDesc, &m_shaderResourceView);
+	result = device->CreateShaderResourceView(mpRenderTargetTexture.Get(), &shaderResourceViewDesc, &mpShaderResourceView);
 	if(FAILED(result))
 	{
 		return false;
@@ -96,7 +91,7 @@ bool d3dRenderTexture::Initialize(ID3D11Device* device, int textureWidth, int te
 	depthBufferDesc.MiscFlags = 0;
 
 	// Create the texture for the depth buffer using the filled out description.
-	result = device->CreateTexture2D(&depthBufferDesc, NULL, &m_depthStencilBuffer);
+	result = device->CreateTexture2D(&depthBufferDesc, NULL, &mpDepthStencilBuffer);
 	if(FAILED(result))
 	{
 		return false;
@@ -111,7 +106,7 @@ bool d3dRenderTexture::Initialize(ID3D11Device* device, int textureWidth, int te
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 
 	// Create the depth stencil view.
-	result = device->CreateDepthStencilView(m_depthStencilBuffer, &depthStencilViewDesc, &m_depthStencilView);
+	result = device->CreateDepthStencilView(mpDepthStencilBuffer.Get(), &depthStencilViewDesc, &mpDepthStencilView);
 	if(FAILED(result))
 	{
 		return false;
@@ -125,56 +120,81 @@ bool d3dRenderTexture::Initialize(ID3D11Device* device, int textureWidth, int te
     m_viewport.TopLeftX = 0.0f;
     m_viewport.TopLeftY = 0.0f;
 
-	// Setup the projection matrix.
-	D3DXMatrixPerspectiveFovLH(&m_projectionMatrix, ((float)D3DX_PI / 4.0f), ((float)textureWidth / (float)textureHeight), screenNear, screenDepth);
-
-	// Create an orthographic projection matrix for 2D rendering.
-	D3DXMatrixOrthoLH(&m_orthoMatrix, (float)textureWidth, (float)textureHeight, screenNear, screenDepth);
-
 	return true;
 }
 
 
-void d3dRenderTexture::Shutdown()
+bool d3dRenderTexture::InitializeWithBackbuffer(ID3D11Device*const aDevice, IDXGISwapChain* const aSwapChain, uint32_t aTextureWidth, uint32_t aTextureHeight, float aNear, float aDepth)
 {
-	if(m_depthStencilView)
+	D3D11_TEXTURE2D_DESC depthBufferDesc;
+	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;	
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+
+	HRESULT result;
+
+	// Initialize the description of the depth buffer.
+	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
+
+	// Set up the description of the depth buffer.
+	depthBufferDesc.Width = aTextureWidth;
+	depthBufferDesc.Height = aTextureHeight;
+	depthBufferDesc.MipLevels = 1;
+	depthBufferDesc.ArraySize = 1;
+	depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthBufferDesc.SampleDesc.Count = 1;
+	depthBufferDesc.SampleDesc.Quality = 0;
+	depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthBufferDesc.CPUAccessFlags = 0;
+	depthBufferDesc.MiscFlags = 0;
+
+	// Create the texture for the depth buffer using the filled out description.
+	result = aDevice->CreateTexture2D(&depthBufferDesc, NULL, &mpDepthStencilBuffer);
+	if (FAILED(result))
 	{
-		m_depthStencilView->Release();
-		m_depthStencilView = 0;
+		LOG(ERROR) << "Failed to create texture 2D";
 	}
 
-	if(m_depthStencilBuffer)
+
+	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
+	// Set up the depth stencil view description.
+	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+	depthStencilViewDesc.Texture2D.MipSlice = 0;
+
+	result = aDevice->CreateDepthStencilView(mpDepthStencilBuffer.Get(), &depthStencilViewDesc, &mpDepthStencilView);
+
+	if (FAILED(result))
 	{
-		m_depthStencilBuffer->Release();
-		m_depthStencilBuffer = 0;
+		LOG(ERROR) << "Failed to create depth stencil view";
 	}
 
-	if(m_shaderResourceView)
+	ID3D11Texture2D* backBufferPtr;
+	result = aSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
+	if (FAILED(result))
 	{
-		m_shaderResourceView->Release();
-		m_shaderResourceView = 0;
+		LOG(ERROR) << "failed to get back buffer ptr from swapchain";
+		return false;
 	}
 
-	if(m_renderTargetView)
+	// Create the render target view with the back buffer pointer.
+	result = aDevice->CreateRenderTargetView(backBufferPtr, NULL, &mpRenderTargetView);
+	if (FAILED(result))
 	{
-		m_renderTargetView->Release();
-		m_renderTargetView = 0;
+		LOG(ERROR) << "failed to create render target view";
+		return false;
 	}
 
-	if(m_renderTargetTexture)
-	{
-		m_renderTargetTexture->Release();
-		m_renderTargetTexture = 0;
-	}
-
-	return;
+	// Release the backbuffer ptr
+	backBufferPtr->Release();
+	backBufferPtr = 0;
 }
 
 
-void d3dRenderTexture::SetRenderTarget(ID3D11DeviceContext* deviceContext)
+void d3dRenderTexture::SetRenderTarget(ID3D11DeviceContext* const deviceContext)
 {
 	// Bind the render target view and depth stencil buffer to the output render pipeline.
-	deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
+	deviceContext->OMSetRenderTargets(1, &mpRenderTargetView, mpDepthStencilView.Get());
 	
 	// Set the viewport.
 	deviceContext->RSSetViewports(1, &m_viewport);
@@ -183,10 +203,9 @@ void d3dRenderTexture::SetRenderTarget(ID3D11DeviceContext* deviceContext)
 }
 
 
-void d3dRenderTexture::ClearRenderTarget(ID3D11DeviceContext* deviceContext, float red, float green, float blue, float alpha)
+void d3dRenderTexture::ClearRenderTarget(ID3D11DeviceContext* const deviceContext, float red, float green, float blue, float alpha)
 {
 	float color[4];
-
 
 	// Setup the color to clear the buffer to.
 	color[0] = red;
@@ -195,30 +214,15 @@ void d3dRenderTexture::ClearRenderTarget(ID3D11DeviceContext* deviceContext, flo
 	color[3] = alpha;
 
 	// Clear the back buffer.
-	deviceContext->ClearRenderTargetView(m_renderTargetView, color);
+	deviceContext->ClearRenderTargetView(mpRenderTargetView.Get(), color);
     
 	// Clear the depth buffer.
-	deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	deviceContext->ClearDepthStencilView(mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	return;
 }
 
-
-ID3D11ShaderResourceView* d3dRenderTexture::GetShaderResourceView()
+ID3D11ShaderResourceView* const d3dRenderTexture::GetShaderResourceView()
 {
-	return m_shaderResourceView;
-}
-
-
-void d3dRenderTexture::GetProjectionMatrix(D3DXMATRIX& projectionMatrix)
-{
-	projectionMatrix = m_projectionMatrix;
-	return;
-}
-
-
-void d3dRenderTexture::GetOrthoMatrix(D3DXMATRIX& orthoMatrix)
-{
-	orthoMatrix = m_orthoMatrix;
-	return;
+	return mpShaderResourceView.Get();
 }
