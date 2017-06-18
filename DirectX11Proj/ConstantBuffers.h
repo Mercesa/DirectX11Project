@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LightStruct.h"
+#include "GraphicsStructures.h"
 
 struct cbMatrixBuffer
 {

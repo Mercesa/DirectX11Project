@@ -17,6 +17,7 @@
 #include "d3dLightClass.h"
 
 #include "IScene.h"
+#include "d3d11HelperFile.h"
 
 class d3dRenderTexture;
 class d3dRenderDepthTexture;
@@ -109,8 +110,16 @@ private:
 	std::unique_ptr<d3dShaderManager> mpShaderManager;
 
 	// Render textures and render depth texture for shadow mapping
-	std::unique_ptr<d3dRenderTexture> mBackBufferRenderTexture;
-	std::unique_ptr<d3dRenderTexture> mSceneRenderTexture;
-	std::unique_ptr<d3dRenderDepthTexture> mSceneDepthPrepassTexture;
+	//std::unique_ptr<d3dRenderTexture> mBackBufferRenderTexture;
+	//std::unique_ptr<d3dRenderTexture> mSceneRenderTexture;
+
+
+	std::unique_ptr<Texture> mBackBufferTexture;
+	std::unique_ptr<Texture> mBackBufferDepthTexture;
+	std::unique_ptr<Texture> mShadowDepthBuffer;
+
+	std::unique_ptr<Texture> mPostProcColorBuffer;
+	std::unique_ptr<Texture> mPostProcDepthBuffer;
+
 };
 

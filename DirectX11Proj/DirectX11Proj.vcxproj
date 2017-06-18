@@ -165,7 +165,6 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="d3dConstantBuffer.cpp" />
     <ClCompile Include="d3dMaterial.cpp" />
-    <ClCompile Include="d3dRenderDepthTexture.cpp" />
     <ClCompile Include="d3dShaderManager.cpp" />
     <ClCompile Include="d3dShaderPS.cpp" />
     <ClCompile Include="d3dShaderVS.cpp" />
@@ -187,7 +186,6 @@
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ObjectExample.cpp" />
     <ClCompile Include="PlayerSceneExample.cpp" />
-    <ClCompile Include="d3dRenderTexture.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
   </ItemGroup>
@@ -197,7 +195,6 @@
     <ClInclude Include="d3d11HelperFile.h" />
     <ClInclude Include="d3dConstantBuffer.h" />
     <ClInclude Include="d3dMaterial.h" />
-    <ClInclude Include="d3dRenderDepthTexture.h" />
     <ClInclude Include="d3dShaderManager.h" />
     <ClInclude Include="d3dShaderPS.h" />
     <ClInclude Include="d3dShaderVS.h" />
@@ -221,7 +218,6 @@
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="ObjectExample.h" />
     <ClInclude Include="PlayerSceneExample.h" />
-    <ClInclude Include="d3dRenderTexture.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ShaderHelperFunctions.h" />

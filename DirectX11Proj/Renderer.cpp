@@ -10,7 +10,6 @@
 #include "d3dShaderPS.h"
 #include "d3dTexture.h"
 #include "d3dRenderTexture.h"
-#include "d3dRenderDepthTexture.h"
 #include "d3dMaterial.h"
 
 #include "ResourceManager.h"
@@ -197,11 +196,11 @@ void Renderer::RenderScene(
 	mpDeviceContext->RSSetViewports(1, &mViewport);
 	mpDeviceContext->RSSetState(mRaster_backcull.Get());
 
-	mpDeviceContext->ClearRenderTargetView(this->mSceneRenderTexture->mpRenderTargetView.Get(), clearColor);
-	mpDeviceContext->ClearDepthStencilView(this->mSceneRenderTexture->mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+	mpDeviceContext->ClearRenderTargetView(this->mPostProcColorBuffer->rtv, clearColor);
+	mpDeviceContext->ClearDepthStencilView(this->mPostProcDepthBuffer->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
-	mpDeviceContext->OMSetRenderTargets(1, this->mSceneRenderTexture->mpRenderTargetView.GetAddressOf(), this->mSceneRenderTexture->mpDepthStencilView.Get());
+	mpDeviceContext->OMSetRenderTargets(1, &mPostProcColorBuffer->rtv, this->mPostProcDepthBuffer->dsv);
 
 	apCamera->UpdateViewMatrix();
 
@@ -221,7 +220,7 @@ void Renderer::RenderScene(
 	// Set the sampler state in the pixel shader.
 	mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
 
-	ID3D11ShaderResourceView* aView = mSceneDepthPrepassTexture->mpShaderResourceView.Get();
+	ID3D11ShaderResourceView* aView = mShadowDepthBuffer->srv;
 	mpDeviceContext->PSSetShaderResources(3, 1, &aView);
 
 	// Render objects
@@ -245,10 +244,10 @@ void Renderer::RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aO
 	mpDeviceContext->RSSetViewports(1, &mShadowLightViewport);
 	mpDeviceContext->RSSetState(mRaster_backcull.Get());
 
-	mpDeviceContext->ClearDepthStencilView(this->mSceneDepthPrepassTexture->mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+	mpDeviceContext->ClearDepthStencilView(this->mShadowDepthBuffer->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
-	mpDeviceContext->OMSetRenderTargets(0, nullptr, this->mSceneDepthPrepassTexture->mpDepthStencilView.Get());
+	mpDeviceContext->OMSetRenderTargets(0, nullptr, mShadowDepthBuffer->dsv);
 
 	d3dShaderVS*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_depth.hlsl");
 	//d3dShaderPS*const tPS = mpShaderManager->GetPixelShader("Shaders\\PS_depth.hlsl");
@@ -282,16 +281,16 @@ void Renderer::RenderFullScreenQuad()
 	mpDeviceContext->RSSetState(mRaster_backcull.Get());
 
 	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
-	mpDeviceContext->OMSetRenderTargets(1, this->mBackBufferRenderTexture->mpRenderTargetView.GetAddressOf(), this->mBackBufferRenderTexture->mpDepthStencilView.Get());
+	mpDeviceContext->OMSetRenderTargets(1, &this->mBackBufferTexture->rtv, mBackBufferTexture->dsv);
 
-	mpDeviceContext->ClearDepthStencilView(this->mBackBufferRenderTexture->mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+	mpDeviceContext->ClearDepthStencilView(mBackBufferTexture->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	// Draw full screen quad
 	mpDeviceContext->PSSetSamplers(0, 1, this->mpPointClampSampler.GetAddressOf());
 	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	mpDeviceContext->VSSetShader(tFVS->GetVertexShader(), NULL, 0);
 	mpDeviceContext->PSSetShader(tFPS->GetPixelShader(), NULL, 0);
-	mpDeviceContext->PSSetShaderResources(0, 1, mSceneRenderTexture->mpShaderResourceView.GetAddressOf());
+	mpDeviceContext->PSSetShaderResources(0, 1, &mPostProcColorBuffer->srv);
 	mpDeviceContext->Draw(4, 0);
 }
 
@@ -524,13 +523,29 @@ bool Renderer::InitializeDXGI()
 
 
 bool Renderer::InitializeBackBuffRTV()
-{
-	mBackBufferRenderTexture = std::make_unique<d3dRenderTexture>();
-	mBackBufferRenderTexture->InitializeWithBackbuffer(mpDevice.Get(), mpSwapchain.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, SCREEN_NEAR, SCREEN_FAR);
+{	
+	//mSceneRenderTexture = std::make_unique<d3dRenderTexture>();
+	//mSceneRenderTexture->Initialize(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, SCREEN_NEAR, SCREEN_FAR);
 
-	mSceneRenderTexture = std::make_unique<d3dRenderTexture>();
-	mSceneRenderTexture->Initialize(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, SCREEN_NEAR, SCREEN_FAR);
+	mBackBufferTexture = std::make_unique<Texture>();
+	mPostProcColorBuffer = std::make_unique<Texture>();
+	mPostProcDepthBuffer = std::make_unique<Texture>();
+	mShadowDepthBuffer = std::make_unique<Texture>();
 
+	mPostProcColorBuffer->texture = CreateSimpleRenderTargetTexture(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight);
+	mPostProcColorBuffer->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), mPostProcColorBuffer->texture);
+	mPostProcColorBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), mPostProcColorBuffer->texture);
+	
+	mPostProcDepthBuffer->texture = CreateSimpleDepthTexture(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight);
+	mPostProcDepthBuffer->dsv = CreateSimpleDepthBuffer(mpDevice.Get(), mPostProcDepthBuffer->texture);
+
+	mBackBufferTexture->texture = CreateSimpleDepthTexture(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight);
+	mBackBufferTexture->dsv =  CreateSimpleDepthstencilView(mpDevice.Get(), mBackBufferTexture->texture);
+	mBackBufferTexture->rtv = CreateRenderTargetViewFromSwapchain(mpDevice.Get(), mpSwapchain.Get());
+
+	mShadowDepthBuffer->texture = CreateSimpleDepthTextureVisibleShader(mpDevice.Get(), 1024, 1024);
+	mShadowDepthBuffer->dsv = CreateSimpleDepthBuffer(mpDevice.Get(), mShadowDepthBuffer->texture);
+	mShadowDepthBuffer->srv = CreateSRVTex2DDepth(mpDevice.Get(), mShadowDepthBuffer->texture);
 	return true;
 }
 
@@ -539,8 +554,8 @@ bool  Renderer::InitializeDepthStencilView()
 {
 	mpDepthStencilState = CreateDepthStateDefault(mpDevice.Get());
 
-	this->mSceneDepthPrepassTexture = std::make_unique<d3dRenderDepthTexture>();
-	this->mSceneDepthPrepassTexture->Initialize(mpDevice.Get(), 2048, 2048, SCREEN_NEAR, SCREEN_FAR);
+	//this->mSceneDepthPrepassTexture = std::make_unique<d3dRenderDepthTexture>();
+	//this->mSceneDepthPrepassTexture->Initialize(mpDevice.Get(), 2048, 2048, SCREEN_NEAR, SCREEN_FAR);
 
 	return true;
 }
@@ -577,8 +592,6 @@ bool  Renderer::InitializeSamplerState()
 	mpPointClampSampler = CreateSamplerPointClamp(mpDevice.Get());
 	mpLinearClampSampler = CreateSamplerLinearClamp(mpDevice.Get());
 	
-
-
 	return true;
 }
 

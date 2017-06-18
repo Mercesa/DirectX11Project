@@ -14,6 +14,7 @@ struct Texture
 {
 	ID3D11Texture2D* texture;
 	ID3D11DepthStencilView* dsv;
+	ID3D11RenderTargetView* rtv;
 	ID3D11ShaderResourceView* srv;
 	ID3D11UnorderedAccessView* uav;
 };
@@ -236,7 +237,7 @@ static ID3D11DepthStencilState* CreateDepthStateDefault(ID3D11Device* const aDev
 **DEPTH STENCIL VIEW FUNCTIONS**
 ***************************
 */
-static ID3D11DepthStencilView* CreateSimpleDepthTextureShader(ID3D11Device* const aDevice, ID3D11Texture2D* const aTexture)
+static ID3D11DepthStencilView* CreateSimpleDepthBuffer(ID3D11Device* const aDevice, ID3D11Texture2D* const aTexture)
 {
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
@@ -299,11 +300,9 @@ static ID3D11Texture2D* CreateSimpleDepthTextureVisibleShader(ID3D11Device* cons
 
 
 
-static ID3D11ShaderResourceView* CreateSimpleShaderResourceViewDepth(ID3D11Device* const aDevice, ID3D11Texture2D* const aTexture)
+static ID3D11ShaderResourceView* CreateSRVTex2DDepth(ID3D11Device* const aDevice, ID3D11Texture2D* const aTexture)
 {
-	D3D11_TEXTURE2D_DESC depthTextureDesc;
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
-	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	ID3D11ShaderResourceView* srv = nullptr;
 
 	// Create shader resource view
