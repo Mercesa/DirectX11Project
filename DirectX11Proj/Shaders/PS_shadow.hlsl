@@ -28,18 +28,20 @@ float ShadowMappingPCF(PixelInputType input)
 	float shadowValue = 0.0f;
 
 	bias = 0.001f;
-	projectTexCoord.x = input.lightViewPosition.x / input.lightViewPosition.w / 2.0f + 0.5f;
-	projectTexCoord.y = input.lightViewPosition.y / -input.lightViewPosition.w / 2.0f + 0.5f;
+	// Project the coordinates and put them from -1 to 1   to   0 to 1
+	projectTexCoord.x = input.lightViewPosition.x / input.lightViewPosition.w * 0.5f + 0.5f;
+	projectTexCoord.y = input.lightViewPosition.y / -input.lightViewPosition.w * 0.5f + 0.5f;
 
-
+	// For loop 
 	for (int y = -2; y < 2; ++y)
 	{
 		for (int x = -2; x < 2; ++x)
 		{
 			// Hardcode the resolution for now
-
 			float texelSize = 1.0f / 2048.0f;
 			float2 offsetProjTexCoord = float2(x*texelSize, y * texelSize);
+			
+			// Clamp the coordinates
 			if ((saturate(offsetProjTexCoord.x) == offsetProjTexCoord.x) && saturate(offsetProjTexCoord.y) == offsetProjTexCoord.y)
 			{
 				depthValue = depthMapTexture.Sample(SampleTypeClamp, projectTexCoord).r;

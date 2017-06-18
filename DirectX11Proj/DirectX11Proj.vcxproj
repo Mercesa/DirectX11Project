@@ -164,7 +164,6 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="d3dConstantBuffer.cpp" />
-    <ClCompile Include="d3dDepthStencil.cpp" />
     <ClCompile Include="d3dMaterial.cpp" />
     <ClCompile Include="d3dRenderDepthTexture.cpp" />
     <ClCompile Include="d3dShaderManager.cpp" />
@@ -195,8 +194,8 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="ConstantBuffers.h" />
+    <ClInclude Include="d3d11HelperFile.h" />
     <ClInclude Include="d3dConstantBuffer.h" />
-    <ClInclude Include="d3dDepthStencil.h" />
     <ClInclude Include="d3dMaterial.h" />
     <ClInclude Include="d3dRenderDepthTexture.h" />
     <ClInclude Include="d3dShaderManager.h" />
@@ -208,6 +207,7 @@
     <ClInclude Include="EngineTimer.h" />
     <ClInclude Include="FormatConversionHelper.h" />
     <ClInclude Include="GraphicsSettings.h" />
+    <ClInclude Include="GraphicsStructures.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="ImguiImplementation.h" />
@@ -216,10 +216,8 @@
     <ClInclude Include="IObject.h" />
     <ClInclude Include="IScene.h" />
     <ClInclude Include="d3dLightClass.h" />
-    <ClInclude Include="LightStruct.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="modelclass.h" />
-    <ClInclude Include="ModelData.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="ObjectExample.h" />
     <ClInclude Include="PlayerSceneExample.h" />

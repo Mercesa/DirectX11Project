@@ -11,7 +11,7 @@ using namespace DirectX;
 
 class d3dVertexBuffer;
 class d3dTexture;
-struct MeshData;
+struct RawMeshData;
 
 class d3dMaterial;
 
@@ -22,7 +22,7 @@ public:
 	ModelClass(const ModelClass&);
 	~ModelClass();
 
-	bool Initialize(ID3D11Device* const apDevice, const MeshData& acMeshData);
+	bool Initialize(ID3D11Device* const apDevice, const RawMeshData& acMeshData);
 
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
@@ -32,7 +32,7 @@ public:
 	std::unique_ptr<d3dMaterial> mMaterial;
 
 private:
-	bool InitializeBuffers(ID3D11Device* const apDevice, const MeshData& aMeshData);
+	bool InitializeBuffers(ID3D11Device* const apDevice, const RawMeshData& aMeshData);
 	void RenderBuffers(ID3D11DeviceContext* const apDeviceContext);
 
 private:

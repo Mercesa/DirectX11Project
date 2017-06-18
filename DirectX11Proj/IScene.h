@@ -5,11 +5,10 @@
 #include <vector>
 
 #include "inputclass.h"
-#include "LightStruct.h"
 #include "IObject.h"
 #include "Camera.h"
 #include "d3dLightClass.h"
-
+#include "GraphicsStructures.h"
 
 
 class IScene

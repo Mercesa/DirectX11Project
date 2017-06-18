@@ -14,7 +14,6 @@
 #include "d3dMaterial.h"
 
 #include "ResourceManager.h"
-#include "LightStruct.h"
 #include "ConstantBuffers.h"
 #include "IObject.h"
 #include "GraphicsSettings.h"
@@ -196,7 +195,7 @@ void Renderer::RenderScene(
 	
 	// Scene prep
 	mpDeviceContext->RSSetViewports(1, &mViewport);
-	mpDeviceContext->RSSetState(mRasterState.Get());
+	mpDeviceContext->RSSetState(mRaster_backcull.Get());
 
 	mpDeviceContext->ClearRenderTargetView(this->mSceneRenderTexture->mpRenderTargetView.Get(), clearColor);
 	mpDeviceContext->ClearDepthStencilView(this->mSceneRenderTexture->mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
@@ -212,7 +211,7 @@ void Renderer::RenderScene(
 
 	// Set samplers
 	mpDeviceContext->PSSetSamplers(0, 1, mpPointClampSampler.GetAddressOf());
-	mpDeviceContext->PSSetSamplers(1, 1, mpLinearWrapSampler.GetAddressOf());
+	mpDeviceContext->PSSetSamplers(1, 1, mpLinearClampSampler.GetAddressOf());
 
 	// Set the vertex and pixel shaders that will be used to render this triangle.
 	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
@@ -244,7 +243,7 @@ void Renderer::RenderScene(
 void Renderer::RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects)
 {
 	mpDeviceContext->RSSetViewports(1, &mShadowLightViewport);
-	mpDeviceContext->RSSetState(mRasterState.Get());
+	mpDeviceContext->RSSetState(mRaster_backcull.Get());
 
 	mpDeviceContext->ClearDepthStencilView(this->mSceneDepthPrepassTexture->mpDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
@@ -280,7 +279,7 @@ void Renderer::RenderFullScreenQuad()
 
 
 	mpDeviceContext->RSSetViewports(1, &mViewport);
-	mpDeviceContext->RSSetState(mRasterState.Get());
+	mpDeviceContext->RSSetState(mRaster_backcull.Get());
 
 	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
 	mpDeviceContext->OMSetRenderTargets(1, this->mBackBufferRenderTexture->mpRenderTargetView.GetAddressOf(), this->mBackBufferRenderTexture->mpDepthStencilView.Get());
@@ -313,7 +312,7 @@ void Renderer::RenderMaterial(d3dMaterial* const aMaterial)
 void Renderer::RenderObject(IObject* const aObject)
 {
 	// Bind vertex/index buffers
-	aObject->mpModel->R	ender(mpDeviceContext.Get());
+	aObject->mpModel->Render(mpDeviceContext.Get());
 
 	int indices = aObject->mpModel->GetIndexCount();
 
@@ -535,43 +534,10 @@ bool Renderer::InitializeBackBuffRTV()
 	return true;
 }
 
-
+#include "d3d11HelperFile.h"
 bool  Renderer::InitializeDepthStencilView()
 {
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	HRESULT result;
-
-
-	// Initialize the description of the stencil state.
-	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
-
-	// Set up the description of the stencil state.
-	depthStencilDesc.DepthEnable = true;
-	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-
-	depthStencilDesc.StencilEnable = true;
-	depthStencilDesc.StencilReadMask = 0xFF;
-	depthStencilDesc.StencilWriteMask = 0xFF;
-
-	// Stencil operations if pixel is front-facing.
-	depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
-	depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-	// Stencil operations if pixel is back-facing.
-	depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
-	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-	result = mpDevice->CreateDepthStencilState(&depthStencilDesc, mpDepthStencilState.GetAddressOf());
-
-	if (FAILED(result))
-	{
-		LOG(ERROR) << "Failed to create depth-stencil state";
-	}
+	mpDepthStencilState = CreateDepthStateDefault(mpDevice.Get());
 
 	this->mSceneDepthPrepassTexture = std::make_unique<d3dRenderDepthTexture>();
 	this->mSceneDepthPrepassTexture->Initialize(mpDevice.Get(), 2048, 2048, SCREEN_NEAR, SCREEN_FAR);
@@ -582,28 +548,7 @@ bool  Renderer::InitializeDepthStencilView()
 
 bool  Renderer::InitializeRasterstate()
 {
-	D3D11_RASTERIZER_DESC rasterDesc;
-	HRESULT result;
-
-	// Setup the raster description which will determine how and what polygons will be drawn.
-	rasterDesc.AntialiasedLineEnable = false;
-	rasterDesc.CullMode = D3D11_CULL_BACK;
-	rasterDesc.DepthBias = 0;
-	rasterDesc.DepthBiasClamp = 0.0f;
-	rasterDesc.DepthClipEnable = true;
-	rasterDesc.FillMode = D3D11_FILL_SOLID;
-	rasterDesc.FrontCounterClockwise = false;
-	rasterDesc.MultisampleEnable = false;
-	rasterDesc.ScissorEnable = false;
-	rasterDesc.SlopeScaledDepthBias = 0.0f;
-
-	result = mpDevice->CreateRasterizerState(&rasterDesc, &mRasterState);
-	if (FAILED(result))
-	{
-		LOG(INFO) << "Rasterizer state failed to initialize";
-		return false;
-	}
-
+	this->mRaster_backcull = CreateRSDefault(mpDevice.Get());
 	return true;
 }
 
@@ -628,77 +573,10 @@ bool Renderer::DestroyDirectX()
 
 bool  Renderer::InitializeSamplerState()
 {
-	//ID3D10Blob* errorMessage;
-	D3D11_SAMPLER_DESC samplerDesc;
-
-	// Create a texture sampler state description.
-	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	samplerDesc.MipLODBias = 0.0f;
-	samplerDesc.MaxAnisotropy = 1;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-	samplerDesc.BorderColor[0] = 0;
-	samplerDesc.BorderColor[1] = 0;
-	samplerDesc.BorderColor[2] = 0;
-	samplerDesc.BorderColor[3] = 0;
-	samplerDesc.MinLOD = 0;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-	// Create the texture sampler state.
-	HRESULT result = mpDevice->CreateSamplerState(&samplerDesc, &mpAnisotropicWrapSampler);
-	if (FAILED(result))
-	{
-		LOG(WARNING) << "Failed to create anisotropic sampler";
-		return false;
-	}
-
-
-	// Create a texture sampler state description.
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.MipLODBias = 0.0f;
-	samplerDesc.MaxAnisotropy = 1;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-	samplerDesc.BorderColor[0] = 0;
-	samplerDesc.BorderColor[1] = 0;
-	samplerDesc.BorderColor[2] = 0;
-	samplerDesc.BorderColor[3] = 0;
-	samplerDesc.MinLOD = 0;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-	result = mpDevice->CreateSamplerState(&samplerDesc, &mpPointClampSampler);
-
-	if (FAILED(result))
-	{
-		LOG(WARNING) << "Failed to create point sampler";
-	}
-
-
-	// Create a texture sampler state description.
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
-	samplerDesc.MipLODBias = 0.0f;
-	samplerDesc.MaxAnisotropy = 1;
-	samplerDesc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
-	samplerDesc.BorderColor[0] = 0;
-	samplerDesc.BorderColor[1] = 0;
-	samplerDesc.BorderColor[2] = 0;
-	samplerDesc.BorderColor[3] = 0;
-	samplerDesc.MinLOD = 0;
-	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
-
-	result = mpDevice->CreateSamplerState(&samplerDesc, &mpLinearWrapSampler);
-
-	if (FAILED(result))
-	{
-		LOG(WARNING) << "Failed to linear clamp sampler";
-	}
+	mpAnisotropicWrapSampler = CreateSamplerAnisotropicWrap(mpDevice.Get());
+	mpPointClampSampler = CreateSamplerPointClamp(mpDevice.Get());
+	mpLinearClampSampler = CreateSamplerLinearClamp(mpDevice.Get());
+	
 
 
 	return true;

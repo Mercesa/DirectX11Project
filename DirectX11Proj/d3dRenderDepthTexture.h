@@ -19,7 +19,6 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> mpDepthStencilView;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> mpShaderResourceView;
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> mpDepthTexture;
-private:
 	
 };
 

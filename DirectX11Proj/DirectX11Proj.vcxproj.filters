@@ -94,9 +94,6 @@
     <ClCompile Include="d3dConstantBuffer.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
-    <ClCompile Include="d3dDepthStencil.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
     <ClCompile Include="d3dRenderDepthTexture.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
@@ -120,9 +117,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ModelData.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="PlayerSceneExample.h">
       <Filter>NonFramework</Filter>
     </ClInclude>
@@ -131,9 +125,6 @@
     </ClInclude>
     <ClInclude Include="easylogging++.h">
       <Filter>Libs</Filter>
-    </ClInclude>
-    <ClInclude Include="LightStruct.h">
-      <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="ConstantBuffers.h">
       <Filter>D3DSetup</Filter>
@@ -207,9 +198,6 @@
     <ClInclude Include="d3dConstantBuffer.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
-    <ClInclude Include="d3dDepthStencil.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
     <ClInclude Include="d3dRenderDepthTexture.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
@@ -230,6 +218,12 @@
     </ClInclude>
     <ClInclude Include="camera.h">
       <Filter>NonFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="d3d11HelperFile.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsStructures.h">
+      <Filter>D3DSetup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

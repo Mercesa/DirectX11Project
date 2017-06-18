@@ -5,7 +5,6 @@
 #include <memory.h>
 
 #include "modelclass.h"
-#include "ModelData.h"
 #include "d3dTexture.h"
 #include "d3dMaterial.h"
 #include "easylogging++.h"
@@ -21,7 +20,7 @@ void ResourceManager::Shutdown()
 }
 
 
-std::unique_ptr<d3dTexture> ResourceManager::LoadTexture(TextureData aData)
+std::unique_ptr<d3dTexture> ResourceManager::LoadTexture(RawTextureData aData)
 {
 	// Convert string texture filepath to wstring
 	std::wstring wString = std::wstring(aData.filepath.begin(), aData.filepath.end());
@@ -38,7 +37,7 @@ std::unique_ptr<d3dTexture> ResourceManager::LoadTexture(TextureData aData)
 	return std::move(tpTextureClass);
 }
 
-std::unique_ptr<d3dMaterial> ResourceManager::LoadTexturesFromMaterial(const MeshData& aMeshData)
+std::unique_ptr<d3dMaterial> ResourceManager::LoadTexturesFromMaterial(const RawMeshData& aMeshData)
 {
 	auto tpMat = std::make_unique<d3dMaterial>();
 
@@ -60,11 +59,11 @@ std::vector<ModelClass*> ResourceManager::LoadModels(std::string aFilePath)
 	std::unique_ptr<ModelClass> tpModelClass = nullptr;
 	std::unique_ptr<d3dTexture> tpTextureClass = nullptr;
 
-	const std::vector<MeshData>& tMeshes = mpModelLoader->GetMeshesToBeProcessed();
+	const std::vector<RawMeshData>& tMeshes = mpModelLoader->GetMeshesToBeProcessed();
 
 	for (unsigned int i = 0; i < tMeshes.size(); ++i)
 	{
-		const MeshData& tData = tMeshes[i];
+		const RawMeshData& tData = tMeshes[i];
 
 		tpModelClass = std::make_unique<ModelClass>();
 		tpModelClass->Initialize(this->mpDevice, tData);

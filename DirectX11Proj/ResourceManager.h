@@ -11,7 +11,7 @@
 
 class ModelClass;
 class d3dMaterial;
-struct TextureData;
+struct RawTextureData;
 
 class ResourceManager
 {
@@ -43,8 +43,8 @@ private:
 	std::vector<std::unique_ptr<ModelClass>> mLoadedModels;
 	std::vector<std::unique_ptr<d3dTexture>> mLoadedTextures;
 
-	std::unique_ptr<d3dMaterial> LoadTexturesFromMaterial(const MeshData& aMeshData);
-	std::unique_ptr<d3dTexture> LoadTexture(TextureData aData);
+	std::unique_ptr<d3dMaterial> LoadTexturesFromMaterial(const RawMeshData& aMeshData);
+	std::unique_ptr<d3dTexture> LoadTexture(RawTextureData aData);
 
 	// Load models as one
 	// Load models as a list

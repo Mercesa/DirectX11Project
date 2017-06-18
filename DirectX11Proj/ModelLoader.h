@@ -2,12 +2,13 @@
 
 #include <vector>
 
+#include "GraphicsStructures.h"
 struct aiNode;
 struct aiScene;
 struct aiMesh;
 
 
-struct MeshData;
+struct RawMeshData;
 
 class ModelLoader
 {
@@ -17,7 +18,7 @@ public:
 
 	void LoadModel(const char* aFilePath);
 	
-	const std::vector<MeshData>& GetMeshesToBeProcessed();
+	const std::vector<RawMeshData>& GetMeshesToBeProcessed();
 	void ClearProcessedMeshes();
 
 private:
@@ -25,5 +26,5 @@ private:
 	void ProcessMesh(aiMesh* const a_Mesh, const aiScene* const a_Scene);
 
 	// has a vector of meshes that are done processing 
-	std::vector<MeshData> mMeshesToBeProcessed;
+	std::vector<RawMeshData> mMeshesToBeProcessed;
 };

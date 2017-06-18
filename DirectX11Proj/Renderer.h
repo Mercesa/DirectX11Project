@@ -90,11 +90,12 @@ private:
 	Microsoft::WRL::ComPtr<IDXGIOutput> mAdapterOutput;
 
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> mpDepthStencilState;
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRasterState;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRaster_backcull;
+	Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRaster_frontcull;
 
 	// Samplers
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpAnisotropicWrapSampler;
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpLinearWrapSampler;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpLinearClampSampler;
 	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpPointClampSampler;
 	
 	// Constant buffers 

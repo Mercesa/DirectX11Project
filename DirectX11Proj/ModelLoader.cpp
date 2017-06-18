@@ -6,7 +6,6 @@
 #include <scene.h>
 #include <iostream>
 
-#include "ModelData.h"
 
 using namespace Assimp;
 
@@ -95,7 +94,7 @@ void ProcessIndices(aiMesh* const a_Mesh, std::vector<uint32_t>& a_Indices)
 }
 
 
-const std::vector<MeshData>& ModelLoader::GetMeshesToBeProcessed()
+const std::vector<RawMeshData>& ModelLoader::GetMeshesToBeProcessed()
 {
 	return mMeshesToBeProcessed;
 }
@@ -130,7 +129,7 @@ std::string GetTextureLocation(aiMaterial* const a_Mat, aiTextureType a_Type)
 
 
 // Goes through the material
-void ProcessMaterial(aiMesh* a_Mesh, const aiScene* a_Scene, MeshData& aMeshdata)
+void ProcessMaterial(aiMesh* a_Mesh, const aiScene* a_Scene, RawMeshData& aMeshdata)
 {
 	// If we have a material
 	if (a_Mesh->mMaterialIndex > 0)
@@ -170,7 +169,7 @@ void ModelLoader::ProcessMesh(aiMesh* const a_Mesh, const aiScene* const a_Scene
 	ProcessVertices(a_Mesh, vertices);
 	ProcessIndices(a_Mesh, indices);
 
-	MeshData meshData;
+	RawMeshData meshData;
 
 	ProcessMaterial(a_Mesh, a_Scene, meshData);
 

@@ -3,8 +3,7 @@
 #include "d3dVertexBuffer.h"
 #include "d3dTexture.h"
 #include "d3dMaterial.h"
-#include "ModelData.h"
-
+#include "GraphicsStructures.h"
 
 ModelClass::ModelClass() 
 	: mMaterial(nullptr)
@@ -21,7 +20,7 @@ ModelClass::~ModelClass()
 {}
 
 
-bool ModelClass::Initialize(ID3D11Device* const apDevice, const MeshData& acMesh)
+bool ModelClass::Initialize(ID3D11Device* const apDevice, const RawMeshData& acMesh)
 {
 	bool result;
 
@@ -56,7 +55,7 @@ int ModelClass::GetIndexCount()
 	return mIndexBuffer->GetAmountOfElements();
 }
 
-bool ModelClass::InitializeBuffers(ID3D11Device* aDevice, const MeshData& aData)
+bool ModelClass::InitializeBuffers(ID3D11Device* aDevice, const RawMeshData& aData)
 {	
 	
 	size_t vertSize = aData.vertices.size();

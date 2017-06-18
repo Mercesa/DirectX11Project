@@ -1,12 +1,6 @@
 #ifndef _INPUTCLASS_H_
 #define _INPUTCLASS_H_
 
-#define DIRECTINPUT_VERSION 0x0800
-
-#pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "dxguid.lib")
-
-#include <dinput.h>
 #include <iostream>
 
 class InputClass
