@@ -1,7 +1,6 @@
 #pragma once
 
-#include "modelclass.h"
-
+#include "d3d11HelperFile.h"
 class IObject
 {
 public:
@@ -17,7 +16,7 @@ public:
 	bool GetHasBeenInitialized() { return mHasBeenInitialized; }
 
 
-	ModelClass* mpModel;
+	Model* mpModel;
 	XMFLOAT4X4  mWorldMatrix;
 
 protected:
@@ -25,6 +24,6 @@ protected:
 	bool mIsActive = false;
 	bool mCastShadow = false;
 	bool mHasBeenInitialized = false;
-
+		
 };
 

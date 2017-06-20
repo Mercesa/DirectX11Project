@@ -10,7 +10,9 @@
 #include "easylogging++.h"
 
 #include <cassert>
-
+#include "d3dMaterial.h"
+#include "GraphicsStructures.h"
+// Texture is a collection of views and a texture
 struct Texture
 {
 	ID3D11Texture2D* texture = nullptr;
@@ -23,7 +25,16 @@ struct Texture
 struct Buffer
 {
 	ID3D11Buffer* buffer = nullptr;
+	// The amount of elements in the buffer
 	size_t amountOfElements = 0;
+};
+
+// A model is nothing more than something with a vertexbuffer and index buffer
+struct Model
+{
+	Buffer* vertexBuffer;
+	Buffer* indexBuffer;
+	std::unique_ptr<d3dMaterial> material;
 };
 
 
@@ -56,6 +67,29 @@ static void ReleaseTexture(Texture* aTexture)
 	}
 }
 
+static void ReleaseModel(Model* aModel)
+{
+	assert(aModel != nullptr);
+
+	if (aModel->vertexBuffer != nullptr)
+	{
+		if (aModel->vertexBuffer->buffer != nullptr)
+		{
+			aModel->vertexBuffer->buffer->Release();
+		}
+		
+		delete aModel->vertexBuffer;
+	}
+
+	if (aModel->indexBuffer != nullptr)
+	{
+		if (aModel->indexBuffer->buffer != nullptr)
+		{
+			aModel->indexBuffer->buffer->Release();
+		}
+		delete aModel->indexBuffer;
+	}
+}
 /*
 ***********************
 * RASTERIZER FUNCTIONS
@@ -522,6 +556,25 @@ static ID3D11Buffer* CreateSimpleBuffer(ID3D11Device* const aDevice, void* aData
 	//mAmountOfElements = aAmountOfElements;
 
 	return buffer;
+}
+
+static Model* CreateSimpleModelFromRawData(ID3D11Device* aDevice, const RawMeshData& aData)
+{
+	Model* model = new Model();
+	model->vertexBuffer = new Buffer();
+	model->indexBuffer = new Buffer();
+
+	size_t vertSize = aData.vertices.size();
+	size_t indicesSize = aData.indices.size();
+
+	model->vertexBuffer->buffer = CreateSimpleBuffer(aDevice, (void*)(aData.vertices.data()), sizeof(VertexData) * vertSize, vertSize, D3D11_BIND_VERTEX_BUFFER, D3D11_USAGE_DEFAULT);
+	model->vertexBuffer->amountOfElements = indicesSize;
+
+	model->indexBuffer->buffer = CreateSimpleBuffer(aDevice, (void*)(aData.indices.data()), sizeof(unsigned long) * indicesSize, indicesSize, D3D11_BIND_INDEX_BUFFER, D3D11_USAGE_DEFAULT);
+	model->indexBuffer->amountOfElements = indicesSize;
+
+
+	return model;
 }
 
 //static ID3D11RenderTargetView* CreateTexture2DRTVDefault(ID3D11Device* const aDevice, uint32_t aWidth, uint32_t aHeight)

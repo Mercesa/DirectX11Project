@@ -18,7 +18,7 @@
 
 #include "IScene.h"
 #include "d3d11HelperFile.h"
-
+#
 class d3dRenderTexture;
 class d3dRenderDepthTexture;
 
@@ -67,6 +67,7 @@ private:
 	void RenderMaterial(d3dMaterial* const aMaterial);
 	void RenderFullScreenQuad();
 	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
+	void RenderBuffers(ID3D11DeviceContext* const apDeviceContext, Model* const aModel);
 
 	const float SCREEN_FAR = 1000.0f;
 	const float SCREEN_NEAR = 2.0f;

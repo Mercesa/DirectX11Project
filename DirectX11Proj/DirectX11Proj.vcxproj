@@ -169,7 +169,6 @@
     <ClCompile Include="d3dShaderPS.cpp" />
     <ClCompile Include="d3dShaderVS.cpp" />
     <ClCompile Include="d3dTexture.cpp" />
-    <ClCompile Include="d3dVertexBuffer.cpp" />
     <ClCompile Include="EngineTimer.cpp" />
     <ClCompile Include="GraphicsSettings.cpp" />
     <ClCompile Include="imgui.cpp" />
@@ -182,7 +181,6 @@
     <ClCompile Include="d3dLightClass.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MathHelper.cpp" />
-    <ClCompile Include="modelclass.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ObjectExample.cpp" />
     <ClCompile Include="PlayerSceneExample.cpp" />
@@ -199,10 +197,8 @@
     <ClInclude Include="d3dShaderPS.h" />
     <ClInclude Include="d3dShaderVS.h" />
     <ClInclude Include="d3dTexture.h" />
-    <ClInclude Include="d3dVertexBuffer.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EngineTimer.h" />
-    <ClInclude Include="FormatConversionHelper.h" />
     <ClInclude Include="GraphicsSettings.h" />
     <ClInclude Include="GraphicsStructures.h" />
     <ClInclude Include="imconfig.h" />
@@ -214,7 +210,6 @@
     <ClInclude Include="IScene.h" />
     <ClInclude Include="d3dLightClass.h" />
     <ClInclude Include="MathHelper.h" />
-    <ClInclude Include="modelclass.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="ObjectExample.h" />
     <ClInclude Include="PlayerSceneExample.h" />

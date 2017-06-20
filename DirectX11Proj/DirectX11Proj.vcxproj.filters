@@ -94,16 +94,10 @@
     <ClCompile Include="d3dConstantBuffer.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
-    <ClCompile Include="d3dVertexBuffer.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
     <ClCompile Include="d3dMaterial.cpp">
       <Filter>Model</Filter>
     </ClCompile>
     <ClCompile Include="d3dTexture.cpp">
-      <Filter>Model</Filter>
-    </ClCompile>
-    <ClCompile Include="modelclass.cpp">
       <Filter>Model</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
@@ -180,9 +174,6 @@
     <ClInclude Include="MathHelper.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="FormatConversionHelper.h">
-      <Filter>Utility</Filter>
-    </ClInclude>
     <ClInclude Include="IScene.h">
       <Filter>NonFramework</Filter>
     </ClInclude>
@@ -192,16 +183,10 @@
     <ClInclude Include="d3dConstantBuffer.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
-    <ClInclude Include="d3dVertexBuffer.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
     <ClInclude Include="d3dMaterial.h">
       <Filter>Model</Filter>
     </ClInclude>
     <ClInclude Include="d3dTexture.h">
-      <Filter>Model</Filter>
-    </ClInclude>
-    <ClInclude Include="modelclass.h">
       <Filter>Model</Filter>
     </ClInclude>
     <ClInclude Include="camera.h">

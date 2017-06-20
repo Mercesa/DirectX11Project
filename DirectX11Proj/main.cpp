@@ -27,6 +27,8 @@ INITIALIZE_EASYLOGGINGPP
 
 #include "Renderer.h"
 #include "ImguiImplementation.h"
+#include "ResourceManager.h"
+
 HWND windowHandle;
 
 class WindowsProcessClass
@@ -381,7 +383,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 	}
 
-
+	Shutdown();
 	ImGui_ImplDX11_Shutdown();
 	mpRenderer->DestroyDirectX();
 

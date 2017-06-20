@@ -37,7 +37,6 @@ void Renderer::Initialize(HWND aHwnd)
 	InitializeDirectX();
 
 	CreateConstantBuffers();
-	ResourceManager::GetInstance().mpDevice = mpDevice.Get();
 
 	mpShaderManager = std::make_unique<d3dShaderManager>();
 	mpShaderManager->InitializeShaders(mpDevice.Get());
@@ -147,7 +146,7 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject)
 	uint32_t bufferNumber;
 
 	// Update material
-	d3dMaterial* const tMat = aObject->mpModel->mMaterial.get();
+	d3dMaterial* const tMat = aObject->mpModel->material.get();
 
 	gMaterialBufferDataPtr->hasDiffuse = (int)tMat->mpDiffuse->exists;
 	gMaterialBufferDataPtr->hasSpecular = (int)tMat->mpSpecular->exists;
@@ -310,12 +309,12 @@ void Renderer::RenderMaterial(d3dMaterial* const aMaterial)
 void Renderer::RenderObject(IObject* const aObject)
 {
 	// Bind vertex/index buffers
-	aObject->mpModel->Render(mpDeviceContext.Get());
+	RenderBuffers(mpDeviceContext.Get(), aObject->mpModel);
 
-	int indices = aObject->mpModel->GetIndexCount();
+	int indices = aObject->mpModel->indexBuffer->amountOfElements;
 
 	// Bind textures from material
-	d3dMaterial* const aMaterial = aObject->mpModel->mMaterial.get();
+	d3dMaterial* const aMaterial = aObject->mpModel->material.get();
 	
 	if (aMaterial != nullptr)
 	{
@@ -324,6 +323,30 @@ void Renderer::RenderObject(IObject* const aObject)
 
 	// Render the model.
 	mpDeviceContext->DrawIndexed(indices, 0, 0);
+}
+
+void Renderer::RenderBuffers(ID3D11DeviceContext* deviceContext, Model* const aModel)
+{
+	unsigned int stride;
+	unsigned int offset;
+
+	// Set vertex buffer stride and offset.
+	stride = sizeof(VertexData);
+	offset = 0;
+
+	// Set the vertex buffer to active in the input assembler so it can be rendered.
+
+	ID3D11Buffer* tBuffer = aModel->vertexBuffer->buffer;
+
+	deviceContext->IASetVertexBuffers(0, 1, &tBuffer, &stride, &offset);
+
+	// Set the index buffer to active in the input assembler so it can be rendered.
+	deviceContext->IASetIndexBuffer(aModel->indexBuffer->buffer, DXGI_FORMAT_R32_UINT, 0);
+
+	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	return;
 }
 
 
