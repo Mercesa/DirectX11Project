@@ -10,7 +10,6 @@
 #include "easylogging++.h"
 ResourceManager::ResourceManager()
 {
-	mpModelLoader = std::make_unique<ModelLoader>();
 }
 
 void ResourceManager::Shutdown()
@@ -53,13 +52,13 @@ std::unique_ptr<d3dMaterial> ResourceManager::LoadTexturesFromMaterial(const Raw
 // TODO, create a function for model loader which just asks for the next model, this removes it from the model list
 std::vector<ModelClass*> ResourceManager::LoadModels(std::string aFilePath)
 {
-	mpModelLoader->LoadModel(aFilePath.c_str());
+
 	std::vector<ModelClass*> tModels;
 
 	std::unique_ptr<ModelClass> tpModelClass = nullptr;
 	std::unique_ptr<d3dTexture> tpTextureClass = nullptr;
 
-	const std::vector<RawMeshData>& tMeshes = mpModelLoader->GetMeshesToBeProcessed();
+	const std::vector<RawMeshData>& tMeshes = ModelLoader::LoadModel(aFilePath.c_str());
 
 	for (unsigned int i = 0; i < tMeshes.size(); ++i)
 	{
@@ -72,8 +71,6 @@ std::vector<ModelClass*> ResourceManager::LoadModels(std::string aFilePath)
 		tModels.push_back(tpModelClass.get());
 		mLoadedModels.push_back(std::move(tpModelClass));
 	}
-
-	mpModelLoader->ClearProcessedMeshes();
 
 	LOG(INFO) << "ModelLoading: Finished loading model " << aFilePath;
 	return tModels;

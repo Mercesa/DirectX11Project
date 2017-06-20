@@ -26,7 +26,7 @@ bool d3dVertexBuffer::Initialize(ID3D11Device *const aDevice,void* aData, size_t
 	D3D11_SUBRESOURCE_DATA vertexData;
 
 	// Set up the description of the static vertex buffer.
-	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT; 
 	vertexBufferDesc.ByteWidth = aSizeInBytes;
 	vertexBufferDesc.BindFlags = (D3D11_BIND_FLAG)aBufferFlag;
 	vertexBufferDesc.CPUAccessFlags = 0;
@@ -37,7 +37,7 @@ bool d3dVertexBuffer::Initialize(ID3D11Device *const aDevice,void* aData, size_t
 	vertexData.pSysMem = aData;
 	vertexData.SysMemPitch = 0;
 	vertexData.SysMemSlicePitch = 0;
-
+	
 	result = aDevice->CreateBuffer(&vertexBufferDesc, &vertexData, &mBuffer);
 
 	if (FAILED(result))

@@ -383,6 +383,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 
 	ImGui_ImplDX11_Shutdown();
+	mpRenderer->DestroyDirectX();
 
 	DestroyWindow(windowHandle);
 	windowHandle = NULL;

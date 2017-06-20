@@ -94,7 +94,7 @@ void PlayerSceneExample::Init()
 	//}
 	
 	// Load sphere
-	tModels = ResourceManager::GetInstance().LoadModels("Models\\Lucy\\lucy_box.obj");
+	tModels = ResourceManager::GetInstance().LoadModels("Models\\Box\\cube.obj");
 	tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
 	XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f/2.0f);
 	for (int i = 0; i < tModels.size(); ++i)

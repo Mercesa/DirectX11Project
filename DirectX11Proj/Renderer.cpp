@@ -9,7 +9,6 @@
 #include "d3dShaderVS.h"
 #include "d3dShaderPS.h"
 #include "d3dTexture.h"
-#include "d3dRenderTexture.h"
 #include "d3dMaterial.h"
 
 #include "ResourceManager.h"
@@ -194,12 +193,12 @@ void Renderer::RenderScene(
 	
 	// Scene prep
 	mpDeviceContext->RSSetViewports(1, &mViewport);
-	mpDeviceContext->RSSetState(mRaster_backcull.Get());
+	mpDeviceContext->RSSetState(mRaster_backcull);
 
 	mpDeviceContext->ClearRenderTargetView(this->mPostProcColorBuffer->rtv, clearColor);
 	mpDeviceContext->ClearDepthStencilView(this->mPostProcDepthBuffer->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
+	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
 	mpDeviceContext->OMSetRenderTargets(1, &mPostProcColorBuffer->rtv, this->mPostProcDepthBuffer->dsv);
 
 	apCamera->UpdateViewMatrix();
@@ -209,8 +208,8 @@ void Renderer::RenderScene(
 
 
 	// Set samplers
-	mpDeviceContext->PSSetSamplers(0, 1, mpPointClampSampler.GetAddressOf());
-	mpDeviceContext->PSSetSamplers(1, 1, mpLinearClampSampler.GetAddressOf());
+	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
+	mpDeviceContext->PSSetSamplers(1, 1, &mpLinearClampSampler);
 
 	// Set the vertex and pixel shaders that will be used to render this triangle.
 	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
@@ -242,11 +241,11 @@ void Renderer::RenderScene(
 void Renderer::RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects)
 {
 	mpDeviceContext->RSSetViewports(1, &mShadowLightViewport);
-	mpDeviceContext->RSSetState(mRaster_backcull.Get());
+	mpDeviceContext->RSSetState(mRaster_backcull);
 
 	mpDeviceContext->ClearDepthStencilView(this->mShadowDepthBuffer->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
+	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
 	mpDeviceContext->OMSetRenderTargets(0, nullptr, mShadowDepthBuffer->dsv);
 
 	d3dShaderVS*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_depth.hlsl");
@@ -278,15 +277,15 @@ void Renderer::RenderFullScreenQuad()
 
 
 	mpDeviceContext->RSSetViewports(1, &mViewport);
-	mpDeviceContext->RSSetState(mRaster_backcull.Get());
+	mpDeviceContext->RSSetState(mRaster_backcull);
 
-	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState.Get(), 1);
+	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
 	mpDeviceContext->OMSetRenderTargets(1, &this->mBackBufferTexture->rtv, mBackBufferTexture->dsv);
 
 	mpDeviceContext->ClearDepthStencilView(mBackBufferTexture->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	// Draw full screen quad
-	mpDeviceContext->PSSetSamplers(0, 1, this->mpPointClampSampler.GetAddressOf());
+	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
 	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	mpDeviceContext->VSSetShader(tFVS->GetVertexShader(), NULL, 0);
 	mpDeviceContext->PSSetShader(tFPS->GetPixelShader(), NULL, 0);
@@ -532,20 +531,23 @@ bool Renderer::InitializeBackBuffRTV()
 	mPostProcDepthBuffer = std::make_unique<Texture>();
 	mShadowDepthBuffer = std::make_unique<Texture>();
 
-	mPostProcColorBuffer->texture = CreateSimpleRenderTargetTexture(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight);
-	mPostProcColorBuffer->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), mPostProcColorBuffer->texture);
-	mPostProcColorBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), mPostProcColorBuffer->texture);
+	// Post proc color and depth buffer 
+	mPostProcColorBuffer->texture =  CreateSimpleRenderTargetTexture(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
+	mPostProcColorBuffer->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), mPostProcColorBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
+	mPostProcColorBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), mPostProcColorBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	
-	mPostProcDepthBuffer->texture = CreateSimpleDepthTexture(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight);
-	mPostProcDepthBuffer->dsv = CreateSimpleDepthBuffer(mpDevice.Get(), mPostProcDepthBuffer->texture);
+	mPostProcDepthBuffer->texture = CreateSimpleDepthTexture(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
+	mPostProcDepthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), mPostProcDepthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
-	mBackBufferTexture->texture = CreateSimpleDepthTexture(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight);
-	mBackBufferTexture->dsv =  CreateSimpleDepthstencilView(mpDevice.Get(), mBackBufferTexture->texture);
+	// Backbuffer
+	mBackBufferTexture->texture = CreateSimpleDepthTexture(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
+	mBackBufferTexture->dsv =  CreateSimpleDepthstencilView(mpDevice.Get(), mBackBufferTexture->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	mBackBufferTexture->rtv = CreateRenderTargetViewFromSwapchain(mpDevice.Get(), mpSwapchain.Get());
 
-	mShadowDepthBuffer->texture = CreateSimpleDepthTextureVisibleShader(mpDevice.Get(), 1024, 1024);
-	mShadowDepthBuffer->dsv = CreateSimpleDepthBuffer(mpDevice.Get(), mShadowDepthBuffer->texture);
-	mShadowDepthBuffer->srv = CreateSRVTex2DDepth(mpDevice.Get(), mShadowDepthBuffer->texture);
+	// Buffer for shadow mapping
+	mShadowDepthBuffer->texture = CreateSimpleDepthTexture(mpDevice.Get(), 2048, 2048, GetDepthResourceFormat(DXGI_FORMAT_D24_UNORM_S8_UINT), D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
+	mShadowDepthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), mShadowDepthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
+	mShadowDepthBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), mShadowDepthBuffer->texture, GetDepthSRVFormat(DXGI_FORMAT_D24_UNORM_S8_UINT));
 	return true;
 }
 
@@ -570,17 +572,30 @@ bool  Renderer::InitializeRasterstate()
 
 bool Renderer::DestroyDirectX()
 {
-	if (mpDevice.Get() != nullptr)
-	{
-		mpDevice.Reset();
-		mpDevice = nullptr;
-	}
+	ReleaseTexture(mBackBufferTexture.get());
+	
+	ReleaseTexture(mPostProcColorBuffer.get());
+	ReleaseTexture(mPostProcDepthBuffer.get());
+	
+	ReleaseTexture(mShadowDepthBuffer.get());
 
-	if (mpDeviceContext.Get() != nullptr)
-	{
-		mpDeviceContext.Reset();
-		mpDeviceContext = nullptr;
-	}
+
+	mRaster_backcull->Release();
+	mpDepthStencilState->Release();
+	mpAnisotropicWrapSampler->Release();
+	mpLinearClampSampler->Release();
+	mpPointClampSampler->Release();
+	//if (mpDevice.Get() != nullptr)
+	//{
+	//	mpDevice.Reset();
+	//	mpDevice = nullptr;
+	//}
+	//
+	//if (mpDeviceContext.Get() != nullptr)
+	//{
+	//	mpDeviceContext.Reset();
+	//	mpDeviceContext = nullptr;
+	//}
 
 	return true;
 }

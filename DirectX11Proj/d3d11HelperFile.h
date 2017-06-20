@@ -12,13 +12,48 @@
 
 struct Texture
 {
-	ID3D11Texture2D* texture;
-	ID3D11DepthStencilView* dsv;
-	ID3D11RenderTargetView* rtv;
-	ID3D11ShaderResourceView* srv;
-	ID3D11UnorderedAccessView* uav;
+	ID3D11Texture2D* texture = nullptr;
+	ID3D11DepthStencilView* dsv = nullptr;
+	ID3D11RenderTargetView* rtv = nullptr;
+	ID3D11ShaderResourceView* srv = nullptr;
+	ID3D11UnorderedAccessView* uav = nullptr;
 };
 
+struct Buffer
+{
+	ID3D11Buffer* buffer = nullptr;
+	size_t amountOfElements = 0;
+};
+
+
+static void ReleaseTexture(Texture* aTexture)
+{
+	assert(aTexture != nullptr);
+	if (aTexture->texture != nullptr)
+	{
+		aTexture->texture->Release();
+	}
+
+	if (aTexture->dsv != nullptr)
+	{
+		aTexture->dsv->Release();
+	}
+
+	if (aTexture->rtv != nullptr)
+	{
+		aTexture->rtv->Release();
+	}
+
+	if (aTexture->srv != nullptr)
+	{
+		aTexture->srv->Release();
+	}
+
+	if (aTexture->uav != nullptr)
+	{
+		aTexture->uav->Release();
+	}
+}
 
 /*
 ***********************
@@ -116,7 +151,7 @@ static ID3D11SamplerState* CreateSamplerAnisotropicWrap(ID3D11Device* const aDev
 	if (FAILED(result))
 	{
 		LOG(ERROR) << "CreateSamplerAnisotropicWrap failed";
-		return false;
+		return nullptr;
 	}
 
 	return sampler;
@@ -147,7 +182,7 @@ static ID3D11SamplerState* CreateSamplerPointClamp(ID3D11Device* const aDevice)
 	if (FAILED(result))
 	{
 		LOG(ERROR) << "CreateSamplerPointClamp failed";
-		return false;
+		return nullptr;
 	}
 
 	return sampler;
@@ -178,7 +213,7 @@ static ID3D11SamplerState* CreateSamplerLinearClamp(ID3D11Device* const aDevice)
 	if (FAILED(result))
 	{
 		LOG(ERROR) << "CreateSamplerPointClamp failed";
-		return false;
+		return nullptr;
 	}
 
 	return sampler;
@@ -232,102 +267,14 @@ static ID3D11DepthStencilState* CreateDepthStateDefault(ID3D11Device* const aDev
 }
 
 
-/*
-***************************
-**DEPTH STENCIL VIEW FUNCTIONS**
-***************************
-*/
-static ID3D11DepthStencilView* CreateSimpleDepthBuffer(ID3D11Device* const aDevice, ID3D11Texture2D* const aTexture)
-{
 
-	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-	ID3D11DepthStencilView* tDsv = nullptr;
-	HRESULT result;
-	// Initialize the depth stencil view description.
-	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
-
-	// Set up the depth stencil view description.
-	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	depthStencilViewDesc.Texture2D.MipSlice = 0;
-
-	// Create the depth stencil view.
-	result = aDevice->CreateDepthStencilView(aTexture, &depthStencilViewDesc, &tDsv);
-	if (FAILED(result))
-	{
-		return false;
-	}
-}
-
-
-/*
-***********************************
-**DEPTH STENCIL TEXTURE FUNCTIONS**
-***********************************
-*/
-
-static ID3D11Texture2D* CreateSimpleDepthTextureVisibleShader(ID3D11Device* const aDevice, uint32_t aWidth, uint32_t aHeight)
-{
-	D3D11_TEXTURE2D_DESC depthTextureDesc;
-	ID3D11Texture2D* tTexture = nullptr;
-	HRESULT result;
-
-	// Create depth buffer
-	ZeroMemory(&depthTextureDesc, sizeof(depthTextureDesc));
-
-	depthTextureDesc.Width = aWidth;
-	depthTextureDesc.Height = aHeight;
-	depthTextureDesc.MipLevels = 1;
-	depthTextureDesc.ArraySize = 1;
-	depthTextureDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
-	depthTextureDesc.SampleDesc.Count = 1;
-	depthTextureDesc.SampleDesc.Quality = 0;
-	depthTextureDesc.Usage = D3D11_USAGE_DEFAULT;
-	depthTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
-	depthTextureDesc.CPUAccessFlags = 0;
-	depthTextureDesc.MiscFlags = 0;
-
-	result = aDevice->CreateTexture2D(&depthTextureDesc, NULL, &tTexture);
-
-	if (FAILED(result))
-	{
-		LOG(ERROR) << "CreateTexture2DDSVDefault failed";
-		return nullptr;
-	}
-
-	return tTexture;
-}
-
-
-
-static ID3D11ShaderResourceView* CreateSRVTex2DDepth(ID3D11Device* const aDevice, ID3D11Texture2D* const aTexture)
-{
-	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
-	ID3D11ShaderResourceView* srv = nullptr;
-
-	// Create shader resource view
-	ZeroMemory(&shaderResourceViewDesc, sizeof(shaderResourceViewDesc));
-	shaderResourceViewDesc.Format = DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
-	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-	shaderResourceViewDesc.Texture2D.MipLevels = -1;
-
-	HRESULT result = aDevice->CreateShaderResourceView(aTexture, &shaderResourceViewDesc, &srv);
-	if (FAILED(result))
-	{
-		LOG(ERROR) << "Failed to create shader resource view in d3dRenderDepthTexture";
-		return nullptr;
-	}
-
-	return srv;
-}
 
 /*
 ********************************
 **RENDER TARGET VIEW FUNCTIONS**
 ********************************
 */
-static ID3D11Texture2D* CreateSimpleRenderTargetTexture(ID3D11Device* const aDevice, uint32_t aWidth, uint32_t aHeight)
+static ID3D11Texture2D* CreateSimpleRenderTargetTexture(ID3D11Device* const aDevice, uint32_t aWidth, uint32_t aHeight, DXGI_FORMAT aFormat, uint32_t aBindFlags)
 {
 	HRESULT result;
 	D3D11_TEXTURE2D_DESC textureDesc;
@@ -359,7 +306,7 @@ static ID3D11Texture2D* CreateSimpleRenderTargetTexture(ID3D11Device* const aDev
 	return tTexture;
 }
 
-static ID3D11Texture2D* CreateSimpleDepthTexture(ID3D11Device* const aDevice, uint32_t aWidth, uint32_t aHeight)
+static ID3D11Texture2D* CreateSimpleDepthTexture(ID3D11Device* const aDevice, uint32_t aWidth, uint32_t aHeight, DXGI_FORMAT aFormat, UINT aBindFlags)
 {
 	D3D11_TEXTURE2D_DESC depthBufferDesc;
 	HRESULT result;
@@ -370,14 +317,14 @@ static ID3D11Texture2D* CreateSimpleDepthTexture(ID3D11Device* const aDevice, ui
 
 	// Set up the description of the depth buffer.
 	depthBufferDesc.Width = aWidth;
-	depthBufferDesc.Height = aWidth;
+	depthBufferDesc.Height = aHeight;
 	depthBufferDesc.MipLevels = 1;
 	depthBufferDesc.ArraySize = 1;
-	depthBufferDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthBufferDesc.Format = aFormat;
 	depthBufferDesc.SampleDesc.Count = 1;
 	depthBufferDesc.SampleDesc.Quality = 0;
 	depthBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	depthBufferDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	depthBufferDesc.BindFlags = aBindFlags;
 	depthBufferDesc.CPUAccessFlags = 0;
 	depthBufferDesc.MiscFlags = 0;
 
@@ -386,20 +333,19 @@ static ID3D11Texture2D* CreateSimpleDepthTexture(ID3D11Device* const aDevice, ui
 	if (FAILED(result))
 	{
 		LOG(ERROR) << "CreateSimpleDepthBuffer failed";
-		return false;
+		return nullptr;
 	}
-
 	return texture;
 }
 
-static ID3D11RenderTargetView* CreateSimpleRenderTargetView(ID3D11Device* const aDevice, ID3D11Texture2D* aTexture)
+static ID3D11RenderTargetView* CreateSimpleRenderTargetView(ID3D11Device* const aDevice, ID3D11Texture2D* aTexture, DXGI_FORMAT aFormat)
 {
 	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 	ID3D11RenderTargetView* rtv = nullptr;
 	HRESULT result;
 
 	// Setup the description of the render target view.
-	renderTargetViewDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	renderTargetViewDesc.Format = aFormat;
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	renderTargetViewDesc.Texture2D.MipSlice = 0;
 
@@ -407,7 +353,6 @@ static ID3D11RenderTargetView* CreateSimpleRenderTargetView(ID3D11Device* const 
 	result = aDevice->CreateRenderTargetView(aTexture, &renderTargetViewDesc, &rtv);
 	if (FAILED(result))
 	{
-		return false;
 		return nullptr;
 	}
 
@@ -415,7 +360,7 @@ static ID3D11RenderTargetView* CreateSimpleRenderTargetView(ID3D11Device* const 
 }
 
 
-static ID3D11DepthStencilView* CreateSimpleDepthstencilView(ID3D11Device* const aDevice, ID3D11Texture2D* const aTexture)
+static ID3D11DepthStencilView* CreateSimpleDepthstencilView(ID3D11Device* const aDevice, ID3D11Texture2D* const aTexture, DXGI_FORMAT aFormat)
 {
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	ID3D11DepthStencilView* dsv;
@@ -423,7 +368,7 @@ static ID3D11DepthStencilView* CreateSimpleDepthstencilView(ID3D11Device* const 
 
 	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
 	// Set up the depth stencil view description.
-	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	depthStencilViewDesc.Format = aFormat;
 	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 
@@ -438,16 +383,16 @@ static ID3D11DepthStencilView* CreateSimpleDepthstencilView(ID3D11Device* const 
 	return dsv;
 }
 
-static ID3D11ShaderResourceView* CreateSimpleShaderResourceView(ID3D11Device* const aDevice, ID3D11Texture2D* const aTexture)
+static ID3D11ShaderResourceView* CreateSimpleShaderResourceView(ID3D11Device* const aDevice, ID3D11Texture2D* const aTexture, DXGI_FORMAT aFormat)
 {
 	D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 	ID3D11ShaderResourceView* srv;
 	HRESULT result;
 	// Setup the description of the shader resource view.
-	shaderResourceViewDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	shaderResourceViewDesc.Format = aFormat;
 	shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
-	shaderResourceViewDesc.Texture2D.MipLevels = 1;
+	shaderResourceViewDesc.Texture2D.MipLevels = -1;
 
 	// Create the shader resource view.
 	result = aDevice->CreateShaderResourceView(aTexture, &shaderResourceViewDesc, &srv);
@@ -470,7 +415,7 @@ static ID3D11RenderTargetView* CreateRenderTargetViewFromSwapchain(ID3D11Device*
 	if (FAILED(result))
 	{
 		LOG(ERROR) << "failed to get back buffer ptr from swapchain";
-		return false;
+		return nullptr;
 	}
 
 	// Create the render target view with the back buffer pointer.
@@ -478,7 +423,7 @@ static ID3D11RenderTargetView* CreateRenderTargetViewFromSwapchain(ID3D11Device*
 	if (FAILED(result))
 	{
 		LOG(ERROR) << "failed to create render target view";
-		return false;
+		return nullptr;
 	}
 
 	// Release the backbuffer ptr
@@ -486,6 +431,96 @@ static ID3D11RenderTargetView* CreateRenderTargetViewFromSwapchain(ID3D11Device*
 	backBufferPtr = 0;
 
 	return rtv;
+}
+
+
+static DXGI_FORMAT GetDepthResourceFormat(DXGI_FORMAT depthformat)
+{
+	DXGI_FORMAT resformat;
+	switch (depthformat)
+	{
+	case DXGI_FORMAT::DXGI_FORMAT_D16_UNORM:
+		resformat = DXGI_FORMAT::DXGI_FORMAT_R16_TYPELESS;
+		break;
+	case DXGI_FORMAT::DXGI_FORMAT_D24_UNORM_S8_UINT:
+		resformat = DXGI_FORMAT::DXGI_FORMAT_R24G8_TYPELESS;
+		break;
+	case DXGI_FORMAT::DXGI_FORMAT_D32_FLOAT:
+		resformat = DXGI_FORMAT::DXGI_FORMAT_R32_TYPELESS;
+		break;
+	case DXGI_FORMAT::DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
+		resformat = DXGI_FORMAT::DXGI_FORMAT_R32G8X24_TYPELESS;
+		break;
+
+	default:
+		LOG(ERROR) << "GetDepthResourceFormat: Unknown format entered";
+		break;
+	}
+
+	return resformat;
+}
+
+static DXGI_FORMAT GetDepthSRVFormat(DXGI_FORMAT depthformat)
+{
+	DXGI_FORMAT srvformat;
+	switch (depthformat)
+	{
+	case DXGI_FORMAT::DXGI_FORMAT_D16_UNORM:
+		srvformat = DXGI_FORMAT::DXGI_FORMAT_R16_FLOAT;
+		break;
+	case DXGI_FORMAT::DXGI_FORMAT_D24_UNORM_S8_UINT:
+		srvformat = DXGI_FORMAT::DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+		break;
+	case DXGI_FORMAT::DXGI_FORMAT_D32_FLOAT:
+		srvformat = DXGI_FORMAT::DXGI_FORMAT_R32_FLOAT;
+		break;
+	case DXGI_FORMAT::DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
+		srvformat = DXGI_FORMAT::DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+		break;
+	default:
+		LOG(ERROR) << "GetDepthSRVFormat: Unknown format entered";
+		break;
+	}
+	return srvformat;
+}
+
+static ID3D11Buffer* CreateSimpleBuffer(ID3D11Device* const aDevice, void* aDataPtr, size_t aSizeInBytes, uint32_t amountOfElements, uint32_t aBindFlags, uint32_t aUsage)
+{
+	if (aSizeInBytes == 0)
+	{
+		LOG(ERROR) << "CreateSimpleBuffer failed, size of buffer to be created is 0";
+		return nullptr;
+	}
+	HRESULT result;
+	D3D11_BUFFER_DESC vertexBufferDesc;
+	D3D11_SUBRESOURCE_DATA vertexData;
+	ID3D11Buffer* buffer;
+
+
+	// Set up the description of the static vertex buffer.
+	vertexBufferDesc.Usage = D3D11_USAGE(aUsage);
+	vertexBufferDesc.ByteWidth = aSizeInBytes;
+	vertexBufferDesc.BindFlags = (D3D11_BIND_FLAG)aBindFlags;
+	vertexBufferDesc.CPUAccessFlags = 0;
+	vertexBufferDesc.MiscFlags = 0;
+	vertexBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the vertex data.
+	vertexData.pSysMem = aDataPtr;
+	vertexData.SysMemPitch = 0;
+	vertexData.SysMemSlicePitch = 0;
+
+	result = aDevice->CreateBuffer(&vertexBufferDesc, &vertexData, &buffer);
+
+	if (FAILED(result))
+	{
+		std::cout << "CreateSimpleBuffer failed" << std::endl;
+		return false;
+	}
+
+	//mAmountOfElements = aAmountOfElements;
+
+	return buffer;
 }
 
 //static ID3D11RenderTargetView* CreateTexture2DRTVDefault(ID3D11Device* const aDevice, uint32_t aWidth, uint32_t aHeight)

@@ -37,7 +37,6 @@ public:
 private:
 	ResourceManager();
 	
-	std::unique_ptr<ModelLoader> mpModelLoader;
 
 	// Turn these into maps at one point
 	std::vector<std::unique_ptr<ModelClass>> mLoadedModels;

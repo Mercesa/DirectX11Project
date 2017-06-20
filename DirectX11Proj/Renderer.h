@@ -42,6 +42,8 @@ public:
 
 	float clearColor[3] = { 0.0f, 0.0f, 0.0f };
 
+		bool DestroyDirectX();
+
 private:
 	bool InitializeDirectX();
 	bool InitializeDXGI();
@@ -59,7 +61,6 @@ private:
 	
 	void CreateConstantBuffers();
 
-	bool DestroyDirectX();
 
 	// Render functions
 	void RenderObject(IObject* const aObject);
@@ -90,14 +91,15 @@ private:
 	Microsoft::WRL::ComPtr<IDXGIAdapter> mAdapter;
 	Microsoft::WRL::ComPtr<IDXGIOutput> mAdapterOutput;
 
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> mpDepthStencilState;
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRaster_backcull;
-	Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRaster_frontcull;
+	ID3D11DepthStencilState* mpDepthStencilState;
+	ID3D11RasterizerState* mRaster_backcull;
+	
+	//Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRaster_frontcull; not used yet
 
 	// Samplers
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpAnisotropicWrapSampler;
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpLinearClampSampler;
-	Microsoft::WRL::ComPtr<ID3D11SamplerState> mpPointClampSampler;
+	ID3D11SamplerState* mpAnisotropicWrapSampler;
+	ID3D11SamplerState* mpLinearClampSampler;
+	ID3D11SamplerState* mpPointClampSampler;
 	
 	// Constant buffers 
 	std::unique_ptr<d3dConstantBuffer> mpMatrixCB;
@@ -108,11 +110,6 @@ private:
 
 	// Shader manager
 	std::unique_ptr<d3dShaderManager> mpShaderManager;
-
-	// Render textures and render depth texture for shadow mapping
-	//std::unique_ptr<d3dRenderTexture> mBackBufferRenderTexture;
-	//std::unique_ptr<d3dRenderTexture> mSceneRenderTexture;
-
 
 	std::unique_ptr<Texture> mBackBufferTexture;
 	std::unique_ptr<Texture> mBackBufferDepthTexture;

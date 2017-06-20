@@ -21,12 +21,6 @@ ModelLoader::~ModelLoader()
 std::string mDirectory;
 
 
-void ModelLoader::ClearProcessedMeshes()
-{
-	this->mMeshesToBeProcessed.clear();
-}
-
-
 void ProcessVertices(aiMesh* const a_Mesh, std::vector<VertexData>& a_Vertices)
 {
 	// Loop through vertices
@@ -93,12 +87,6 @@ void ProcessIndices(aiMesh* const a_Mesh, std::vector<uint32_t>& a_Indices)
 	}
 }
 
-
-const std::vector<RawMeshData>& ModelLoader::GetMeshesToBeProcessed()
-{
-	return mMeshesToBeProcessed;
-}
-
 bool DoesMaterialHaveTextures(aiMaterial* const aMat, aiTextureType a_Type)
 {
 	// Check the amount of textures of a specific type
@@ -160,7 +148,7 @@ void ProcessMaterial(aiMesh* a_Mesh, const aiScene* a_Scene, RawMeshData& aMeshd
 
 
 // Process mesh
-void ModelLoader::ProcessMesh(aiMesh* const a_Mesh, const aiScene* const a_Scene)
+RawMeshData ModelLoader::ProcessMesh(aiMesh* const a_Mesh, const aiScene* const a_Scene)
 {
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;
@@ -178,31 +166,30 @@ void ModelLoader::ProcessMesh(aiMesh* const a_Mesh, const aiScene* const a_Scene
 	meshData.indices = indices;
 
 
-	this->mMeshesToBeProcessed.push_back(meshData);
+	return meshData;
 }
 
 // This function will be called recursively if there is more than 1 node in a scene
-void ModelLoader::ProcessNode(aiNode* const a_Node, const aiScene* const a_Scene)
+void ModelLoader::ProcessNode(aiNode* const a_Node, const aiScene* const a_Scene, std::vector<RawMeshData>& aData)
 {
 	// Process meshes in node
 	for (unsigned int i = 0; i < a_Node->mNumMeshes; i++)
 	{
-		ProcessMesh(a_Scene->mMeshes[a_Node->mMeshes[i]], a_Scene);
-		
+		aData.push_back(ProcessMesh(a_Scene->mMeshes[a_Node->mMeshes[i]], a_Scene));
 	}
 
 	// Process children of scene recursively
 	for (unsigned int j = 0; j < a_Node->mNumChildren; j++)
 	{
-		ProcessNode((a_Node->mChildren[j]), a_Scene);
+		ProcessNode((a_Node->mChildren[j]), a_Scene, aData);
 	}
 }
 
-void ModelLoader::LoadModel(const char* const aFilePath)
+std::vector<RawMeshData> ModelLoader::LoadModel(const char* const aFilePath)
 {
 	Assimp::Importer importer;
 
-
+	std::vector<RawMeshData> tData;
 
 	const aiScene* scene;
 
@@ -219,6 +206,8 @@ void ModelLoader::LoadModel(const char* const aFilePath)
 
 	mDirectory = aFilePathStr.substr(0, aFilePathStr.find_last_of("\\"));
 	
-	ProcessNode(scene->mRootNode, scene);
+	ProcessNode(scene->mRootNode, scene, tData);
+	
+	return tData;
 	//printf("%i", mMeshesToBeProcessed.size());
 }
