@@ -9,6 +9,7 @@
 #include <d3d11.h>
 #include "easylogging++.h"
 
+#include <cassert>
 
 struct Texture
 {

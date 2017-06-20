@@ -4,12 +4,13 @@
 #include "d3dTexture.h"
 #include "d3dMaterial.h"
 #include "GraphicsStructures.h"
+#include "d3d11HelperFile.h"
 
 ModelClass::ModelClass() 
 	: mMaterial(nullptr)
 {
-	mVertexBuffer = std::make_unique<d3dVertexBuffer>();
-	mIndexBuffer = std::make_unique<d3dVertexBuffer>();
+	mVertexBuffer = std::make_unique<Buffer>();
+	mIndexBuffer = std::make_unique<Buffer>();
 }
 
 ModelClass::ModelClass(const ModelClass& other)
@@ -17,7 +18,10 @@ ModelClass::ModelClass(const ModelClass& other)
 }
 
 ModelClass::~ModelClass()
-{}
+{
+	mVertexBuffer->buffer->Release();
+	mIndexBuffer->buffer->Release();
+}
 
 
 bool ModelClass::Initialize(ID3D11Device* const apDevice, const RawMeshData& acMesh)
@@ -52,7 +56,7 @@ void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 
 int ModelClass::GetIndexCount()
 {
-	return mIndexBuffer->GetAmountOfElements();
+	return mIndexBuffer->amountOfElements;
 }
 
 bool ModelClass::InitializeBuffers(ID3D11Device* aDevice, const RawMeshData& aData)
@@ -61,15 +65,11 @@ bool ModelClass::InitializeBuffers(ID3D11Device* aDevice, const RawMeshData& aDa
 	size_t vertSize = aData.vertices.size();
 	size_t indicesSize = aData.indices.size();
 
-	if (!mVertexBuffer->Initialize(aDevice, (void*)(aData.vertices.data()), sizeof(VertexData) * vertSize, vertSize, D3D11_BIND_VERTEX_BUFFER))
-	{
-		return false;
-	}
-
-	if (!mIndexBuffer->Initialize(aDevice, (void*)(aData.indices.data()), sizeof(unsigned long) * indicesSize, indicesSize, D3D11_BIND_INDEX_BUFFER))
-	{
-		return false;
-	}
+	mVertexBuffer->buffer = CreateSimpleBuffer(aDevice, (void*)(aData.vertices.data()), sizeof(VertexData) * vertSize, vertSize, D3D11_BIND_VERTEX_BUFFER, D3D11_USAGE_DEFAULT);
+	mVertexBuffer->amountOfElements = indicesSize;
+	
+	mIndexBuffer->buffer = CreateSimpleBuffer(aDevice, (void*)(aData.indices.data()), sizeof(unsigned long) * indicesSize, indicesSize, D3D11_BIND_INDEX_BUFFER, D3D11_USAGE_DEFAULT);
+	mIndexBuffer->amountOfElements = indicesSize;
 
 	return true;
 }
@@ -87,12 +87,12 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
     
 	// Set the vertex buffer to active in the input assembler so it can be rendered.
 
-	ID3D11Buffer* tBuffer = mVertexBuffer->GetBuffer();
+	ID3D11Buffer* tBuffer = mVertexBuffer->buffer;
 
 	deviceContext->IASetVertexBuffers(0, 1, &tBuffer, &stride, &offset);
 
     // Set the index buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetIndexBuffer(mIndexBuffer->GetBuffer(), DXGI_FORMAT_R32_UINT, 0);
+	deviceContext->IASetIndexBuffer(mIndexBuffer->buffer, DXGI_FORMAT_R32_UINT, 0);
 
     // Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

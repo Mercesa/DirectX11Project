@@ -9,10 +9,11 @@ using namespace DirectX;
 
 #include <memory>
 
+
 class d3dVertexBuffer;
 class d3dTexture;
 struct RawMeshData;
-
+struct Buffer;
 class d3dMaterial;
 
 class ModelClass
@@ -37,8 +38,8 @@ private:
 
 private:
 	int32_t tIndiceSize = 0;
-	std::unique_ptr<d3dVertexBuffer> mVertexBuffer;
-	std::unique_ptr<d3dVertexBuffer> mIndexBuffer;
+	std::unique_ptr<Buffer> mVertexBuffer;
+	std::unique_ptr<Buffer> mIndexBuffer;
 };
 
 #endif

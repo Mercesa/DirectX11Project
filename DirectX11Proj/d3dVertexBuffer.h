@@ -4,7 +4,7 @@
 #include <wrl.h>
 
 #include <cstdint>
-
+#include "d3d11HelperFile.h"
 class d3dVertexBuffer
 {
 public:
@@ -17,7 +17,7 @@ public:
 	uint32_t GetAmountOfElements();
 
 private:
-	Microsoft::WRL::ComPtr<ID3D11Buffer> mBuffer;
+	std::unique_ptr<Buffer> mBuffer;
 	uint32_t mAmountOfElements;
 };
 
