@@ -16,7 +16,7 @@ public:
 	bool GetHasBeenInitialized() { return mHasBeenInitialized; }
 
 
-	Model* mpModel;
+	ModelID mpModel;
 	XMFLOAT4X4  mWorldMatrix;
 
 protected:

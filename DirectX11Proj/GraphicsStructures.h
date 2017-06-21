@@ -52,3 +52,6 @@ struct RawMeshData
 	RawTextureData normalData;
 
 };
+
+#include <memory>
+

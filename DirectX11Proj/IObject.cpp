@@ -2,7 +2,7 @@
 
 
 
-IObject::IObject()
+IObject::IObject() : mpModel(0)
 {
 }
 

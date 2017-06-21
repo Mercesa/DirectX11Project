@@ -94,9 +94,6 @@
     <ClCompile Include="d3dConstantBuffer.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
-    <ClCompile Include="d3dMaterial.cpp">
-      <Filter>Model</Filter>
-    </ClCompile>
     <ClCompile Include="d3dTexture.cpp">
       <Filter>Model</Filter>
     </ClCompile>
@@ -183,9 +180,6 @@
     <ClInclude Include="d3dConstantBuffer.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
-    <ClInclude Include="d3dMaterial.h">
-      <Filter>Model</Filter>
-    </ClInclude>
     <ClInclude Include="d3dTexture.h">
       <Filter>Model</Filter>
     </ClInclude>
@@ -197,6 +191,9 @@
     </ClInclude>
     <ClInclude Include="d3d11HelperFile.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="ExternalGraphicsData.h">
+      <Filter>D3DSetup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -10,8 +10,45 @@
 #include "easylogging++.h"
 
 #include <cassert>
-#include "d3dMaterial.h"
 #include "GraphicsStructures.h"
+
+
+
+struct TexID
+{
+	explicit TexID(uint32_t id) : id(id) {}
+	explicit TexID() : id(0) {}
+
+	const uint32_t GetID() const { return id; }
+
+private:
+	uint32_t id;
+};
+static void DoShitWithTexID(const TexID& id)
+{
+	std::cout << sizeof(TexID) << std::endl;
+}
+struct MatID
+{
+	explicit MatID(uint32_t id) : id(id) {}
+	explicit MatID() : id(0) {}
+
+	const uint32_t GetID() const { return id; }
+
+private:
+	uint32_t id;
+};
+
+struct ModelID
+{
+	explicit ModelID(uint32_t id) : id(id) {}
+	ModelID() : id(0) {}
+
+	const uint32_t GetID() const { return id; }
+private:
+	uint32_t id;
+};
+
 // Texture is a collection of views and a texture
 struct Texture
 {
@@ -29,12 +66,21 @@ struct Buffer
 	size_t amountOfElements = 0;
 };
 
+struct d3dMaterial
+{
+	d3dMaterial() : mpDiffuse(0), mpNormal(0), mpSpecular(0) {}
+	TexID mpDiffuse = TexID();
+	TexID mpSpecular = TexID();
+	TexID mpNormal = TexID();
+};
+
+
 // A model is nothing more than something with a vertexbuffer and index buffer
 struct Model
 {
 	Buffer* vertexBuffer;
 	Buffer* indexBuffer;
-	std::unique_ptr<d3dMaterial> material;
+	d3dMaterial* material;
 };
 
 
@@ -89,6 +135,11 @@ static void ReleaseModel(Model* aModel)
 		}
 		delete aModel->indexBuffer;
 	}
+
+	if (aModel->material != nullptr)
+	{
+		delete aModel->material;
+	}
 }
 /*
 ***********************
@@ -111,7 +162,7 @@ static ID3D11RasterizerState* CreateRSDefault(ID3D11Device* const aDevice)
 	rasterDesc.MultisampleEnable = false;
 	rasterDesc.ScissorEnable = false;
 	rasterDesc.SlopeScaledDepthBias = 0.0f;
-
+	
 
 	result = aDevice->CreateRasterizerState(&rasterDesc, &tRaster);
 	

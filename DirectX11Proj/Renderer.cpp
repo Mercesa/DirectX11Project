@@ -9,14 +9,14 @@
 #include "d3dShaderVS.h"
 #include "d3dShaderPS.h"
 #include "d3dTexture.h"
-#include "d3dMaterial.h"
+
 
 #include "ResourceManager.h"
 #include "ConstantBuffers.h"
 #include "IObject.h"
 #include "GraphicsSettings.h"
 #include "camera.h"
-
+#include "GraphicsStructures.h"
 
 using namespace DirectX;
 
@@ -37,7 +37,7 @@ void Renderer::Initialize(HWND aHwnd)
 	InitializeDirectX();
 
 	CreateConstantBuffers();
-
+	ResourceManager::GetInstance().mpDevice = this->mpDevice.Get();
 	mpShaderManager = std::make_unique<d3dShaderManager>();
 	mpShaderManager->InitializeShaders(mpDevice.Get());
 }
@@ -143,14 +143,16 @@ void Renderer::UpdateShadowLightConstantBuffers(d3dLightClass* const aDirectiona
 
 void Renderer::UpdateObjectConstantBuffers(IObject* const aObject)
 {
+	ResourceManager& rm = ResourceManager::GetInstance();
 	uint32_t bufferNumber;
 
 	// Update material
-	d3dMaterial* const tMat = aObject->mpModel->material.get();
+	Model* const tModel = ResourceManager::GetInstance().GetModelByID(aObject->mpModel);
+	d3dMaterial* const tMat = tModel->material;
 
-	gMaterialBufferDataPtr->hasDiffuse = (int)tMat->mpDiffuse->exists;
-	gMaterialBufferDataPtr->hasSpecular = (int)tMat->mpSpecular->exists;
-	gMaterialBufferDataPtr->hasNormal = (int)tMat->mpNormal->exists;
+	gMaterialBufferDataPtr->hasDiffuse = (int)rm.GetTextureByID(tMat->mpDiffuse)->exists;
+	gMaterialBufferDataPtr->hasSpecular = (int)rm.GetTextureByID(tMat->mpSpecular)->exists;
+	gMaterialBufferDataPtr->hasNormal = (int)rm.GetTextureByID(tMat->mpNormal)->exists;
 
 
 	mpMaterialCB->UpdateBuffer((void*)gMaterialBufferDataPtr.get(), mpDeviceContext.Get());
@@ -176,21 +178,11 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject)
 }
 
 
-void Renderer::RenderScene(
-	std::vector<std::unique_ptr<IObject>>& aObjects,
+void Renderer::RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aObjects,
 	std::vector<std::unique_ptr<Light>>& aLights,
 	d3dLightClass* const aDirectionalLight,
-	Camera* const apCamera
-)
+	Camera* const apCamera)
 {
-	float color[4]{ clearColor[0], clearColor[1], clearColor[2], 1.0f };
-
-	// Update frame constant buffers  
-	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
-
-	RenderSceneDepthPrePass(aObjects);
-	
-	// Scene prep
 	mpDeviceContext->RSSetViewports(1, &mViewport);
 	mpDeviceContext->RSSetState(mRaster_backcull);
 
@@ -209,12 +201,13 @@ void Renderer::RenderScene(
 	// Set samplers
 	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
 	mpDeviceContext->PSSetSamplers(1, 1, &mpLinearClampSampler);
+	mpDeviceContext->PSSetSamplers(2, 1, &mpAnisotropicWrapSampler);
 
 	// Set the vertex and pixel shaders that will be used to render this triangle.
 	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
 	mpDeviceContext->PSSetShader(tPS->GetPixelShader(), NULL, 0);
 
-	
+
 	// Set the sampler state in the pixel shader.
 	mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
 
@@ -228,11 +221,65 @@ void Renderer::RenderScene(
 		RenderObject(aObjects[i].get());
 	}
 
+}
+
+
+#include <chrono>
+
+void Renderer::RenderScene(
+	std::vector<std::unique_ptr<IObject>>& aObjects,
+	std::vector<std::unique_ptr<Light>>& aLights,
+	d3dLightClass* const aDirectionalLight,
+	Camera* const apCamera
+)
+{
+	float color[4]{ clearColor[0], clearColor[1], clearColor[2], 1.0f };
+
+	// Update frame constant buffers  
+
+
+	auto frameConstantBufferTimerStart = std::chrono::high_resolution_clock::now();
+	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
+	auto frameConstantBufferTimerEnd = std::chrono::high_resolution_clock::now();
+
+
+	auto renderSceneDepthPrePassTimerStart = std::chrono::high_resolution_clock::now();
+	RenderSceneDepthPrePass(aObjects);
+	auto renderSceneDepthPrePassTimerEnd = std::chrono::high_resolution_clock::now();
+
+	auto renderSceneWithShadowsTimerStart = std::chrono::high_resolution_clock::now();
+
+	// do something
+	RenderSceneWithShadows(aObjects, aLights, aDirectionalLight, apCamera);
+
+	auto renderSceneWithShadowsTimerEnd = std::chrono::high_resolution_clock::now();
+
+	// Scene prep
+
 	// Render post processing quad
 	RenderFullScreenQuad();
-	ImGui::Render();
 
-	mpDeviceContext->ClearState();
+	static int frames = 0;
+	++frames;
+
+	static float fCbtiming = 0.0f;
+	static float depthPrePassTiming = 0.0f;
+	static float objectRenderingTiming = 0.0f;
+
+	if (frames % 30 == 0)
+	{
+		fCbtiming = std::chrono::duration_cast<std::chrono::microseconds>(frameConstantBufferTimerEnd - frameConstantBufferTimerStart).count() / 1000.0f;
+		depthPrePassTiming = std::chrono::duration_cast<std::chrono::microseconds>(renderSceneDepthPrePassTimerEnd - renderSceneDepthPrePassTimerStart).count() / 1000.0f;
+		objectRenderingTiming = std::chrono::duration_cast<std::chrono::microseconds>(renderSceneWithShadowsTimerEnd - renderSceneWithShadowsTimerStart).count() / 1000.0f;
+	}
+
+	ImGui::Text("Updating frame constant %.5f ms/frame", fCbtiming);
+	ImGui::Text("Render scene depth pre-pass %.5f ms/frame", depthPrePassTiming);
+	ImGui::Text("Render scene with shadows %.5f ms/frame", objectRenderingTiming);
+
+
+	//std::cout << (float)std::chrono::duration_cast<std::chrono::microseconds>(renderSceneWithShadowsTimerEnd - renderSceneWithShadowsTimerStart).count()/1000.0f << std::endl;;
+	
 }
 
 
@@ -295,26 +342,28 @@ void Renderer::RenderFullScreenQuad()
 void Renderer::RenderMaterial(d3dMaterial* const aMaterial)
 {
 	// Bind textures from material
-	ID3D11ShaderResourceView* aView = aMaterial->mpDiffuse->GetTexture();
+	ID3D11ShaderResourceView* aView = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpDiffuse)->GetTexture();
 	mpDeviceContext->PSSetShaderResources(0, 1, &aView);
 
-	ID3D11ShaderResourceView* aView2 = aMaterial->mpSpecular->GetTexture();
+	ID3D11ShaderResourceView* aView2 = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpSpecular)->GetTexture();
 	mpDeviceContext->PSSetShaderResources(1, 1, &aView2);
 
-	ID3D11ShaderResourceView* aView3 = aMaterial->mpNormal->GetTexture();
+	ID3D11ShaderResourceView* aView3 = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpNormal)->GetTexture();
 	mpDeviceContext->PSSetShaderResources(2, 1, &aView3);
 }
 
 // Render the object
 void Renderer::RenderObject(IObject* const aObject)
 {
-	// Bind vertex/index buffers
-	RenderBuffers(mpDeviceContext.Get(), aObject->mpModel);
 
-	int indices = aObject->mpModel->indexBuffer->amountOfElements;
+	Model* const model = ResourceManager::GetInstance().GetModelByID(aObject->mpModel);
+	// Bind vertex/index buffers
+	RenderBuffers(mpDeviceContext.Get(), model);
+
+	int indices = model->indexBuffer->amountOfElements;
 
 	// Bind textures from material
-	d3dMaterial* const aMaterial = aObject->mpModel->material.get();
+	d3dMaterial* const aMaterial = model->material;
 	
 	if (aMaterial != nullptr)
 	{
@@ -568,7 +617,7 @@ bool Renderer::InitializeBackBuffRTV()
 	mBackBufferTexture->rtv = CreateRenderTargetViewFromSwapchain(mpDevice.Get(), mpSwapchain.Get());
 
 	// Buffer for shadow mapping
-	mShadowDepthBuffer->texture = CreateSimpleDepthTexture(mpDevice.Get(), 2048, 2048, GetDepthResourceFormat(DXGI_FORMAT_D24_UNORM_S8_UINT), D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
+	mShadowDepthBuffer->texture = CreateSimpleDepthTexture(mpDevice.Get(), 8096, 8096, GetDepthResourceFormat(DXGI_FORMAT_D24_UNORM_S8_UINT), D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
 	mShadowDepthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), mShadowDepthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	mShadowDepthBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), mShadowDepthBuffer->texture, GetDepthSRVFormat(DXGI_FORMAT_D24_UNORM_S8_UINT));
 	return true;
@@ -636,8 +685,8 @@ bool  Renderer::InitializeSamplerState()
 
 bool Renderer::InitializeViewportAndMatrices()
 {
-	mShadowLightViewport.Width = 2048.0f;
-	mShadowLightViewport.Height = 2048.0f;
+	mShadowLightViewport.Width = 8096.0f;
+	mShadowLightViewport.Height = 8096.0f;
 	mShadowLightViewport.MinDepth = 0.0f;
 	mShadowLightViewport.MaxDepth = 1.0f;
 	mShadowLightViewport.TopLeftX = 0.0f;

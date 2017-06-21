@@ -67,6 +67,10 @@ private:
 	void RenderMaterial(d3dMaterial* const aMaterial);
 	void RenderFullScreenQuad();
 	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
+	void RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aObjects,
+		std::vector<std::unique_ptr<Light>>& aLights,
+		d3dLightClass* const aDirectionalLight,
+		Camera* const apCamera);
 	void RenderBuffers(ID3D11DeviceContext* const apDeviceContext, Model* const aModel);
 
 	const float SCREEN_FAR = 1000.0f;

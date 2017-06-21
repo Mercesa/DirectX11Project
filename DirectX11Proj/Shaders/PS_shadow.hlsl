@@ -1,11 +1,12 @@
 #include "Lighting.hlsl"
 
-Texture2D shaderTexture : register(t1);
+Texture2D shaderTexture : register(t0);
 
 Texture2D depthMapTexture : register(t3);
 
 SamplerState SampleTypeClamp : register(s0);
 SamplerState SampleTypeWrap : register(s1);
+SamplerState SampleTypeAnisotropicWrap : register(s2);
 
 
 struct PixelInputType
@@ -38,26 +39,25 @@ float ShadowMappingPCF(PixelInputType input)
 		for (int x = -2; x < 2; ++x)
 		{
 			// Hardcode the resolution for now
-			float texelSize = 1.0f / 2048.0f;
-			float2 offsetProjTexCoord = float2(x*texelSize, y * texelSize);
+			float texelSize = 1.0f / 8096.0f;
+			float2 offsetProjTexCoord = projectTexCoord + float2(x*texelSize, y*texelSize);
 			
 			// Clamp the coordinates
 			if ((saturate(offsetProjTexCoord.x) == offsetProjTexCoord.x) && saturate(offsetProjTexCoord.y) == offsetProjTexCoord.y)
 			{
-				depthValue = depthMapTexture.Sample(SampleTypeClamp, projectTexCoord).r;
+				depthValue = depthMapTexture.Sample(SampleTypeClamp, offsetProjTexCoord).r;
 
 				lightDepthValue = input.lightViewPosition.z / input.lightViewPosition.w;
 
 				lightDepthValue -= bias;
 
 				// If light value is less far away than the depth value
-				shadowValue += depthValue > lightDepthValue ? 1.0f : 0.0f;
+				shadowValue += depthValue > lightDepthValue ? 1.0f : 0.1f;
 				continue;
 			}
 			shadowValue += 1.0f;
 		}
 	}
-
 	shadowValue /= 16.0f;
 
 	return shadowValue;
@@ -66,7 +66,7 @@ float ShadowMappingPCF(PixelInputType input)
 float4 ShadowPixelShader(PixelInputType input) : SV_TARGET
 {
 	float shadowImpact = ShadowMappingPCF(input);
-	float4 color = PerformLighting(input.fragPos, input.normal, float4(1.0f, 1.0f, 1.0f, 1.0f), 1.0f) * shadowImpact;
+	float4 color = PerformLighting(input.fragPos, input.normal, shaderTexture.Sample(SampleTypeAnisotropicWrap, input.tex), 1.0f) * shadowImpact;
 
 	return color;
 }

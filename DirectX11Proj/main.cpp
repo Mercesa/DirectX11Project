@@ -129,7 +129,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 }
 
 bool showTWindow = true;
-
+#include <chrono>
 static void ShowExampleMenuFile()
 {
 	ImGui::MenuItem("(dummy menu)", NULL, false, false);
@@ -341,6 +341,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 			GraphicsSettings::gShowDebugWindow = !GraphicsSettings::gShowDebugWindow;
 		}
 		mpPlayerScene->Tick(mpInput.get(), 1.0f);
+		auto frameConstantBufferTimerStart = std::chrono::high_resolution_clock::now();
 
 
 		bool hasBeenSelected = false;
@@ -350,25 +351,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 
 			static float f = 0.0f;
+			
+			
 			ImGui::Text("Hello, world!");
 			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
 
 			for (int i = 0; i < mpPlayerScene->mLights.size(); ++i)
 			{
-			
 				ImGui::ColorEdit3("color point light", (float*)&mpPlayerScene->mLights[i]->diffuseColor);
 
 				ImGui::ColorEditMode(ImGuiColorEditMode_UserSelect);
 				static float pos[3] = { 0.0, 0.0, 0.0 };
 				ImGui::ColorEdit3("position point light", (float*)&pos);
-				std::cout << pos[0] << std::endl;
 				mpPlayerScene->mLights[i]->position = XMFLOAT3(pos);
 			}
+			float arr[3] = { 0.01f, 0.01f, 0.01f };
 			ImGui::ColorEditMode(ImGuiColorEditMode_RGB);
 			ImGui::ColorEdit3("color directional light", (float*)&mpPlayerScene->mDirectionalLight->mDiffuseColor);
 			//ImGui::ColorEdit3("position directional light", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
 			//ImGui::InputFloat3("PITCH   YAW    ROLL", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
-			ImGui::DragFloat3("Pitch Yaw Roll", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
+			ImGui::DragFloat3("Pitch Yaw Roll", (float*)&mpPlayerScene->mDirectionalLight->mPosition, 0.1f, 0.0f, 0.0f, "%.3f", 1.0f);
 			
 			mpPlayerScene->mDirectionalLight->GenerateViewMatrix();
 
@@ -378,12 +380,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 		}
 
 		mpRenderer->RenderScene(mpPlayerScene->mObjects, mpPlayerScene->mLights, mpPlayerScene->mDirectionalLight.get(), mpPlayerScene->GetCamera());
+		auto frameConstantBufferTimerEnd = std::chrono::high_resolution_clock::now();
+
+		float performance = std::chrono::duration_cast<std::chrono::microseconds>(frameConstantBufferTimerEnd - frameConstantBufferTimerStart).count()/1000.0f;
+
+		
+		ImGui::Text("Rendering total: %.3f ms/frame", performance);
+
+		ImGui::Render();
+
+		mpRenderer->mpDeviceContext->ClearState();
 
 		mpRenderer->mpSwapchain->Present((GraphicsSettings::gIsVsyncEnabled ? 1 : 0), 0);
-
+	
 	}
 
-	Shutdown();
+	ResourceManager::GetInstance().Shutdown();
 	ImGui_ImplDX11_Shutdown();
 	mpRenderer->DestroyDirectX();
 

@@ -65,7 +65,7 @@ void PlayerSceneExample::Init()
 	mpCamera->SetPosition(0.0f, 2.0f, -1.0f);
 	
 	
-	std::vector<ModelClass*> tModels = ResourceManager::GetInstance().LoadModels("Models\\Box\\Cube.obj");
+	std::vector<ModelID> tModels;
 
 	
 	XMMATRIX tScaleMat = tScaleMat = XMMatrixScaling(1.0f, 1.0f, 1.0f);
@@ -92,20 +92,31 @@ void PlayerSceneExample::Init()
 	//
 	//	this->mObjects.push_back(std::move(tpObject));
 	//}
-	
 	// Load sphere
-	tModels = ResourceManager::GetInstance().LoadModels("Models\\Box\\cube.obj");
+	tModels = ResourceManager::GetInstance().LoadModels("Models\\Sponza\\Sponza.obj");
 	tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
 	XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f/2.0f);
 	for (int i = 0; i < tModels.size(); ++i)
 	{
 		std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
 		tpObject->mpModel = tModels[i];
-		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixScaling(5.0f, 5.0f, 5.0f));
+		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixScaling(0.01f, 0.01f, 0.01f));
 	
 		this->mObjects.push_back(std::move(tpObject));
 	}
 
+
+	tModels = ResourceManager::GetInstance().LoadModels("Models\\Sponza\\Sponza.obj");
+	tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
+	//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
+	for (int i = 0; i < tModels.size(); ++i)
+	{
+		std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
+		tpObject->mpModel = tModels[i];
+		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(100.0f, 0.0f, 0.0f)));
+
+		this->mObjects.push_back(std::move(tpObject));
+	}
 	// Create light, set diffuse and position, add light to list
 	std::unique_ptr<Light> tpLight = std::make_unique<Light>();
 	tpLight->diffuseColor = XMFLOAT3(1.0f, 0.0f, 1.0f);
