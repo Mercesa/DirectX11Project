@@ -47,9 +47,10 @@ private:
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 static WindowsProcessClass* ApplicationHandle = 0;
 
-//XMFLOAT4X4 gOrthoMatrix;
 
 std::unique_ptr<InputClass> mpInput;
+std::unique_ptr<PlayerSceneExample> mpPlayerScene;
+std::unique_ptr<Renderer> mpRenderer;
 
 LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
@@ -65,6 +66,18 @@ LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARA
 
 		return 0;
 	}
+
+	case WM_RBUTTONDOWN:
+		mpInput->RMouseDown();
+		return 0;
+		break;
+
+	case WM_RBUTTONUP:
+		mpInput->RMouseUp();
+		return 0;
+		break;
+
+
 
 	// Check if a key has been pressed on the keyboard.
 	case WM_KEYDOWN:
@@ -201,6 +214,7 @@ void ShowTitleMenu()
 	}
 }
 
+void Render();
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
 	std::unique_ptr<WindowsProcessClass> mWProc = std::make_unique<WindowsProcessClass>();
@@ -208,7 +222,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	mpInput->Initialize();
 
 
-	std::unique_ptr<Renderer> mpRenderer = std::make_unique<Renderer>();
+	mpRenderer = std::make_unique<Renderer>();
 	
 	// This is for the console window
 	AllocConsole();
@@ -297,7 +311,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	ShowWindow(windowHandle, SW_SHOW);
 	SetForegroundWindow(windowHandle);
 	SetFocus(windowHandle);
-
+	SetCapture(windowHandle);
+	
 	// Hide the mouse cursor.
 	ShowCursor(true);
 
@@ -308,7 +323,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	//unsigned char* pixels;
 	//int width, height;
 	//ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
-	std::unique_ptr<PlayerSceneExample> mpPlayerScene = std::make_unique<PlayerSceneExample>();
+	mpPlayerScene = std::make_unique<PlayerSceneExample>();
 	mpPlayerScene->Init();
 
 	MSG msg;
@@ -317,9 +332,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	{
 		ImGui_ImplDX11_NewFrame();
 		mpInput->Frame();
-	
+
 		// Handle the windows messages.
-		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -341,58 +356,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 			GraphicsSettings::gShowDebugWindow = !GraphicsSettings::gShowDebugWindow;
 		}
 		mpPlayerScene->Tick(mpInput.get(), 1.0f);
-		auto frameConstantBufferTimerStart = std::chrono::high_resolution_clock::now();
+		Render();
 
-
-		bool hasBeenSelected = false;
-		if(GraphicsSettings::gShowDebugWindow)
-		{
-			ShowTitleMenu();
-
-
-			static float f = 0.0f;
-			
-			
-			ImGui::Text("Hello, world!");
-			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-
-			for (int i = 0; i < mpPlayerScene->mLights.size(); ++i)
-			{
-				ImGui::ColorEdit3("color point light", (float*)&mpPlayerScene->mLights[i]->diffuseColor);
-
-				ImGui::ColorEditMode(ImGuiColorEditMode_UserSelect);
-				static float pos[3] = { 0.0, 0.0, 0.0 };
-				ImGui::ColorEdit3("position point light", (float*)&pos);
-				mpPlayerScene->mLights[i]->position = XMFLOAT3(pos);
-			}
-			float arr[3] = { 0.01f, 0.01f, 0.01f };
-			ImGui::ColorEditMode(ImGuiColorEditMode_RGB);
-			ImGui::ColorEdit3("color directional light", (float*)&mpPlayerScene->mDirectionalLight->mDiffuseColor);
-			//ImGui::ColorEdit3("position directional light", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
-			//ImGui::InputFloat3("PITCH   YAW    ROLL", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
-			ImGui::DragFloat3("Pitch Yaw Roll", (float*)&mpPlayerScene->mDirectionalLight->mPosition, 0.1f, 0.0f, 0.0f, "%.3f", 1.0f);
-			
-			mpPlayerScene->mDirectionalLight->GenerateViewMatrix();
-
-
-			ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		}
-
-		mpRenderer->RenderScene(mpPlayerScene->mObjects, mpPlayerScene->mLights, mpPlayerScene->mDirectionalLight.get(), mpPlayerScene->GetCamera());
-		auto frameConstantBufferTimerEnd = std::chrono::high_resolution_clock::now();
-
-		float performance = std::chrono::duration_cast<std::chrono::microseconds>(frameConstantBufferTimerEnd - frameConstantBufferTimerStart).count()/1000.0f;
-
-		
-		ImGui::Text("Rendering total: %.3f ms/frame", performance);
-
-		ImGui::Render();
-
-		mpRenderer->mpDeviceContext->ClearState();
-
-		mpRenderer->mpSwapchain->Present((GraphicsSettings::gIsVsyncEnabled ? 1 : 0), 0);
-	
 	}
 
 	ResourceManager::GetInstance().Shutdown();
@@ -417,3 +382,57 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	return 0;
 }
 
+
+void Render()
+{
+	auto frameConstantBufferTimerStart = std::chrono::high_resolution_clock::now();
+
+	bool hasBeenSelected = false;
+	if (GraphicsSettings::gShowDebugWindow)
+	{
+		ShowTitleMenu();
+
+
+		static float f = 0.0f;
+
+		ImGui::Text("Hello, world!");
+		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
+
+		for (int i = 0; i < mpPlayerScene->mLights.size(); ++i)
+		{
+			ImGui::ColorEdit3("color point light", (float*)&mpPlayerScene->mLights[i]->diffuseColor);
+
+			ImGui::ColorEditMode(ImGuiColorEditMode_UserSelect);
+			static float pos[3] = { 0.0, 0.0, 0.0 };
+			ImGui::ColorEdit3("position point light", (float*)&pos);
+			mpPlayerScene->mLights[i]->position = XMFLOAT3(pos);
+		}
+		float arr[3] = { 0.01f, 0.01f, 0.01f };
+		ImGui::ColorEditMode(ImGuiColorEditMode_RGB);
+		ImGui::ColorEdit3("color directional light", (float*)&mpPlayerScene->mDirectionalLight->mDiffuseColor);
+		//ImGui::ColorEdit3("position directional light", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
+		//ImGui::InputFloat3("PITCH   YAW    ROLL", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
+		ImGui::DragFloat3("Pitch Yaw Roll", (float*)&mpPlayerScene->mDirectionalLight->mPosition, 0.1f, 0.0f, 0.0f, "%.3f", 1.0f);
+
+		mpPlayerScene->mDirectionalLight->GenerateViewMatrix();
+
+
+		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+	}
+
+	mpRenderer->RenderScene(mpPlayerScene->mObjects, mpPlayerScene->mLights, mpPlayerScene->mDirectionalLight.get(), mpPlayerScene->GetCamera());
+	auto frameConstantBufferTimerEnd = std::chrono::high_resolution_clock::now();
+
+	float performance = std::chrono::duration_cast<std::chrono::microseconds>(frameConstantBufferTimerEnd - frameConstantBufferTimerStart).count() / 1000.0f;
+
+
+	ImGui::Text("Rendering total: %.3f ms/frame", performance);
+
+	ImGui::Render();
+
+	mpRenderer->mpDeviceContext->ClearState();
+
+	mpRenderer->mpSwapchain->Present((GraphicsSettings::gIsVsyncEnabled ? 1 : 0), 0);
+
+}

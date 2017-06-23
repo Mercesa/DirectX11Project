@@ -18,7 +18,6 @@ ModelLoader::~ModelLoader()
 {
 }
 
-std::string mDirectory;
 
 
 void ProcessVertices(aiMesh* const a_Mesh, std::vector<VertexData>& a_Vertices)
@@ -185,29 +184,61 @@ void ModelLoader::ProcessNode(aiNode* const a_Node, const aiScene* const a_Scene
 	}
 }
 
+
+#include <fstream>
+#include "easylogging++.h"
+
+bool is_file_exist(const char *fileName)
+{
+	std::ifstream infile(fileName);
+	return infile.good();
+}
+
+// LoadModel implicitly exports a file to assbin right now, and next time it will load the assbin version if possible
 std::vector<RawMeshData> ModelLoader::LoadModel(const char* const aFilePath)
 {
-	Assimp::Importer importer;
+	bool doesAssbinVersionExist = false;
+	// Set directory string and c_string
+	std::string assbinString(aFilePath);
 
-	std::vector<RawMeshData> tData;
+
+	std::size_t dotPos = assbinString.find_last_of(".");
+	assbinString.erase(dotPos, assbinString.size());
+
+	assbinString.append(".assbin");
+
+	doesAssbinVersionExist = is_file_exist(assbinString.c_str());
+
 
 	const aiScene* scene;
+	Assimp::Importer importer;
 
-	scene = importer.ReadFile(aFilePath, aiProcess_GenUVCoords | aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_Fast | aiProcess_CalcTangentSpace);
+	std::string filePathToBeLoaded = aFilePath;
+	if (doesAssbinVersionExist)
+	{
+		LOG(INFO) << "ModelLoader Assbin version exists, loading";
+		filePathToBeLoaded = assbinString;
+		scene = importer.ReadFile(filePathToBeLoaded.c_str(), 0);
+	}
+
+	else
+	{
+		LOG(INFO) << "ModelLoader Assbin version created of asset";
+		Exporter exporter;
+		scene = importer.ReadFile(filePathToBeLoaded.c_str(), aiProcess_GenUVCoords | aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_Fast | aiProcess_CalcTangentSpace);
+		exporter.Export(scene, "assbin", assbinString, aiProcess_GenUVCoords | aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_Fast | aiProcess_CalcTangentSpace);
+	}
+
+
 	assert(scene != nullptr);
-
 	if (!scene)
 	{
 		printf("%s", importer.GetErrorString());
 	}
-
-	// Set directory string and c_string
-	std::string aFilePathStr(aFilePath);
-
-	mDirectory = aFilePathStr.substr(0, aFilePathStr.find_last_of("\\"));
 	
+
+	std::vector<RawMeshData> tData;
 	ProcessNode(scene->mRootNode, scene, tData);
 	
 	return tData;
-	//printf("%i", mMeshesToBeProcessed.size());
 }

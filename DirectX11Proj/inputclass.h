@@ -29,6 +29,22 @@ public:
 	// Don't want my if statements to be compiled away
 #pragma optimize( "", off )
 
+	void RMouseDown()
+	{
+		if (rMouseDownC == false)
+		{
+			rMouseDown = true;
+		}
+
+		rMouseDownC = true;
+	}
+
+	void RMouseUp()
+	{
+		rMouseDownC = false;
+		rMouseDown = false;
+	}
+
 	void KeyDown(unsigned int input)
 	{
 		// If a key is pressed then save that state in the key array.
@@ -61,11 +77,16 @@ public:
 		return mKeysC[key];
 	}
 
+
+	bool rMouseDown = false;
+	bool rMouseDownC = false;
+
 private:
 	void ProcessInput();
 
 	int mMouseX, mMouseY;
 	int mMouseRelX, mMouseRelY;
+
 
 	bool mKeys[256];
 	bool mKeysC[256];

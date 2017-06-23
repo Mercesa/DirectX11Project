@@ -82,7 +82,7 @@ d3dMaterial* ResourceManager::LoadTexturesFromMaterial(const RawMeshData& aMeshD
 	assert(tpMat);
 
 	
-	if (this->stringModelMap.find(aMeshData.diffuseData.filepath) != stringModelMap.end())
+	if (this->stringTextureMap.find(aMeshData.diffuseData.filepath) != stringTextureMap.end())
 	{
 		tpMat->mpDiffuse = stringTextureMap[aMeshData.diffuseData.filepath];
 	}
@@ -93,7 +93,7 @@ d3dMaterial* ResourceManager::LoadTexturesFromMaterial(const RawMeshData& aMeshD
 		stringTextureMap.insert(std::pair<std::string, TexID>(aMeshData.diffuseData.filepath, tpMat->mpDiffuse));
 	}
 
-	if (this->stringModelMap.find(aMeshData.specularData.filepath) != stringModelMap.end())
+	if (this->stringTextureMap.find(aMeshData.specularData.filepath) != stringTextureMap.end())
 	{
 		tpMat->mpSpecular = stringTextureMap[aMeshData.specularData.filepath];
 	}
@@ -104,7 +104,7 @@ d3dMaterial* ResourceManager::LoadTexturesFromMaterial(const RawMeshData& aMeshD
 		stringTextureMap.insert(std::pair<std::string, TexID>(aMeshData.specularData.filepath, tpMat->mpSpecular));
 	}
 
-	if (this->stringModelMap.find(aMeshData.normalData.filepath) != stringModelMap.end())
+	if (this->stringTextureMap.find(aMeshData.normalData.filepath) != stringTextureMap.end())
 	{
 		tpMat->mpNormal = stringTextureMap[aMeshData.normalData.filepath];
 	}

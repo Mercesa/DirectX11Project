@@ -61,6 +61,7 @@ void InputClass::ProcessInput()
 	for (int i = 0; i < 256; ++i)
 	{
 		mKeys[i] = false;
+		rMouseDown = false;
 	}
 }
 
