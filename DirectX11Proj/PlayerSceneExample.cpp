@@ -111,9 +111,9 @@ void PlayerSceneExample::Init()
 	//	this->mObjects.push_back(std::move(tpObject));
 	//}
 
-	for (int y = 0; y < 12; ++y)
+	for (int y = 0; y < 10; ++y)
 	{
-		for (int x = 0; x < 12; ++x)
+		for (int x = 0; x < 10; ++x)
 		{
 			tModels = ResourceManager::GetInstance().LoadModels("Models\\Sponza\\Sponza.obj");
 			tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
@@ -126,22 +126,48 @@ void PlayerSceneExample::Init()
 
 				this->mObjects.push_back(std::move(tpObject));
 			}
+			//
+			//tModels = ResourceManager::GetInstance().LoadModels("Models\\Lucy\\Lucy.obj");
+			//tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
+			////XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
+			//for (int i = 0; i < tModels.size(); ++i)
+			//{
+			//	std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
+			//	tpObject->mpModel = tModels[i];
+			//	XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(0.1f, 0.1f, 0.1f), XMMatrixTranslation(x*50.0f, 4.0f, y*50.0f)));
+			//
+			//	this->mObjects.push_back(std::move(tpObject));
+			//}
+
+
+			//tModels = ResourceManager::GetInstance().LoadModels("Models\\Empire\\lost_empire.obj");
+			//tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
+			////XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
+			//for (int i = 0; i < tModels.size(); ++i)
+			//{
+			//	std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
+			//	tpObject->mpModel = tModels[i];
+			//	XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(1.0f, 1.0f, 1.0f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
+			//
+			//	this->mObjects.push_back(std::move(tpObject));
+			//}
 		}
 	}
 
 	
 
 	// Create light, set diffuse and position, add light to list
-	std::unique_ptr<Light> tpLight = std::make_unique<Light>();
-	tpLight->diffuseColor = XMFLOAT3(1.0f, 0.0f, 1.0f);
-	tpLight->position = XMFLOAT3(0.0f, 0.0f, 0.0f);
-
-	this->mLights.push_back(std::move(tpLight));
+	//std::unique_ptr<Light> tpLight = std::make_unique<Light>();
+	//tpLight->diffuseColor = XMFLOAT3(1.0f, 0.0f, 1.0f);
+	//tpLight->position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	//
+	//this->mLights.push_back(std::move(tpLight));
 
 	mDirectionalLight = std::make_unique<d3dLightClass>();
-	mDirectionalLight->SetLookAt(0.0f, 0.0f, 0.00f);
+	mDirectionalLight->SetPosition(1.6f, 2.6f, 0.00f);
 	mDirectionalLight->GenerateProjectionMatrix(-32.0f, -32.0f);
-	mDirectionalLight->SetPosition(0.0f, 0.0f, 0.0f);
+
+	mDirectionalLight->mDiffuseColor = XMFLOAT3(1.0f, 1.0f, 1.0f);
 	mDirectionalLight->GenerateViewMatrix();
 	//throw std::logic_error("The method or operation is not implemented.");
 }

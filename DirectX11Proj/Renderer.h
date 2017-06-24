@@ -11,6 +11,8 @@
 
 #include <fcntl.h>
 #include <d3d11.h>	
+#include <d3d11_1.h>
+
 #include <directxmath.h>
 #include "d3dShaderManager.h"
 #include "d3dConstantBuffer.h"

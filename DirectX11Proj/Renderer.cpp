@@ -1,5 +1,7 @@
 #include "Renderer.h"
 
+#include <chrono>
+
 #include "easylogging++.h"
 #include "Imgui.h"
 
@@ -67,7 +69,6 @@ void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& 
 {
 
 	// Update light constant buffers
-	uint32_t bufferNumber;
 
 	gLightBufferDataPtr->amountOfLights = static_cast<int>(apLights.size());
 
@@ -81,14 +82,9 @@ void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& 
 	gLightBufferDataPtr->directionalLight.specularColor = aDirectionalLight->mSpecularColor;
 	gLightBufferDataPtr->directionalLight.position = aDirectionalLight->mDirectionVector;
 
-
+	
 	mpLightCB->UpdateBuffer((void*)gLightBufferDataPtr.get(), mpDeviceContext.Get());
-
-	bufferNumber = 2;
-	ID3D11Buffer* tBuff = mpLightCB->GetBuffer();
-
-	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
-
+	
 
 	XMMATRIX viewMatrix, projectionMatrix;
 	projectionMatrix = apCamera->GetProj();
@@ -111,13 +107,6 @@ void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& 
 
 	mpMatrixCB->UpdateBuffer((void*)gMatrixBufferDataPtr.get(), mpDeviceContext.Get());
 
-	// Set the position of the constant buffer in the vertex shader.
-	bufferNumber = 0;
-
-	tBuff = mpMatrixCB->GetBuffer();
-	// finally set the constant buffer in the vertex shader with the updated values.
-	mpDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
-	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
 
 	UpdateShadowLightConstantBuffers(aDirectionalLight);
 }
@@ -125,7 +114,6 @@ void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& 
 
 void Renderer::UpdateShadowLightConstantBuffers(d3dLightClass* const aDirectionalLight)
 {
-	uint32_t bufferNumber = 3;
 	XMMATRIX viewMatrix, projectionMatrix;
 	aDirectionalLight->GetViewMatrix(viewMatrix);
 	aDirectionalLight->GetProjectionMatrix(projectionMatrix);
@@ -134,18 +122,13 @@ void Renderer::UpdateShadowLightConstantBuffers(d3dLightClass* const aDirectiona
 	gLightMatrixBufferDataPtr->lightProjectionMatrix = XMMatrixTranspose(projectionMatrix);
 
 	this->mpLightMatrixCB->UpdateBuffer((void*)gLightMatrixBufferDataPtr.get(), mpDeviceContext.Get());
-
-	ID3D11Buffer* tBuff = mpLightMatrixCB->GetBuffer();
-	mpDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
-	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
 }
 
 
 void Renderer::UpdateObjectConstantBuffers(IObject* const aObject)
 {
 	ResourceManager& rm = ResourceManager::GetInstance();
-	uint32_t bufferNumber;
-
+	
 	// Update material
 	Model* const tModel = ResourceManager::GetInstance().GetModelByID(aObject->mpModel);
 	d3dMaterial* const tMat = tModel->material;
@@ -156,9 +139,7 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject)
 
 
 	mpMaterialCB->UpdateBuffer((void*)gMaterialBufferDataPtr.get(), mpDeviceContext.Get());
-	bufferNumber = 1;
-	ID3D11Buffer* tBuff = mpMaterialCB->GetBuffer();
-	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
+	
 	// End update material
 
 
@@ -170,14 +151,11 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject)
 	
 	mpPerObjectCB->UpdateBuffer((void*)gPerObjectMatrixBufferDataPtr.get(), mpDeviceContext.Get());
 
-	bufferNumber = 4;
-
-	tBuff = mpPerObjectCB->GetBuffer();
-	mpDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
-	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
+	
 }
 
 
+static float objectRenderingTime = 0.0f;
 void Renderer::RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aObjects,
 	std::vector<std::unique_ptr<Light>>& aLights,
 	d3dLightClass* const aDirectionalLight,
@@ -214,17 +192,32 @@ void Renderer::RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aOb
 	ID3D11ShaderResourceView* aView = mShadowDepthBuffer->srv;
 	mpDeviceContext->PSSetShaderResources(3, 1, &aView);
 
+
+	auto renderSceneObjectsStart = std::chrono::high_resolution_clock::now();
+	
+	uint32_t bufferNumber;
+	bufferNumber = 1;
+	
+	ID3D11Buffer* tBuff = mpMaterialCB->GetBuffer();
+	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
+
+	bufferNumber = 4;
+	tBuff = mpPerObjectCB->GetBuffer();
+	mpDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
+	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
+	
 	// Render objects
 	for (int i = 0; i < aObjects.size(); ++i)
 	{
 		UpdateObjectConstantBuffers(aObjects[i].get());
 		RenderObject(aObjects[i].get());
 	}
+	auto renderSceneObjectsEnd = std::chrono::high_resolution_clock::now();
+	objectRenderingTime = std::chrono::duration_cast<std::chrono::microseconds>(renderSceneObjectsEnd - renderSceneObjectsStart).count() / 1000.0f;
+
 
 }
 
-
-#include <chrono>
 
 void Renderer::RenderScene(
 	std::vector<std::unique_ptr<IObject>>& aObjects,
@@ -238,8 +231,21 @@ void Renderer::RenderScene(
 	// Update frame constant buffers  
 
 
+	// Update and bind constant buffers
 	auto frameConstantBufferTimerStart = std::chrono::high_resolution_clock::now();
 	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
+
+	ID3D11Buffer* tBuff = mpLightMatrixCB->GetBuffer();
+	mpDeviceContext->VSSetConstantBuffers(3, 1, &tBuff);
+	mpDeviceContext->PSSetConstantBuffers(3, 1, &tBuff);
+	
+	tBuff = mpLightCB->GetBuffer();
+	mpDeviceContext->PSSetConstantBuffers(2, 1, &tBuff);
+
+	tBuff = mpMatrixCB->GetBuffer();
+	mpDeviceContext->VSSetConstantBuffers(0, 1, &tBuff);
+	mpDeviceContext->PSSetConstantBuffers(0, 1, &tBuff);
+	
 	auto frameConstantBufferTimerEnd = std::chrono::high_resolution_clock::now();
 
 
@@ -248,10 +254,7 @@ void Renderer::RenderScene(
 	auto renderSceneDepthPrePassTimerEnd = std::chrono::high_resolution_clock::now();
 
 	auto renderSceneWithShadowsTimerStart = std::chrono::high_resolution_clock::now();
-
-	// do something
 	RenderSceneWithShadows(aObjects, aLights, aDirectionalLight, apCamera);
-
 	auto renderSceneWithShadowsTimerEnd = std::chrono::high_resolution_clock::now();
 
 	// Scene prep
@@ -264,22 +267,20 @@ void Renderer::RenderScene(
 
 	static float fCbtiming = 0.0f;
 	static float depthPrePassTiming = 0.0f;
-	static float objectRenderingTiming = 0.0f;
-
-	if (frames % 30 == 0)
+	static float shadowSceneTiming = 0.0f;
+	static float shadowSceneObjectTiming = 0.0f;
+	if (frames % 15 == 0)
 	{
 		fCbtiming = std::chrono::duration_cast<std::chrono::microseconds>(frameConstantBufferTimerEnd - frameConstantBufferTimerStart).count() / 1000.0f;
 		depthPrePassTiming = std::chrono::duration_cast<std::chrono::microseconds>(renderSceneDepthPrePassTimerEnd - renderSceneDepthPrePassTimerStart).count() / 1000.0f;
-		objectRenderingTiming = std::chrono::duration_cast<std::chrono::microseconds>(renderSceneWithShadowsTimerEnd - renderSceneWithShadowsTimerStart).count() / 1000.0f;
+		shadowSceneTiming = std::chrono::duration_cast<std::chrono::microseconds>(renderSceneWithShadowsTimerEnd - renderSceneWithShadowsTimerStart).count() / 1000.0f;
+		shadowSceneObjectTiming = objectRenderingTime;
 	}
 
 	ImGui::Text("Updating frame constant %.5f ms/frame", fCbtiming);
 	ImGui::Text("Render scene depth pre-pass %.5f ms/frame", depthPrePassTiming);
-	ImGui::Text("Render scene with shadows %.5f ms/frame", objectRenderingTiming);
-
-
-	//std::cout << (float)std::chrono::duration_cast<std::chrono::microseconds>(renderSceneWithShadowsTimerEnd - renderSceneWithShadowsTimerStart).count()/1000.0f << std::endl;;
-	
+	ImGui::Text("Render scene with shadows %.5f ms/frame", shadowSceneTiming);
+	ImGui::Text("Render shadow scene objects %.5f ms/frame", shadowSceneObjectTiming);
 }
 
 
@@ -305,6 +306,17 @@ void Renderer::RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aO
 	// Set the sampler state in the pixel shader.
 	mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
 
+	uint32_t bufferNumber;
+	bufferNumber = 1;
+
+	// bind buffers
+	ID3D11Buffer* tBuff = mpMaterialCB->GetBuffer();
+	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
+
+	bufferNumber = 4;
+	tBuff = mpPerObjectCB->GetBuffer();
+	mpDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
+	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
 
 	for (int i = 0; i < aObjects.size(); ++i)
 	{
@@ -355,7 +367,6 @@ void Renderer::RenderMaterial(d3dMaterial* const aMaterial)
 // Render the object
 void Renderer::RenderObject(IObject* const aObject)
 {
-
 	Model* const model = ResourceManager::GetInstance().GetModelByID(aObject->mpModel);
 	// Bind vertex/index buffers
 	RenderBuffers(mpDeviceContext.Get(), model);
@@ -413,6 +424,7 @@ bool Renderer::InitializeDeviceAndContext()
 #endif
 
 	featureLevel = D3D_FEATURE_LEVEL_11_0;
+	
 	result = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, creationFlags, 0, 0, D3D11_SDK_VERSION, &mpDevice, &featureLevel, &mpDeviceContext);
 
 	if (FAILED(result))

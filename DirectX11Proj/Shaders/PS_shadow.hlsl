@@ -1,6 +1,8 @@
 #include "Lighting.hlsl"
 
-Texture2D shaderTexture : register(t0);
+Texture2D diffuseTexture : register(t0);
+Texture2D specularTexture : register(t1);
+Texture2D normalTexture : register(t2);
 
 Texture2D depthMapTexture : register(t3);
 
@@ -12,10 +14,12 @@ SamplerState SampleTypeAnisotropicWrap : register(s2);
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
-	float2 tex : TEXCOORD0;
-	float3 normal : NORMAL;
 	float4 lightViewPosition : TEXCOORD1;
+	float3 normal : NORMAL;
 	float3 fragPos : FRAGPOSITION;
+	float3 tang : TANGENT;
+	float2 tex : TEXCOORD0;
+
 };
 
 
@@ -66,7 +70,26 @@ float ShadowMappingPCF(PixelInputType input)
 float4 ShadowPixelShader(PixelInputType input) : SV_TARGET
 {
 	float shadowImpact = ShadowMappingPCF(input);
-	float4 color = PerformLighting(input.fragPos, input.normal, shaderTexture.Sample(SampleTypeAnisotropicWrap, input.tex), 1.0f) * shadowImpact;
+
+	float3 tNorm = input.normal;
+	if (hasNormal)
+	{
+		tNorm = NormalSampleToWorldSpace(normalTexture.Sample(SampleTypeAnisotropicWrap, input.tex), input.normal , input.tang);
+	}
+
+	float4 specColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	if (hasSpecular)
+	{
+		specColor = specularTexture.Sample(SampleTypeAnisotropicWrap, input.tex);
+	}
+
+	float4 diffuseColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	if (hasDiffuse)
+	{
+		diffuseColor = diffuseTexture.Sample(SampleTypeAnisotropicWrap, input.tex);
+	}
+	
+	float4 color = PerformLighting(input.fragPos, tNorm, diffuseColor, 1.0f) * shadowImpact;
 
 	return color;
 }

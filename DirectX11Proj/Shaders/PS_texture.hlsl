@@ -14,7 +14,6 @@ struct PixelInputType
 	float3 norm : NORMAL;
 	float3 fragPos : FRAGPOSITION;
 	float3 tang : TANGENT;
-	
 };
 
 
