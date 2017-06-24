@@ -3,8 +3,6 @@
 //#include "systemclass.h"
 #define _CRT_SECURE_NO_DEPRECATE
 
-
-
 #include <memory>
 #include <cassert>
 

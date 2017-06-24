@@ -6,11 +6,11 @@
 #pragma comment(lib, "d3dx10.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
+#include <windows.h>
 #include <windowsx.h>
 #include <wrl.h>
 
 #include <fcntl.h>
-#include <d3d11.h>	
 #include <d3d11_1.h>
 
 #include <directxmath.h>
@@ -20,7 +20,7 @@
 
 #include "IScene.h"
 #include "d3d11HelperFile.h"
-#
+
 class d3dRenderTexture;
 class d3dRenderDepthTexture;
 

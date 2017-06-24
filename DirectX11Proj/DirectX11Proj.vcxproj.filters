@@ -192,9 +192,7 @@
     <ClInclude Include="d3d11HelperFile.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="ExternalGraphicsData.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
+    <ClInclude Include="stdafxh.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\VS_texture.hlsl">

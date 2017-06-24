@@ -22,7 +22,6 @@
 
 using namespace DirectX;
 
-
 Renderer::Renderer()
 {
 }

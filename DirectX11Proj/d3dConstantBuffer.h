@@ -1,6 +1,6 @@
 #pragma once
 
-#include <d3d11.h>
+#include <d3d11_1.h>
 
 // https://github.com/degenerated1123/GD3D11/blob/master/D3D11Engine/D3D11ConstantBuffer.cpp inspired by (pretty much copied from)
 class d3dConstantBuffer

@@ -6,7 +6,7 @@
 #include <wrl.h>
 
 #include <fcntl.h>
-#include <d3d11.h>
+#include <d3d11_1.h>
 #include "easylogging++.h"
 
 #include <cassert>
@@ -24,10 +24,7 @@ struct TexID
 private:
 	uint32_t id;
 };
-static void DoShitWithTexID(const TexID& id)
-{
-	std::cout << sizeof(TexID) << std::endl;
-}
+
 struct MatID
 {
 	explicit MatID(uint32_t id) : id(id) {}
@@ -520,6 +517,7 @@ static ID3D11RenderTargetView* CreateRenderTargetViewFromSwapchain(ID3D11Device*
 }
 
 
+// Format conversion functions
 static DXGI_FORMAT GetDepthResourceFormat(DXGI_FORMAT depthformat)
 {
 	DXGI_FORMAT resformat;
@@ -570,6 +568,8 @@ static DXGI_FORMAT GetDepthSRVFormat(DXGI_FORMAT depthformat)
 	return srvformat;
 }
 
+
+// Create simple buffer(generally used for vertex/index buffer)
 static ID3D11Buffer* CreateSimpleBuffer(ID3D11Device* const aDevice, void* aDataPtr, size_t aSizeInBytes, uint32_t amountOfElements, uint32_t aBindFlags, uint32_t aUsage)
 {
 	if (aSizeInBytes == 0)
@@ -607,6 +607,24 @@ static ID3D11Buffer* CreateSimpleBuffer(ID3D11Device* const aDevice, void* aData
 	//mAmountOfElements = aAmountOfElements;
 
 	return buffer;
+}
+
+static void UpdateBufferWithData(ID3D11DeviceContext* const aContext, ID3D11Buffer* const aBuffer, void* data)
+{
+	D3D11_MAPPED_SUBRESOURCE res;
+	HRESULT result = aContext->Map(aBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &res);
+
+	if (!FAILED(result))
+	{
+		memcpy(res.pData, data, res.DepthPitch);
+
+		aContext->Unmap(aBuffer, 0);
+	}
+
+	else
+	{
+		LOG(ERROR) << "UpdateBufferWithData failed";
+	}
 }
 
 static Model* CreateSimpleModelFromRawData(ID3D11Device* aDevice, const RawMeshData& aData)
