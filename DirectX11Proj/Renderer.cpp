@@ -2,7 +2,6 @@
 
 #include <chrono>
 
-#include "easylogging++.h"
 #include "Imgui.h"
 
 #include "IScene.h"
@@ -10,15 +9,14 @@
 #include "d3dShaderManager.h"
 #include "d3dShaderVS.h"
 #include "d3dShaderPS.h"
-#include "d3dTexture.h"
 
 
 #include "ResourceManager.h"
 #include "ConstantBuffers.h"
 #include "IObject.h"
-#include "GraphicsSettings.h"
 #include "camera.h"
 #include "GraphicsStructures.h"
+#include "GraphicsSettings.h"
 
 using namespace DirectX;
 
@@ -132,9 +130,9 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject)
 	Model* const tModel = ResourceManager::GetInstance().GetModelByID(aObject->mpModel);
 	d3dMaterial* const tMat = tModel->material;
 
-	gMaterialBufferDataPtr->hasDiffuse = (int)rm.GetTextureByID(tMat->mpDiffuse)->exists;
-	gMaterialBufferDataPtr->hasSpecular = (int)rm.GetTextureByID(tMat->mpSpecular)->exists;
-	gMaterialBufferDataPtr->hasNormal = (int)rm.GetTextureByID(tMat->mpNormal)->exists;
+	gMaterialBufferDataPtr->hasDiffuse = (int)(rm.GetTextureByID(tMat->mpDiffuse)->srv == nullptr ? false : true);
+	gMaterialBufferDataPtr->hasSpecular = (int)(rm.GetTextureByID(tMat->mpSpecular)->srv == nullptr ? false : true);
+	gMaterialBufferDataPtr->hasNormal = (int)(rm.GetTextureByID(tMat->mpNormal)->srv == nullptr ? false : true);
 
 
 	mpMaterialCB->UpdateBuffer((void*)gMaterialBufferDataPtr.get(), mpDeviceContext.Get());
@@ -353,13 +351,13 @@ void Renderer::RenderFullScreenQuad()
 void Renderer::RenderMaterial(d3dMaterial* const aMaterial)
 {
 	// Bind textures from material
-	ID3D11ShaderResourceView* aView = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpDiffuse)->GetTexture();
+	ID3D11ShaderResourceView* aView = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpDiffuse)->srv;
 	mpDeviceContext->PSSetShaderResources(0, 1, &aView);
 
-	ID3D11ShaderResourceView* aView2 = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpSpecular)->GetTexture();
+	ID3D11ShaderResourceView* aView2 = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpSpecular)->srv;
 	mpDeviceContext->PSSetShaderResources(1, 1, &aView2);
 
-	ID3D11ShaderResourceView* aView3 = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpNormal)->GetTexture();
+	ID3D11ShaderResourceView* aView3 = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpNormal)->srv;
 	mpDeviceContext->PSSetShaderResources(2, 1, &aView3);
 }
 
@@ -370,7 +368,7 @@ void Renderer::RenderObject(IObject* const aObject)
 	// Bind vertex/index buffers
 	RenderBuffers(mpDeviceContext.Get(), model);
 
-	int indices = model->indexBuffer->amountOfElements;
+	uint32_t indices = (uint32_t)model->indexBuffer->amountOfElements;
 
 	// Bind textures from material
 	d3dMaterial* const aMaterial = model->material;
@@ -422,9 +420,13 @@ bool Renderer::InitializeDeviceAndContext()
 	creationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	featureLevel = D3D_FEATURE_LEVEL_11_0;
+	featureLevel = D3D_FEATURE_LEVEL_11_1;
+	
 	
 	result = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, creationFlags, 0, 0, D3D11_SDK_VERSION, &mpDevice, &featureLevel, &mpDeviceContext);
+	mpDeviceContext.As(&mpDeviceContext1);
+	mpDevice.As(&mpDevice1);
+
 
 	if (FAILED(result))
 	{
