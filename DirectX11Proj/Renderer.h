@@ -65,9 +65,13 @@ private:
 	// Render functions
 	void RenderObject(IObject* const aObject);
 	void RenderMaterial(d3dMaterial* const aMaterial);
-	void RenderFullScreenQuad();
-	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
 
+	void RenderFullScreenQuad();
+	
+	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
+	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
+
+	void RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aObjects);
 	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
 	void RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aObjects,
 		std::vector<std::unique_ptr<Light>>& aLights,
@@ -89,9 +93,6 @@ private:
 
 	D3D11_VIEWPORT mViewport;
 	D3D11_VIEWPORT mShadowLightViewport;
-
-
-
 
 	// IDXGI stuff
 	Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;
@@ -131,8 +132,6 @@ private:
 	std::unique_ptr<Texture> gBuffer_albedoBuffer;
 	std::unique_ptr<Texture> gBuffer_normalBuffer;
 	std::unique_ptr<Texture> gBuffer_specularBuffer;
-
-
-
+	std::unique_ptr<Texture> gBuffer_depthBuffer;
 };
 

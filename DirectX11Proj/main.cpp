@@ -425,7 +425,7 @@ void Render()
 	float performance = std::chrono::duration_cast<std::chrono::microseconds>(frameConstantBufferTimerEnd - frameConstantBufferTimerStart).count() / 1000.0f;
 
 
-	//ImGui::Text("Rendering total: %.3f ms/frame", performance);
+	ImGui::Text("Rendering total: %.3f ms/frame", performance);
 
 	ImGui::Render();
 
