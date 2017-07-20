@@ -17,8 +17,8 @@ d3dConstantBuffer::d3dConstantBuffer(int aSize, void* aData, ID3D11Device* const
 	d.SysMemPitch = 0;
 	d.SysMemSlicePitch = 0;
 
-	// Create constantbuffer
-	HRESULT hr;
+	
+	// Create buffer with constant buffer tag
 	
 	aDevice->CreateBuffer(&CD3D11_BUFFER_DESC(aSize	, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE), &d, &mpBuffer);
 

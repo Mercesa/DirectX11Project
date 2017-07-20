@@ -37,9 +37,6 @@
     <ClCompile Include="PlayerSceneExample.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
-    <ClCompile Include="ObjectExample.cpp">
-      <Filter>NonFramework</Filter>
-    </ClCompile>
     <ClCompile Include="d3dShaderManager.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
@@ -100,9 +97,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PlayerSceneExample.h">
-      <Filter>NonFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="ObjectExample.h">
       <Filter>NonFramework</Filter>
     </ClInclude>
     <ClInclude Include="easylogging++.h">

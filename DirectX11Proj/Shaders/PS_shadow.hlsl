@@ -9,7 +9,7 @@ Texture2D depthMapTexture : register(t3);
 SamplerState SampleTypeClamp : register(s0);
 SamplerState SampleTypeWrap : register(s1);
 SamplerState SampleTypeAnisotropicWrap : register(s2);
-
+SamplerState SampleTypeLinearWrap : register(s3);
 
 struct PixelInputType
 {
@@ -74,7 +74,7 @@ float4 ShadowPixelShader(PixelInputType input) : SV_TARGET
 	float3 tNorm = input.normal;
 	if (hasNormal)
 	{
-		tNorm = NormalSampleToWorldSpace(normalTexture.Sample(SampleTypeAnisotropicWrap, input.tex), input.normal , input.tang);
+		tNorm = NormalSampleToWorldSpace(normalTexture.Sample(SampleTypeLinearWrap, input.tex), input.normal , input.tang);
 	}
 
 	float4 specColor = float4(1.0f, 1.0f, 1.0f, 1.0f);

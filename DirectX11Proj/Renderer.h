@@ -66,11 +66,15 @@ private:
 	void RenderObject(IObject* const aObject);
 	void RenderMaterial(d3dMaterial* const aMaterial);
 	void RenderFullScreenQuad();
+	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
+
 	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
 	void RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aObjects,
 		std::vector<std::unique_ptr<Light>>& aLights,
 		d3dLightClass* const aDirectionalLight,
 		Camera* const apCamera);
+	
+	
 	void RenderBuffers(ID3D11DeviceContext* const apDeviceContext, Model* const aModel);
 
 	const float SCREEN_FAR = 1000.0f;
@@ -87,8 +91,6 @@ private:
 	D3D11_VIEWPORT mShadowLightViewport;
 
 
-	XMFLOAT4X4 mProjectionMatrix;
-	XMFLOAT4X4 mViewMatrix;
 
 
 	// IDXGI stuff
@@ -104,6 +106,8 @@ private:
 	// Samplers
 	ID3D11SamplerState* mpAnisotropicWrapSampler;
 	ID3D11SamplerState* mpLinearClampSampler;
+	ID3D11SamplerState* mpLinearWrapSampler;
+
 	ID3D11SamplerState* mpPointClampSampler;
 	
 	// Constant buffers 
@@ -123,9 +127,9 @@ private:
 	std::unique_ptr<Texture> mPostProcColorBuffer;
 	std::unique_ptr<Texture> mPostProcDepthBuffer;
 
-	std::unique_ptr<Texture> g_albedoBuffer;
-	std::unique_ptr<Texture> g_normalBuffer;
-	std::unique_ptr<Texture> g_specularBuffer;
+	std::unique_ptr<Texture> gBuffer_albedoBuffer;
+	std::unique_ptr<Texture> gBuffer_normalBuffer;
+	std::unique_ptr<Texture> gBuffer_specularBuffer;
 
 
 

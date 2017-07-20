@@ -178,7 +178,6 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
-    <ClCompile Include="ObjectExample.cpp" />
     <ClCompile Include="PlayerSceneExample.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -205,7 +204,6 @@
     <ClInclude Include="d3dLightClass.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="ModelLoader.h" />
-    <ClInclude Include="ObjectExample.h" />
     <ClInclude Include="PlayerSceneExample.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ResourceManager.h" />

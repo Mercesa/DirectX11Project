@@ -17,6 +17,5 @@ public:
 private:
 	ID3D11Device* const mpDevice;
 	ID3D11Buffer* mpBuffer;
-	int OriginalSize; // Buffersize must be a multiple of 16
 };
 

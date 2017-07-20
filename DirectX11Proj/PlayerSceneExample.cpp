@@ -1,14 +1,10 @@
 #include "PlayerSceneExample.h"
 
-//#include <d3d11.h>
-//#include "Inc\SimpleMath.h"
-//using namespace DirectX::SimpleMath;
+
 #include <iostream>
 
 #include "ResourceManager.h"
-#include "ObjectExample.h"
 #include <windows.h>
-#include <fcntl.h>
 
 
 PlayerSceneExample::PlayerSceneExample()
@@ -120,7 +116,7 @@ void PlayerSceneExample::Init()
 			//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
 			for (int i = 0; i < tModels.size(); ++i)
 			{
-				std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
+				std::unique_ptr<IObject> tpObject = std::make_unique<IObject>();
 				tpObject->mpModel = tModels[i];
 				XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
 

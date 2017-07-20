@@ -50,6 +50,7 @@ void Renderer::CreateConstantBuffers()
 	mpLightCB = std::make_unique<d3dConstantBuffer>(sizeof(cbLights), nullptr, mpDevice.Get());
 	mpPerObjectCB = std::make_unique<d3dConstantBuffer>(sizeof(cbPerObject), nullptr, mpDevice.Get());
 	mpLightMatrixCB = std::make_unique<d3dConstantBuffer>(sizeof(cbLightMatrix), nullptr, mpDevice.Get());
+
 	LOG(INFO) << "Constant buffers created";
 }
 
@@ -130,20 +131,17 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject)
 	Model* const tModel = ResourceManager::GetInstance().GetModelByID(aObject->mpModel);
 	d3dMaterial* const tMat = tModel->material;
 
+	// Check if texture exists or not
 	gMaterialBufferDataPtr->hasDiffuse = (int)(rm.GetTextureByID(tMat->mpDiffuse)->srv == nullptr ? false : true);
 	gMaterialBufferDataPtr->hasSpecular = (int)(rm.GetTextureByID(tMat->mpSpecular)->srv == nullptr ? false : true);
 	gMaterialBufferDataPtr->hasNormal = (int)(rm.GetTextureByID(tMat->mpNormal)->srv == nullptr ? false : true);
 
 
+
 	mpMaterialCB->UpdateBuffer((void*)gMaterialBufferDataPtr.get(), mpDeviceContext.Get());
-	
-	// End update material
 
 
-	XMMATRIX worldMatrix;
-	worldMatrix = XMLoadFloat4x4(&aObject->mWorldMatrix);
-
-	XMMATRIX worldMatrix2 = XMMatrixTranspose(worldMatrix);
+	XMMATRIX worldMatrix2 = XMMatrixTranspose(XMLoadFloat4x4(&aObject->mWorldMatrix));
 	gPerObjectMatrixBufferDataPtr->worldMatrix = worldMatrix2;
 	
 	mpPerObjectCB->UpdateBuffer((void*)gPerObjectMatrixBufferDataPtr.get(), mpDeviceContext.Get());
@@ -177,6 +175,7 @@ void Renderer::RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aOb
 	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
 	mpDeviceContext->PSSetSamplers(1, 1, &mpLinearClampSampler);
 	mpDeviceContext->PSSetSamplers(2, 1, &mpAnisotropicWrapSampler);
+	mpDeviceContext->PSSetSamplers(3, 1, &mpLinearWrapSampler);
 
 	// Set the vertex and pixel shaders that will be used to render this triangle.
 	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
@@ -223,6 +222,13 @@ void Renderer::RenderScene(
 	Camera* const apCamera
 )
 {
+	
+	RenderSceneForward(aObjects, aLights, aDirectionalLight, apCamera);
+}
+
+
+void Renderer::RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera)
+{
 	float color[4]{ clearColor[0], clearColor[1], clearColor[2], 1.0f };
 
 	// Update frame constant buffers  
@@ -235,14 +241,14 @@ void Renderer::RenderScene(
 	ID3D11Buffer* tBuff = mpLightMatrixCB->GetBuffer();
 	mpDeviceContext->VSSetConstantBuffers(3, 1, &tBuff);
 	mpDeviceContext->PSSetConstantBuffers(3, 1, &tBuff);
-	
+
 	tBuff = mpLightCB->GetBuffer();
 	mpDeviceContext->PSSetConstantBuffers(2, 1, &tBuff);
 
 	tBuff = mpMatrixCB->GetBuffer();
 	mpDeviceContext->VSSetConstantBuffers(0, 1, &tBuff);
 	mpDeviceContext->PSSetConstantBuffers(0, 1, &tBuff);
-	
+
 	auto frameConstantBufferTimerEnd = std::chrono::high_resolution_clock::now();
 
 
@@ -616,6 +622,10 @@ bool Renderer::InitializeBackBuffRTV()
 	mPostProcDepthBuffer = std::make_unique<Texture>();
 	mShadowDepthBuffer = std::make_unique<Texture>();
 
+	gBuffer_albedoBuffer = std::make_unique<Texture>();
+	gBuffer_normalBuffer = std::make_unique<Texture>();
+	gBuffer_specularBuffer = std::make_unique<Texture>();
+
 	// Post proc color and depth buffer 
 	mPostProcColorBuffer->texture =  CreateSimpleRenderTargetTexture(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
 	mPostProcColorBuffer->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), mPostProcColorBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
@@ -633,6 +643,9 @@ bool Renderer::InitializeBackBuffRTV()
 	mShadowDepthBuffer->texture = CreateSimpleDepthTexture(mpDevice.Get(), 8096, 8096, GetDepthResourceFormat(DXGI_FORMAT_D24_UNORM_S8_UINT), D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
 	mShadowDepthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), mShadowDepthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	mShadowDepthBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), mShadowDepthBuffer->texture, GetDepthSRVFormat(DXGI_FORMAT_D24_UNORM_S8_UINT));
+
+
+
 	return true;
 }
 
@@ -664,23 +677,17 @@ bool Renderer::DestroyDirectX()
 	
 	ReleaseTexture(mShadowDepthBuffer.get());
 
+	ReleaseTexture(gBuffer_albedoBuffer.get());
+	ReleaseTexture(gBuffer_normalBuffer.get());
+	ReleaseTexture(gBuffer_specularBuffer.get());
+
 
 	mRaster_backcull->Release();
 	mpDepthStencilState->Release();
 	mpAnisotropicWrapSampler->Release();
 	mpLinearClampSampler->Release();
 	mpPointClampSampler->Release();
-	//if (mpDevice.Get() != nullptr)
-	//{
-	//	mpDevice.Reset();
-	//	mpDevice = nullptr;
-	//}
-	//
-	//if (mpDeviceContext.Get() != nullptr)
-	//{
-	//	mpDeviceContext.Reset();
-	//	mpDeviceContext = nullptr;
-	//}
+	mpLinearWrapSampler->Release();
 
 	return true;
 }
@@ -691,7 +698,7 @@ bool  Renderer::InitializeSamplerState()
 	mpAnisotropicWrapSampler = CreateSamplerAnisotropicWrap(mpDevice.Get());
 	mpPointClampSampler = CreateSamplerPointClamp(mpDevice.Get());
 	mpLinearClampSampler = CreateSamplerLinearClamp(mpDevice.Get());
-	
+	mpLinearWrapSampler = CreateSamplerLinearWrap(mpDevice.Get());
 	return true;
 }
 
@@ -712,24 +719,7 @@ bool Renderer::InitializeViewportAndMatrices()
 	mViewport.TopLeftX = 0.0f;
 	mViewport.TopLeftY = 0.0f;
 
-	float fieldOfView, screenAspect;
-	fieldOfView = 3.141592654f / 4.0f;
-	screenAspect = (float)GraphicsSettings::gCurrentScreenWidth / (float)GraphicsSettings::gCurrentScreenHeight;
-	XMStoreFloat4x4(&mProjectionMatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, SCREEN_NEAR, SCREEN_FAR));
-
-	XMFLOAT3 upF3, pF3, LF3;
-	XMVECTOR upVector, positionVector, lookAtVector;
-
-	upF3.x = 0; upF3.y = 1; upF3.z = 0;
-	pF3.x = 0; pF3.y = 1.0; pF3.z = -4;
-	LF3.x = 0; LF3.y = 0; LF3.z = 0;
-
-	upVector = XMLoadFloat3(&upF3);
-	positionVector = XMLoadFloat3(&pF3);
-	lookAtVector = XMLoadFloat3(&LF3);
-
-
-	XMStoreFloat4x4(&mViewMatrix, XMMatrixLookAtLH(positionVector, lookAtVector, upVector));
+	
 
 	return true;
 }

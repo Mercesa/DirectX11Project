@@ -53,5 +53,4 @@ struct RawMeshData
 
 };
 
-#include <memory>
 

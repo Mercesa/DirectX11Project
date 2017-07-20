@@ -7,9 +7,9 @@ public:
 	IObject();
 	virtual ~IObject();
 
-	virtual void OnDestroy() = 0;
-	virtual void OnInit() = 0;
-	virtual void Tick() = 0;
+	virtual void OnDestroy(){}
+	virtual void OnInit(){}
+	virtual void Tick(){}
 	
 	bool GetActive() { return mIsActive; }
 	bool GetCastShadow() { return mCastShadow; }
@@ -17,7 +17,7 @@ public:
 
 
 	ModelID mpModel;
-	XMFLOAT4X4  mWorldMatrix;
+	XMFLOAT4X4 mWorldMatrix;
 
 protected:
 	// premature initialization just so I dont forget in general
