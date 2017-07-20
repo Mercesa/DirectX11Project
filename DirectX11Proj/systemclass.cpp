@@ -1,14 +1,17 @@
 #include "systemclass.h"
 
+#include <windowsx.h>
 #include <fcntl.h>
 
 #include "easylogging++.h"
-
+#include "ResourceManager.h"
+#include "IScene.h"
+#include "IObject.h"
 
 SystemClass::SystemClass()
 {
 	m_Input = 0;
-	m_Graphics = 0;
+	mpGraphics = 0;
 }
 
 
@@ -70,29 +73,35 @@ bool SystemClass::Initialize()
 	LOG(INFO) << "Created input class";
 
 	// Create the graphics object.  This object will handle rendering all the graphics for this application.
-	m_Graphics = std::make_unique<GraphicsClass>();
-	if(!m_Graphics)
+	mpGraphics = std::make_unique<GraphicsClass>();
+	if(!mpGraphics)
 	{
+		MessageBox(m_hwnd, L"Could not create the graphics object.", L"error", MB_OK);
 		return false;
 	}
 
 	// Initialize the graphics object.
-	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
+	result = mpGraphics->Initialize(screenWidth, screenHeight, m_hwnd);
 	if(!result)
 	{
+		MessageBox(m_hwnd, L"Could not initialize the graphics object.", L"error", MB_OK);
 		return false;
 	}
 
-	mApplication = std::make_unique<Application>();
-	if (!mApplication)
+	mpApplication = std::make_unique<Application>();
+	if (!mpApplication)
 	{
 		return false;
 	}
-	mApplication->Init();
+	mpApplication->Init();
 
 	LOG(INFO) << "Intialized graphics class";
 
 	LOG(INFO) << "System finished initilization";
+	
+	
+	mTimer->Start();
+	
 	return true;
 }
 
@@ -100,8 +109,10 @@ bool SystemClass::Initialize()
 void SystemClass::Shutdown()
 {
 	// Release the graphics object.
-	m_Graphics->Shutdown();
-	mApplication->Destroy();
+	ResourceManager::GetInstance().Shutdown();
+
+	mpGraphics->Shutdown();
+	mpApplication->Destroy();
 	
 	// Shutdown the window.
 	ShutdownWindows();
@@ -123,6 +134,7 @@ void SystemClass::Run()
 	done = false;
 	while(!done)
 	{
+		result = m_Input->Frame();
 		// Handle the windows messages.
 		if(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
@@ -146,30 +158,20 @@ void SystemClass::Run()
 		}
 
 	}
+	mTimer->Update();
 
 	return;
 }
+
 using namespace el;
 // Engine tick in a sense, what goes on in one frame
 bool SystemClass::Frame()
 {
-	TIMED_FUNC(Derp);
-	bool result;
+	//TIMED_FUNC(Derp);
 
 
-	TIMED_SCOPE(inputBlkObj, "input time spend");
-	result = m_Input->Frame();
+	//TIMED_SCOPE(inputBlkObj, "input time spend");
 	
-	if (!result)
-	{
-		return false;
-	}
-
-	int x, y;
-	m_Input->GetMouseLocation(x,y);
-	std::cout << "x: " << x << std::endl;
-	std::cout << "y: " << y << std::endl;
-
 
 	// Check if the user pressed escape and wants to exit the application.
 	if(m_Input->IsEscapePressed())
@@ -178,7 +180,7 @@ bool SystemClass::Frame()
 		return false;
 	}
 
-	if (mApplication->ShouldQuit())
+	if (mpApplication->ShouldQuit())
 	{
 		LOG(INFO) << "Application requested quit. Exiting application";
 		return false;
@@ -187,16 +189,24 @@ bool SystemClass::Frame()
 	//PERFORMANCE_CHECKPOINT(inputBlkObj);
 
 	
-	mApplication->Tick();
-	mApplication->SceneTick(m_Input.get());
+	mpApplication->Tick();
 
+	mpApplication->GetCurrentScene()->Tick(m_Input.get(), mTimer->GetDeltaTime());
+	
+	std::vector <std::unique_ptr<IObject>>& tpScene = mpApplication->GetCurrentScene()->mObjects;
+	
+	for (int i = 0; i < tpScene.size(); ++i)
+	{
+		tpScene[i]->Tick();
+	}
 
 	// Do the frame processing for the graphics object.
-	result = m_Graphics->Frame(mApplication->mpCurrentScene);
-	if(!result)
-	{
-		return false;
-	}
+	EngineTimer t;
+	t.Start();
+
+	mpGraphics->Frame(mpApplication->mpCurrentScene.get());
+	t.Update();
+	std::cout << t.GetDeltaTime() << std::endl;
 
 	return true;
 }
@@ -204,7 +214,43 @@ bool SystemClass::Frame()
 
 LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
-	return DefWindowProc(hwnd, umsg, wparam, lparam);
+	switch (umsg)
+	{
+
+	case WM_MOUSEMOVE:
+	{
+		int xPos = GET_X_LPARAM(lparam);
+		int yPos = GET_Y_LPARAM(lparam);
+
+		m_Input->MouseMove(xPos, yPos);
+
+		return 0;
+	}
+
+		// Check if a key has been pressed on the keyboard.
+	case WM_KEYDOWN:
+	{
+		// If a key is pressed send it to the input object so it can record that state.
+		m_Input->KeyDown((unsigned int)wparam);
+		return 0;
+	}
+
+	// Check if a key has been released on the keyboard.
+	case WM_KEYUP:
+	{
+		// If a key is released then send it to the input object so it can unset the state for that key.
+		m_Input->KeyUp((unsigned int)wparam);
+		return 0;
+	}
+
+
+	// Any other messages send to the default message handler as our application won't make use of them.
+	default:
+	{
+		return DefWindowProc(hwnd, umsg, wparam, lparam);
+	}
+	}
+	
 }
 
 

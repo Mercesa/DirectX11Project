@@ -4,11 +4,12 @@
 #include <cassert>
 #include <iostream>
 
+#include "GraphicsEngine.h"
+#include "d3dDXGIManager.h"
 
-d3dSwapchain::d3dSwapchain(IDXGIFactory* const aFactory, ID3D11Device* const aDevice) : mpFactory(aFactory), mpDevice(aDevice)
+d3dSwapchain::d3dSwapchain()
 {
-	assert(aFactory != nullptr);
-	assert(aDevice != nullptr);
+
 }
 
 
@@ -31,7 +32,7 @@ IDXGISwapChain* const d3dSwapchain::GetSwapChain()
 	// Can't return a swapchain that has no
 	if (mpSwapchain.Get() == nullptr)
 	{
-		assert(false | "TRYING TO OBTAIN EMPTY SWAPCHAIN");
+		assert(false);
 		return nullptr;
 	}
 
@@ -110,11 +111,13 @@ bool d3dSwapchain::Create(DXGI_SWAP_CHAIN_DESC aSwapChainDesc)
 
 bool d3dSwapchain::CreateSwapChainWithDesc(DXGI_SWAP_CHAIN_DESC aDesc)
 {
+	GraphicsEngine& engine = GraphicsEngine::getInstance();
+
 	HRESULT result;
 	if (mpSwapchain.Get() == nullptr)
 	{
 		IDXGISwapChain* tSC = mpSwapchain.Get();
-		result = mpFactory->CreateSwapChain(mpDevice, &aDesc, &mpSwapchain);
+		result = engine.GetDXGIManager()->GetFactory()->CreateSwapChain(engine.GetDevice(), &aDesc, &mpSwapchain);
 		if (FAILED(result))
 		{
 			return false;

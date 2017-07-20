@@ -1,5 +1,7 @@
 #include "d3dDXGIManager.h"
 
+#include "easylogging++.h"
+
 bool d3dDXGIManager::Create(int aWidth, int aHeight, int &aNumerator, int &aDenominator)
 {
 	HRESULT result;
@@ -13,6 +15,7 @@ bool d3dDXGIManager::Create(int aWidth, int aHeight, int &aNumerator, int &aDeno
 	result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&mFactory);
 	if (FAILED(result))
 	{
+		LOG(FATAL) << "Failed to create DXGIFactory";
 		return false;
 	}
 
@@ -20,6 +23,7 @@ bool d3dDXGIManager::Create(int aWidth, int aHeight, int &aNumerator, int &aDeno
 	result = mFactory->EnumAdapters(0, &mAdapter);
 	if (FAILED(result))
 	{
+		LOG(FATAL) << "Failed to enumerate adapters";
 		return false;
 	}
 
@@ -27,6 +31,7 @@ bool d3dDXGIManager::Create(int aWidth, int aHeight, int &aNumerator, int &aDeno
 	result = mAdapter->EnumOutputs(0, &mAdapterOutput);
 	if (FAILED(result))
 	{
+		LOG(FATAL) << "Failed to enumerate primary adapter output";
 		return false;
 	}
 
@@ -34,6 +39,7 @@ bool d3dDXGIManager::Create(int aWidth, int aHeight, int &aNumerator, int &aDeno
 	result = mAdapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, NULL);
 	if (FAILED(result))
 	{
+		LOG(FATAL) << "Failed to get displaymode list";
 		return false;
 	}
 

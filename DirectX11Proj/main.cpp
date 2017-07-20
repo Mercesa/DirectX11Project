@@ -1,3 +1,5 @@
+#include <vld.h>
+
 #include "systemclass.h"
 
 #include <memory>
@@ -6,7 +8,6 @@
 // And its nice to have a central place for the logging library
 #include "easylogging++.h"
 INITIALIZE_EASYLOGGINGPP
-
 
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
@@ -27,12 +28,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	result = System->Initialize();
 	if(result)
 	{
-		LOG(FATAL) << "System failed on initialization";
 		System->Run();
+	}
+
+	else
+	{
+		LOG(FATAL) << "System failed on initialization";
 	}
 
 	// Shutdown and release the system object.
 	System->Shutdown();
 
+	//System.release();
 	return 0;
 }

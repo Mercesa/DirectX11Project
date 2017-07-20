@@ -7,8 +7,8 @@
 
 #include "cameraclass.h"
 #include "inputclass.h"
-
-class IObject;
+#include "LightStruct.h"
+#include "IObject.h"
 
 class IScene
 {
@@ -17,21 +17,23 @@ public:
 	IScene();
 	~IScene();
 
-	virtual void Tick(InputClass* const aInput) = 0;
+	virtual void Tick(InputClass* const apInput, float aDT) = 0;
 	virtual void Init() = 0;
 	virtual void Destroy() = 0;
 
-	// Just a bit lazy and turn it into a vector, will convert back to a list later
-	std::vector <std::shared_ptr<IObject>> mObjects;
+	std::vector <std::unique_ptr<IObject>> mObjects;
+	std::vector <std::unique_ptr<Light>> mLights;
 	
+	std::unique_ptr<Light> mDirectionalLight;
+
 	bool HasBeenInitialized() { return mInitialized; }
 
-	CameraClass* const GetCamera() { return mCamera.get(); }
+	CameraClass* const GetCamera() { return mpCamera.get(); }
 
 protected:
-	std::shared_ptr<CameraClass> mCamera;
+	std::unique_ptr<CameraClass> mpCamera;
 
 private:
-	bool mInitialized = false;
+	bool mInitialized;
 };
 

@@ -18,6 +18,7 @@ struct VertexData
 struct TextureData
 {
 	std::string filepath;
+	bool isValid;
 };
 
 struct MeshData
@@ -26,6 +27,8 @@ struct MeshData
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;
 
-	std::string textureFilePath;
+	TextureData diffuseData;
+	TextureData specularData;
+	TextureData normalData;
 
 };

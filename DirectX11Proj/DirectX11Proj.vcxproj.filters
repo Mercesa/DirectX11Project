@@ -25,12 +25,30 @@
     <Filter Include="Libs">
       <UniqueIdentifier>{b5c942b3-b9a3-4ea9-91e2-dfe1d138626c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="D3DSetup\D3DShaderTypes">
+      <UniqueIdentifier>{e810992e-765c-44da-9774-6b792bf4a10f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3DSetup\DXGI">
+      <UniqueIdentifier>{a49f142c-2c65-4524-901e-5eb59ab70156}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3DSetup\Shaderclasses">
+      <UniqueIdentifier>{9e312e10-0cb7-4f63-89e8-bf29bd194cac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NonFramework\Interfaces">
+      <UniqueIdentifier>{51a44c7a-bb86-4352-821b-16ba45b14fd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3DSetup\SetupClasses">
+      <UniqueIdentifier>{4017dcef-3591-4572-a99e-065d2b1580db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Utility">
+      <UniqueIdentifier>{1578abde-7f40-4936-90cb-27fbb939e80a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3DSetup\Managers">
+      <UniqueIdentifier>{8734bb2f-0609-41ec-8c29-2c1fd88d5eaa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="inputclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="systemclass.cpp">
@@ -45,62 +63,92 @@
     <ClCompile Include="Application.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
-    <ClCompile Include="IApplication.cpp">
-      <Filter>NonFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="IScene.cpp">
-      <Filter>NonFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dclass.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dDXGIManager.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dSwapchain.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
     <ClCompile Include="graphicsclass.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
-    <ClCompile Include="colorshaderclass.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dDepthStencil.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dRasterizerState.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dVertexBuffer.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="IObject.cpp">
-      <Filter>NonFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="ModelLoader.cpp">
-      <Filter>NonFramework</Filter>
-    </ClCompile>
     <ClCompile Include="PlayerSceneExample.cpp">
       <Filter>NonFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="ResourceManager.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ObjectExample.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
     <ClCompile Include="d3dTexture.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceManager.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dMaterial.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dShaderManager.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dShaderVS.cpp">
+      <Filter>D3DSetup\D3DShaderTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dShaderPS.cpp">
+      <Filter>D3DSetup\D3DShaderTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dDXGIManager.cpp">
+      <Filter>D3DSetup\DXGI</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dSwapchain.cpp">
+      <Filter>D3DSetup\DXGI</Filter>
+    </ClCompile>
+    <ClCompile Include="colorshaderclass.cpp">
+      <Filter>D3DSetup\Shaderclasses</Filter>
+    </ClCompile>
+    <ClCompile Include="textureshaderclass.cpp">
+      <Filter>D3DSetup\Shaderclasses</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dRenderTexture.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="IApplication.cpp">
+      <Filter>NonFramework\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="IObject.cpp">
+      <Filter>NonFramework\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="IScene.cpp">
+      <Filter>NonFramework\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="depthshaderclass.cpp">
+      <Filter>D3DSetup\Shaderclasses</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dLightClass.cpp">
+      <Filter>D3DSetup</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dConstantBuffer.cpp">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dDepthStencil.cpp">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dRasterizerState.cpp">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dVertexBuffer.cpp">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="inputclass.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineTimer.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsEngine.cpp">
+      <Filter>D3DSetup</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="inputclass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="systemclass.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="cameraclass.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -110,47 +158,11 @@
     <ClInclude Include="Application.h">
       <Filter>NonFramework</Filter>
     </ClInclude>
-    <ClInclude Include="IApplication.h">
-      <Filter>NonFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="IScene.h">
-      <Filter>NonFramework</Filter>
-    </ClInclude>
     <ClInclude Include="ModelData.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="d3dclass.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dDXGIManager.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dSwapchain.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
     <ClInclude Include="graphicsclass.h">
       <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="colorshaderclass.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dDepthStencil.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dRasterizerState.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dVertexBuffer.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderHelperFunctions.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="IObject.h">
-      <Filter>NonFramework</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelLoader.h">
-      <Filter>NonFramework</Filter>
     </ClInclude>
     <ClInclude Include="PlayerSceneExample.h">
       <Filter>NonFramework</Filter>
@@ -161,15 +173,123 @@
     <ClInclude Include="ObjectExample.h">
       <Filter>NonFramework</Filter>
     </ClInclude>
-    <ClInclude Include="d3dTexture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="easylogging++.h">
       <Filter>Libs</Filter>
     </ClInclude>
+    <ClInclude Include="d3dTexture.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dMaterial.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="LightStruct.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBuffers.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dShaderManager.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dShaderInterface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dShaderVS.h">
+      <Filter>D3DSetup\D3DShaderTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderHelperFunctions.h">
+      <Filter>D3DSetup\D3DShaderTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dShaderPS.h">
+      <Filter>D3DSetup\D3DShaderTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="systemclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dDXGIManager.h">
+      <Filter>D3DSetup\DXGI</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dSwapchain.h">
+      <Filter>D3DSetup\DXGI</Filter>
+    </ClInclude>
+    <ClInclude Include="colorshaderclass.h">
+      <Filter>D3DSetup\Shaderclasses</Filter>
+    </ClInclude>
+    <ClInclude Include="textureshaderclass.h">
+      <Filter>D3DSetup\Shaderclasses</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dRenderTexture.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="IApplication.h">
+      <Filter>NonFramework\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IObject.h">
+      <Filter>NonFramework\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="IScene.h">
+      <Filter>NonFramework\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="depthshaderclass.h">
+      <Filter>D3DSetup\Shaderclasses</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dLightClass.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dDepthStencil.h">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dConstantBuffer.h">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dRasterizerState.h">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="d3dVertexBuffer.h">
+      <Filter>D3DSetup\SetupClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="inputclass.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineTimer.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelLoader.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsEngine.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="color.vs">
+    <None Include="Shaders\VS_texture.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\Lighting.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PS_color.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PS_texture.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\VS_color.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\VS_shadow.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PS_shadow.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PS_depth.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\VS_depth.hlsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
