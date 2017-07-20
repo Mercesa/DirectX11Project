@@ -4,9 +4,9 @@
 #include <iostream>
 #include <memory.h>
 
-#include "d3dTexture.h"
 #include "easylogging++.h"
 #include "GraphicsStructures.h"
+
 ResourceManager::ResourceManager()
 {
 }
@@ -23,6 +23,7 @@ void ResourceManager::Shutdown()
 
 	for (int i = 0; i < mLoadedTextures.size(); ++i)
 	{
+		ReleaseTexture(mLoadedTextures[i]);
 		delete mLoadedTextures[i];
 		mLoadedTextures[i] = nullptr;
 		//delete modelData[i];
@@ -45,7 +46,7 @@ Model* const ResourceManager::GetModelByID(const ModelID& aID) const
 	return modelData[aID.GetID()];
 }
 
-d3dTexture* const ResourceManager::GetTextureByID(const TexID& aID) const
+Texture* const ResourceManager::GetTextureByID(const TexID& aID) const
 {
 	if (aID.GetID() >= mLoadedTextures.size())
 	{
@@ -56,20 +57,27 @@ d3dTexture* const ResourceManager::GetTextureByID(const TexID& aID) const
 	return mLoadedTextures[aID.GetID()];
 }
 
-
-d3dTexture* ResourceManager::LoadTexture(RawTextureData aData)
+#include <D3Dcommon.h>
+Texture* ResourceManager::LoadTexture(RawTextureData aData)
 {
 	// Convert string texture filepath to wstring
 	std::wstring wString = std::wstring(aData.filepath.begin(), aData.filepath.end());
-	const WCHAR* result = wString.c_str();
+	const WCHAR* resultString = wString.c_str();
+	HRESULT result;
 
-	auto tpTextureClass = new d3dTexture();
+	auto tpTextureClass = new Texture();
 	assert(tpTextureClass);
 	// if the single texture could not initialize
-	if (!tpTextureClass->Initialize(mpDevice, result))
+
+	// Create shader resource
+	result = D3DX11CreateShaderResourceViewFromFile(mpDevice, resultString, NULL, NULL, &tpTextureClass->srv, NULL);
+
+	
+	if (FAILED(result))
 	{
 		LOG(WARNING) << "ModelLoading: Texture could not initialize " << aData.filepath;
 	}
+
 
 	return tpTextureClass;
 }
@@ -88,7 +96,7 @@ d3dMaterial* ResourceManager::LoadTexturesFromMaterial(const RawMeshData& aMeshD
 	}
 	else
 	{
-		tpMat->mpDiffuse = TexID(mLoadedTextures.size());
+		tpMat->mpDiffuse = TexID((uint32_t)mLoadedTextures.size());
 		mLoadedTextures.push_back(LoadTexture(aMeshData.diffuseData));
 		stringTextureMap.insert(std::pair<std::string, TexID>(aMeshData.diffuseData.filepath, tpMat->mpDiffuse));
 	}
@@ -99,7 +107,7 @@ d3dMaterial* ResourceManager::LoadTexturesFromMaterial(const RawMeshData& aMeshD
 	}
 	else
 	{
-		tpMat->mpSpecular = TexID(mLoadedTextures.size());
+		tpMat->mpSpecular = TexID((uint32_t)mLoadedTextures.size());
 		mLoadedTextures.push_back(LoadTexture(aMeshData.specularData));
 		stringTextureMap.insert(std::pair<std::string, TexID>(aMeshData.specularData.filepath, tpMat->mpSpecular));
 	}
@@ -110,7 +118,8 @@ d3dMaterial* ResourceManager::LoadTexturesFromMaterial(const RawMeshData& aMeshD
 	}
 	else
 	{
-		tpMat->mpNormal = TexID(mLoadedTextures.size());
+		tpMat->mpNormal = TexID((uint32_t)mLoadedTextures.size());
+
 		mLoadedTextures.push_back(LoadTexture(aMeshData.normalData));
 		stringTextureMap.insert(std::pair<std::string, TexID>(aMeshData.normalData.filepath, tpMat->mpNormal));
 	}
@@ -141,7 +150,7 @@ std::vector<ModelID> ResourceManager::LoadModels(std::string aFilePath)
 
 		tMod->material = LoadTexturesFromMaterial(tData);
 		assert(tMod->material != nullptr);
-		ModelID id = ModelID(modelData.size());
+		ModelID id = ModelID((uint32_t)modelData.size());
 		tModels.push_back(id);
 
 		modelData.push_back(tMod);

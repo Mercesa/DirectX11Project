@@ -6,9 +6,9 @@
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <D3DX11tex.h>
 
 #include "ModelLoader.h"
-#include "d3dTexture.h"
 #include "d3d11HelperFile.h"
 #include "GraphicsStructures.h"
 
@@ -37,7 +37,7 @@ public:
 	ID3D11Device* mpDevice;
 
 	Model* const GetModelByID(const ModelID& aID) const;
-	d3dTexture* const GetTextureByID(const TexID& aID) const;
+	Texture* const GetTextureByID(const TexID& aID) const;
 
 private:
 	ResourceManager();
@@ -50,11 +50,11 @@ private:
 	std::vector<Model*> modelData;
 
 	std::unordered_map<std::string, TexID> stringTextureMap;
-	std::vector<d3dTexture*> mLoadedTextures;
+	std::vector<Texture*> mLoadedTextures;
 
 
 	d3dMaterial* LoadTexturesFromMaterial(const RawMeshData& aMeshData);
-	d3dTexture* LoadTexture(RawTextureData aData);
+	Texture* LoadTexture(RawTextureData aData);
 
 	// Load models as one
 	// Load models as a list

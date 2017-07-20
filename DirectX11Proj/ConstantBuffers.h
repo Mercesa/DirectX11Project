@@ -4,13 +4,13 @@
 
 struct cbMatrixBuffer
 {
+	XMMATRIX view;
+	XMMATRIX projection;
+
 	float gEyePosX;
 	float gEyePosY;
 	float gEyePosZ;
 	float pad0;
-
-	XMMATRIX view;
-	XMMATRIX projection;
 };
 
 struct cbLightMatrix

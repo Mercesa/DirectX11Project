@@ -6,14 +6,9 @@
 #pragma comment(lib, "d3dx10.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 
-#include <windows.h>
-#include <windowsx.h>
-#include <wrl.h>
+#include "WindowsAndDXIncludes.h"
 
-#include <fcntl.h>
-#include <d3d11_1.h>
 
-#include <directxmath.h>
 #include "d3dShaderManager.h"
 #include "d3dConstantBuffer.h"
 #include "d3dLightClass.h"
@@ -41,6 +36,9 @@ public:
 	Microsoft::WRL::ComPtr<IDXGISwapChain> mpSwapchain;
 	Microsoft::WRL::ComPtr<ID3D11Device> mpDevice;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> mpDeviceContext;
+
+	Microsoft::WRL::ComPtr<ID3D11Device1> mpDevice1;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext1> mpDeviceContext1;
 
 	float clearColor[3] = { 0.0f, 0.0f, 0.0f };
 
@@ -124,6 +122,12 @@ private:
 
 	std::unique_ptr<Texture> mPostProcColorBuffer;
 	std::unique_ptr<Texture> mPostProcDepthBuffer;
+
+	std::unique_ptr<Texture> g_albedoBuffer;
+	std::unique_ptr<Texture> g_normalBuffer;
+	std::unique_ptr<Texture> g_specularBuffer;
+
+
 
 };
 

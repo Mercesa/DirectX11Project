@@ -585,7 +585,7 @@ static ID3D11Buffer* CreateSimpleBuffer(ID3D11Device* const aDevice, void* aData
 
 	// Set up the description of the static vertex buffer.
 	vertexBufferDesc.Usage = D3D11_USAGE(aUsage);
-	vertexBufferDesc.ByteWidth = aSizeInBytes;
+	vertexBufferDesc.ByteWidth = (UINT)aSizeInBytes;
 	vertexBufferDesc.BindFlags = (D3D11_BIND_FLAG)aBindFlags;
 	vertexBufferDesc.CPUAccessFlags = 0;
 	vertexBufferDesc.MiscFlags = 0;
@@ -636,10 +636,10 @@ static Model* CreateSimpleModelFromRawData(ID3D11Device* aDevice, const RawMeshD
 	size_t vertSize = aData.vertices.size();
 	size_t indicesSize = aData.indices.size();
 
-	model->vertexBuffer->buffer = CreateSimpleBuffer(aDevice, (void*)(aData.vertices.data()), sizeof(VertexData) * vertSize, vertSize, D3D11_BIND_VERTEX_BUFFER, D3D11_USAGE_DEFAULT);
+	model->vertexBuffer->buffer = CreateSimpleBuffer(aDevice, (void*)(aData.vertices.data()), sizeof(VertexData) * vertSize, (uint32_t)vertSize, D3D11_BIND_VERTEX_BUFFER, D3D11_USAGE_DEFAULT);
 	model->vertexBuffer->amountOfElements = indicesSize;
 
-	model->indexBuffer->buffer = CreateSimpleBuffer(aDevice, (void*)(aData.indices.data()), sizeof(unsigned long) * indicesSize, indicesSize, D3D11_BIND_INDEX_BUFFER, D3D11_USAGE_DEFAULT);
+	model->indexBuffer->buffer = CreateSimpleBuffer(aDevice, (void*)(aData.indices.data()), sizeof(unsigned long) * indicesSize, (uint32_t)indicesSize, D3D11_BIND_INDEX_BUFFER, D3D11_USAGE_DEFAULT);
 	model->indexBuffer->amountOfElements = indicesSize;
 
 

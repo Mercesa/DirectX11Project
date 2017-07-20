@@ -111,9 +111,9 @@ void PlayerSceneExample::Init()
 	//	this->mObjects.push_back(std::move(tpObject));
 	//}
 
-	for (int y = 0; y < 10; ++y)
+	for (int y = 0; y < 1; ++y)
 	{
-		for (int x = 0; x < 10; ++x)
+		for (int x = 0; x < 1; ++x)
 		{
 			tModels = ResourceManager::GetInstance().LoadModels("Models\\Sponza\\Sponza.obj");
 			tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);

@@ -26,8 +26,8 @@
     <Filter Include="Libs\IMGUI">
       <UniqueIdentifier>{ee975a26-cde9-4b1e-90cd-016fbccacbd5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Model">
-      <UniqueIdentifier>{9b50e867-2fd5-481b-94a9-c063e5253ea8}</UniqueIdentifier>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{58bcb988-2c8e-4a4e-8d48-c692b36e1be6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -93,9 +93,6 @@
     </ClCompile>
     <ClCompile Include="d3dConstantBuffer.cpp">
       <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dTexture.cpp">
-      <Filter>Model</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>NonFramework</Filter>
@@ -180,9 +177,6 @@
     <ClInclude Include="d3dConstantBuffer.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
-    <ClInclude Include="d3dTexture.h">
-      <Filter>Model</Filter>
-    </ClInclude>
     <ClInclude Include="camera.h">
       <Filter>NonFramework</Filter>
     </ClInclude>
@@ -192,7 +186,9 @@
     <ClInclude Include="d3d11HelperFile.h">
       <Filter>Utility</Filter>
     </ClInclude>
-    <ClInclude Include="stdafxh.h" />
+    <ClInclude Include="WindowsAndDXIncludes.h">
+      <Filter>Platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\VS_texture.hlsl">

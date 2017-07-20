@@ -11,15 +11,13 @@ struct Light
 	int lightType;
 };
 
-
-
 cbuffer MatrixBuffer : register(b0)
 {
-	float3 gEyePos;
-	float1 pad0;
-
 	matrix viewMatrix;
 	matrix projectionMatrix;
+
+	float3 gEyePos;
+	float1 pad0;
 };
 
 // integers are 32 bit in HLSL
@@ -56,17 +54,15 @@ cbuffer PerObjectBuffer : register(b4)
 
 float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangentW)
 {
-	// Uncompress each component from [0,1] to [-1,1].
-	float3 normalT = 2.0f*normalMapSample - 1.0f;
+	// Transform from 0 1 to -1.0f 2.0f;
+	float3 normalT = normalMapSample * 2.0f - 1.0f;
 
-	// Build orthonormal basis.
 	float3 N = unitNormalW;
-	float3 T = normalize(tangentW - dot(tangentW, N)*N);
+	float3 T = normalize(tangentW - dot(tangentW, N) * N);
 	float3 B = cross(N, T);
 
 	float3x3 TBN = float3x3(T, B, N);
-
-	// Transform from tangent space to world space.
+	
 	float3 bumpedNormalW = mul(normalT, TBN);
 
 	return bumpedNormalW;

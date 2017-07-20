@@ -29,6 +29,8 @@ PixelInputType ShadowVertexShader(VertexInputType input)
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul(input.position, worldMatrix);
+	output.fragPos = output.position;
+
 	output.position = mul(output.position, viewMatrix);
 	output.position = mul(output.position, projectionMatrix);
 
@@ -42,7 +44,7 @@ PixelInputType ShadowVertexShader(VertexInputType input)
 	output.normal = normalize(output.normal);
 	
 	output.tang = mul(input.tangent, (float3x3)worldMatrix);
-	output.fragPos = output.position;
+	
 
 
 	// Store the texture coordinates for the pixel shader.
