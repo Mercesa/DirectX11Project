@@ -4,11 +4,12 @@
 #include <memory>
 #include <vector>
 
-
-#include "cameraclass.h"
 #include "inputclass.h"
-#include "LightStruct.h"
 #include "IObject.h"
+#include "Camera.h"
+#include "d3dLightClass.h"
+#include "GraphicsStructures.h"
+
 
 class IScene
 {
@@ -24,14 +25,14 @@ public:
 	std::vector <std::unique_ptr<IObject>> mObjects;
 	std::vector <std::unique_ptr<Light>> mLights;
 	
-	std::unique_ptr<Light> mDirectionalLight;
+	std::unique_ptr<d3dLightClass> mDirectionalLight;
 
 	bool HasBeenInitialized() { return mInitialized; }
 
-	CameraClass* const GetCamera() { return mpCamera.get(); }
+	Camera* const GetCamera() { return mpCamera.get(); }
 
 protected:
-	std::unique_ptr<CameraClass> mpCamera;
+	std::unique_ptr<Camera> mpCamera;
 
 private:
 	bool mInitialized;

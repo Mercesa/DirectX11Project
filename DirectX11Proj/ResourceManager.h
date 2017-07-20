@@ -1,17 +1,19 @@
 #pragma once
 
-#include <d3d11.h>
+#include <d3d11_1.h>
 
 #include <vector>
 #include <memory>
 #include <string>
+#include <unordered_map>
+#include <D3DX11tex.h>
 
 #include "ModelLoader.h"
-#include "d3dTexture.h"
+#include "d3d11HelperFile.h"
+#include "GraphicsStructures.h"
 
 class ModelClass;
-class d3dMaterial;
-struct TextureData;
+struct RawTextureData;
 
 class ResourceManager
 {
@@ -30,20 +32,29 @@ public:
 		return instance;
 	}
 
-	std::vector<ModelClass*> LoadModels(std::string aFilePath);
+	std::vector<ModelID> LoadModels(std::string aFilePath);
+
+	ID3D11Device* mpDevice;
+
+	Model* const GetModelByID(const ModelID& aID) const;
+	Texture* const GetTextureByID(const TexID& aID) const;
 
 private:
 	ResourceManager();
 	
-	std::unique_ptr<ModelLoader> mpModelLoader;
-	ID3D11Device* mpDevice;
 
 	// Turn these into maps at one point
-	std::vector<std::unique_ptr<ModelClass>> mLoadedModels;
-	std::vector<std::unique_ptr<d3dTexture>> mLoadedTextures;
+	//std::vector<std::unique_ptr<Model>> mLoadedModels;
 
-	std::unique_ptr<d3dMaterial> LoadTexturesFromMaterial(const MeshData& aMeshData);
-	std::unique_ptr<d3dTexture> LoadTexture(TextureData aData);
+	std::unordered_map<std::string, std::vector<ModelID>> stringModelMap;
+	std::vector<Model*> modelData;
+
+	std::unordered_map<std::string, TexID> stringTextureMap;
+	std::vector<Texture*> mLoadedTextures;
+
+
+	d3dMaterial* LoadTexturesFromMaterial(const RawMeshData& aMeshData);
+	Texture* LoadTexture(RawTextureData aData);
 
 	// Load models as one
 	// Load models as a list

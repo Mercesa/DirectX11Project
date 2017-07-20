@@ -1,8 +1,8 @@
 #include "inputclass.h"
 
 #include "easylogging++.h"
-// This class is taken from rastertek, possibly some changes are made but this is work not of my own design.
-// http://www.rastertek.com/dx11tut13.html
+
+
 InputClass::InputClass()
 {
 	//this->mpDirectInput = 0;
@@ -21,12 +21,9 @@ InputClass::~InputClass()
 }
 
 
-bool InputClass::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int screenHeight)
+bool InputClass::Initialize()
 {
 	HRESULT result;
-
-	mScreenWidth = screenWidth;
-	mScreenHeight = screenHeight;
 	
 	mMouseX = 0;
 	mMouseY = 0;
@@ -37,6 +34,7 @@ bool InputClass::Initialize(HINSTANCE hinstance, HWND hwnd, int screenWidth, int
 	for (int i = 0; i < 256; ++i)
 	{
 		mKeys[i] = false;
+		mKeysC[i] = false;
 	}
 
 	return true;
@@ -53,7 +51,6 @@ bool InputClass::Frame()
 {
 	// Process the changes in the mouse and keyboard.
 	ProcessInput();
-
 	return true;
 }
 
@@ -61,22 +58,11 @@ void InputClass::ProcessInput()
 {
 	mMouseRelX = 0;
 	mMouseRelY = 0;
-	// Update the location of the mouse cursor based on the change of the mouse location during the frame.
-	//mMouseX += mMouseState.lX;
-	//mMouseY	+= mMouseState.lY;
-	//
-	//mMouseRelX = mMouseState.lX;
-	//mMouseRelY = mMouseState.lY;
-	//
-	//
-	//// Ensure the mouse location doesn't exceed the screen width or height.
-	//if (mMouseX < 0) { mMouseX = 0; }
-	//if (mMouseY < 0) { mMouseY = 0; }
-	//
-	//if (mMouseX > mScreenWidth) { mMouseX = mScreenWidth; }
-	//if (mMouseY > mScreenHeight) { mMouseY = mScreenHeight; }
-
-	return;
+	for (int i = 0; i < 256; ++i)
+	{
+		mKeys[i] = false;
+		rMouseDown = false;
+	}
 }
 
 

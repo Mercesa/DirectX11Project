@@ -82,11 +82,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\Assimp;$(IncludePath)</IncludePath>
-    <LibraryPath>E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\Assimp\X86-Release;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath>E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\Assimp\X64-Release;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\Assimp;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\Assimp\x64-Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -108,8 +109,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -143,8 +143,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -157,82 +156,62 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Application.cpp" />
-    <ClCompile Include="cameraclass.cpp" />
-    <ClCompile Include="colorshaderclass.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="d3dConstantBuffer.cpp" />
-    <ClCompile Include="d3dDepthStencil.cpp" />
-    <ClCompile Include="d3dDXGIManager.cpp" />
-    <ClCompile Include="d3dMaterial.cpp" />
-    <ClCompile Include="d3dRasterizerState.cpp" />
     <ClCompile Include="d3dShaderManager.cpp" />
     <ClCompile Include="d3dShaderPS.cpp" />
     <ClCompile Include="d3dShaderVS.cpp" />
-    <ClCompile Include="d3dSwapchain.cpp" />
-    <ClCompile Include="d3dTexture.cpp" />
-    <ClCompile Include="d3dVertexBuffer.cpp" />
-    <ClCompile Include="depthshaderclass.cpp" />
     <ClCompile Include="EngineTimer.cpp" />
-    <ClCompile Include="graphicsclass.cpp" />
-    <ClCompile Include="GraphicsEngine.cpp" />
-    <ClCompile Include="IApplication.cpp" />
+    <ClCompile Include="GraphicsSettings.cpp" />
+    <ClCompile Include="imgui.cpp" />
+    <ClCompile Include="ImguiImplementation.cpp" />
+    <ClCompile Include="imgui_demo.cpp" />
+    <ClCompile Include="imgui_draw.cpp" />
     <ClCompile Include="inputclass.cpp" />
     <ClCompile Include="IObject.cpp" />
     <ClCompile Include="IScene.cpp" />
     <ClCompile Include="d3dLightClass.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="modelclass.cpp" />
+    <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
-    <ClCompile Include="ObjectExample.cpp" />
     <ClCompile Include="PlayerSceneExample.cpp" />
-    <ClCompile Include="d3dRenderTexture.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
-    <ClCompile Include="systemclass.cpp" />
-    <ClCompile Include="textureshaderclass.cpp" />
-    <ClCompile Include="Transform.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Application.h" />
-    <ClInclude Include="cameraclass.h" />
-    <ClInclude Include="colorshaderclass.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="ConstantBuffers.h" />
+    <ClInclude Include="d3d11HelperFile.h" />
     <ClInclude Include="d3dConstantBuffer.h" />
-    <ClInclude Include="d3dDepthStencil.h" />
-    <ClInclude Include="d3dDXGIManager.h" />
-    <ClInclude Include="d3dMaterial.h" />
-    <ClInclude Include="d3dRasterizerState.h" />
-    <ClInclude Include="d3dShaderInterface.h" />
     <ClInclude Include="d3dShaderManager.h" />
     <ClInclude Include="d3dShaderPS.h" />
     <ClInclude Include="d3dShaderVS.h" />
-    <ClInclude Include="d3dSwapchain.h" />
-    <ClInclude Include="d3dTexture.h" />
-    <ClInclude Include="d3dVertexBuffer.h" />
-    <ClInclude Include="depthshaderclass.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EngineTimer.h" />
-    <ClInclude Include="graphicsclass.h" />
-    <ClInclude Include="GraphicsEngine.h" />
-    <ClInclude Include="IApplication.h" />
+    <ClInclude Include="GraphicsSettings.h" />
+    <ClInclude Include="GraphicsStructures.h" />
+    <ClInclude Include="imconfig.h" />
+    <ClInclude Include="imgui.h" />
+    <ClInclude Include="ImguiImplementation.h" />
+    <ClInclude Include="imgui_internal.h" />
     <ClInclude Include="inputclass.h" />
     <ClInclude Include="IObject.h" />
     <ClInclude Include="IScene.h" />
     <ClInclude Include="d3dLightClass.h" />
-    <ClInclude Include="LightStruct.h" />
-    <ClInclude Include="modelclass.h" />
-    <ClInclude Include="ModelData.h" />
+    <ClInclude Include="MathHelper.h" />
     <ClInclude Include="ModelLoader.h" />
-    <ClInclude Include="ObjectExample.h" />
     <ClInclude Include="PlayerSceneExample.h" />
-    <ClInclude Include="d3dRenderTexture.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="ShaderHelperFunctions.h" />
-    <ClInclude Include="systemclass.h" />
-    <ClInclude Include="textureshaderclass.h" />
-    <ClInclude Include="Transform.h" />
+    <ClInclude Include="stb_rect_pack.h" />
+    <ClInclude Include="stb_textedit.h" />
+    <ClInclude Include="stb_truetype.h" />
+    <ClInclude Include="WindowsAndDXIncludes.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\Lighting.hlsl">
@@ -264,6 +243,14 @@
       <FileType>Document</FileType>
     </None>
     <None Include="Shaders\VS_depth.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\fullScreenQuad_PS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shaders\fullScreenQuad_VS.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

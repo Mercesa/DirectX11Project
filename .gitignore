@@ -318,3 +318,7 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+*.tlog
+DirectX11Proj/Debug/DirectX11Proj.tlog/CL.read.1.tlog
+DirectX11Proj/Debug/DirectX11Proj.log
+DirectX11Proj/Debug/DirectX11Proj.log

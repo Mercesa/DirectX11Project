@@ -6,7 +6,6 @@
 #include <scene.h>
 #include <iostream>
 
-#include "ModelData.h"
 
 using namespace Assimp;
 
@@ -19,13 +18,6 @@ ModelLoader::~ModelLoader()
 {
 }
 
-std::string mDirectory;
-
-
-void ModelLoader::ClearProcessedMeshes()
-{
-	this->mMeshesToBeProcessed.clear();
-}
 
 
 void ProcessVertices(aiMesh* const a_Mesh, std::vector<VertexData>& a_Vertices)
@@ -94,12 +86,6 @@ void ProcessIndices(aiMesh* const a_Mesh, std::vector<uint32_t>& a_Indices)
 	}
 }
 
-
-const std::vector<MeshData>& ModelLoader::GetMeshesToBeProcessed()
-{
-	return mMeshesToBeProcessed;
-}
-
 bool DoesMaterialHaveTextures(aiMaterial* const aMat, aiTextureType a_Type)
 {
 	// Check the amount of textures of a specific type
@@ -119,6 +105,7 @@ std::string GetTextureLocation(aiMaterial* const a_Mat, aiTextureType a_Type)
 	std::string stString = std::string(str.C_Str());
 
 
+	// Add DDS to the file extension
 	std::size_t dotPos = stString.find_last_of(".");
 	stString.erase(dotPos, stString.size());
 
@@ -129,7 +116,7 @@ std::string GetTextureLocation(aiMaterial* const a_Mat, aiTextureType a_Type)
 
 
 // Goes through the material
-void ProcessMaterial(aiMesh* a_Mesh, const aiScene* a_Scene, MeshData& aMeshdata)
+void ProcessMaterial(aiMesh* a_Mesh, const aiScene* a_Scene, RawMeshData& aMeshdata)
 {
 	// If we have a material
 	if (a_Mesh->mMaterialIndex > 0)
@@ -160,7 +147,7 @@ void ProcessMaterial(aiMesh* a_Mesh, const aiScene* a_Scene, MeshData& aMeshdata
 
 
 // Process mesh
-void ModelLoader::ProcessMesh(aiMesh* const a_Mesh, const aiScene* const a_Scene)
+RawMeshData ModelLoader::ProcessMesh(aiMesh* const a_Mesh, const aiScene* const a_Scene)
 {
 	std::vector<VertexData> vertices;
 	std::vector<uint32_t> indices;
@@ -169,7 +156,7 @@ void ModelLoader::ProcessMesh(aiMesh* const a_Mesh, const aiScene* const a_Scene
 	ProcessVertices(a_Mesh, vertices);
 	ProcessIndices(a_Mesh, indices);
 
-	MeshData meshData;
+	RawMeshData meshData;
 
 	ProcessMaterial(a_Mesh, a_Scene, meshData);
 
@@ -178,47 +165,80 @@ void ModelLoader::ProcessMesh(aiMesh* const a_Mesh, const aiScene* const a_Scene
 	meshData.indices = indices;
 
 
-	this->mMeshesToBeProcessed.push_back(meshData);
+	return meshData;
 }
 
 // This function will be called recursively if there is more than 1 node in a scene
-void ModelLoader::ProcessNode(aiNode* const a_Node, const aiScene* const a_Scene)
+void ModelLoader::ProcessNode(aiNode* const a_Node, const aiScene* const a_Scene, std::vector<RawMeshData>& aData)
 {
 	// Process meshes in node
 	for (unsigned int i = 0; i < a_Node->mNumMeshes; i++)
 	{
-		ProcessMesh(a_Scene->mMeshes[a_Node->mMeshes[i]], a_Scene);
-		
+		aData.push_back(ProcessMesh(a_Scene->mMeshes[a_Node->mMeshes[i]], a_Scene));
 	}
 
 	// Process children of scene recursively
 	for (unsigned int j = 0; j < a_Node->mNumChildren; j++)
 	{
-		ProcessNode((a_Node->mChildren[j]), a_Scene);
+		ProcessNode((a_Node->mChildren[j]), a_Scene, aData);
 	}
 }
 
-void ModelLoader::LoadModel(const char* const aFilePath)
-{
-	Assimp::Importer importer;
 
+#include <fstream>
+#include "easylogging++.h"
+
+bool is_file_exist(const char *fileName)
+{
+	std::ifstream infile(fileName);
+	return infile.good();
+}
+
+// LoadModel implicitly exports a file to assbin right now, and next time it will load the assbin version if possible
+std::vector<RawMeshData> ModelLoader::LoadModel(const char* const aFilePath)
+{
+	bool doesAssbinVersionExist = false;
+	// Set directory string and c_string
+	std::string assbinString(aFilePath);
+
+
+	std::size_t dotPos = assbinString.find_last_of(".");
+	assbinString.erase(dotPos, assbinString.size());
+
+	assbinString.append(".assbin");
+
+	doesAssbinVersionExist = is_file_exist(assbinString.c_str());
 
 
 	const aiScene* scene;
+	Assimp::Importer importer;
 
-	scene = importer.ReadFile(aFilePath, aiProcess_GenUVCoords | aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_Fast | aiProcess_CalcTangentSpace);
+	std::string filePathToBeLoaded = aFilePath;
+	if (doesAssbinVersionExist)
+	{
+		LOG(INFO) << "ModelLoader Assbin version exists, loading";
+		filePathToBeLoaded = assbinString;
+		scene = importer.ReadFile(filePathToBeLoaded.c_str(), 0);
+	}
+
+	else
+	{
+		LOG(INFO) << "ModelLoader Assbin version created of asset";
+		Exporter exporter;
+		scene = importer.ReadFile(filePathToBeLoaded.c_str(), aiProcess_GenUVCoords | aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_Fast | aiProcess_CalcTangentSpace);
+		exporter.Export(scene, "assbin", assbinString, aiProcess_GenUVCoords | aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_Fast | aiProcess_CalcTangentSpace);
+	}
+
+
 	assert(scene != nullptr);
-
 	if (!scene)
 	{
 		printf("%s", importer.GetErrorString());
 	}
-
-	// Set directory string and c_string
-	std::string aFilePathStr(aFilePath);
-
-	mDirectory = aFilePathStr.substr(0, aFilePathStr.find_last_of("\\"));
 	
-	ProcessNode(scene->mRootNode, scene);
-	//printf("%i", mMeshesToBeProcessed.size());
+
+	std::vector<RawMeshData> tData;
+	ProcessNode(scene->mRootNode, scene, tData);
+	
+	return tData;
 }

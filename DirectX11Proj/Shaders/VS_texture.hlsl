@@ -40,7 +40,8 @@ PixelInputType TextureVertexShader(VertexInputType input)
 	
 	output.norm = mul(input.normal, (float3x3)worldMatrix);
 	output.tang = mul(input.tangent, (float3x3)worldMatrix);
-    output.position = mul(output.position, viewMatrix);
+   
+	output.position = mul(output.position, viewMatrix);
     output.position = mul(output.position, projectionMatrix);
         
 	output.uv = input.uv;
