@@ -389,17 +389,17 @@ void Render()
 	if (GraphicsSettings::gShowDebugWindow)
 	{
 		ShowTitleMenu();
-
-
+		
+		
 		static float f = 0.0f;
-
+		
 		ImGui::Text("Hello, world!");
 		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-
+		
 		for (int i = 0; i < mpPlayerScene->mLights.size(); ++i)
 		{
 			ImGui::ColorEdit3("color point light", (float*)&mpPlayerScene->mLights[i]->diffuseColor);
-
+		
 			ImGui::ColorEditMode(ImGuiColorEditMode_UserSelect);
 			static float pos[3] = { 0.0, 0.0, 0.0 };
 			ImGui::ColorEdit3("position point light", (float*)&pos);
@@ -415,8 +415,8 @@ void Render()
 		mpPlayerScene->mDirectionalLight->GenerateViewMatrix();
 
 
-		ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		//ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
+		//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}
 
 	mpRenderer->RenderScene(mpPlayerScene->mObjects, mpPlayerScene->mLights, mpPlayerScene->mDirectionalLight.get(), mpPlayerScene->GetCamera());
@@ -425,7 +425,7 @@ void Render()
 	float performance = std::chrono::duration_cast<std::chrono::microseconds>(frameConstantBufferTimerEnd - frameConstantBufferTimerStart).count() / 1000.0f;
 
 
-	ImGui::Text("Rendering total: %.3f ms/frame", performance);
+	//ImGui::Text("Rendering total: %.3f ms/frame", performance);
 
 	ImGui::Render();
 

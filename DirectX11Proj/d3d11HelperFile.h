@@ -388,39 +388,9 @@ static ID3D11DepthStencilState* CreateDepthStateDefault(ID3D11Device* const aDev
 **RENDER TARGET VIEW FUNCTIONS**
 ********************************
 */
-static ID3D11Texture2D* CreateSimpleRenderTargetTexture(ID3D11Device* const aDevice, uint32_t aWidth, uint32_t aHeight, DXGI_FORMAT aFormat, uint32_t aBindFlags)
-{
-	HRESULT result;
-	D3D11_TEXTURE2D_DESC textureDesc;
-	ID3D11Texture2D* tTexture = nullptr;
 
-	// Initialize the render target texture description.
-	ZeroMemory(&textureDesc, sizeof(textureDesc));
 
-	// Setup the render target texture description.
-	textureDesc.Width = aWidth;
-	textureDesc.Height = aHeight;
-	textureDesc.MipLevels = 1;
-	textureDesc.ArraySize = 1;
-	textureDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	textureDesc.SampleDesc.Count = 1;
-	textureDesc.Usage = D3D11_USAGE_DEFAULT;
-	textureDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-	textureDesc.CPUAccessFlags = 0;
-	textureDesc.MiscFlags = 0;
-
-	// Create the render target texture.
-	result = aDevice->CreateTexture2D(&textureDesc, NULL, &tTexture);
-	if (FAILED(result))
-	{
-		LOG(ERROR) << "CreateTexture2DRTVDefault failed";
-		return nullptr;
-	}
-
-	return tTexture;
-}
-
-static ID3D11Texture2D* CreateSimpleDepthTexture(ID3D11Device* const aDevice, uint32_t aWidth, uint32_t aHeight, DXGI_FORMAT aFormat, UINT aBindFlags)
+static ID3D11Texture2D* CreateSimpleTexture2D(ID3D11Device* const aDevice, uint32_t aWidth, uint32_t aHeight, DXGI_FORMAT aFormat, UINT aBindFlags)
 {
 	D3D11_TEXTURE2D_DESC depthBufferDesc;
 	HRESULT result;
@@ -446,7 +416,7 @@ static ID3D11Texture2D* CreateSimpleDepthTexture(ID3D11Device* const aDevice, ui
 	result = aDevice->CreateTexture2D(&depthBufferDesc, NULL, &texture);
 	if (FAILED(result))
 	{
-		LOG(ERROR) << "CreateSimpleDepthBuffer failed";
+		LOG(ERROR) << "CreateSimpleTexture2D failed";
 		return nullptr;
 	}
 	return texture;

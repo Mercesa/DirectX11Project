@@ -280,10 +280,10 @@ void Renderer::RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObject
 		shadowSceneObjectTiming = objectRenderingTime;
 	}
 
-	ImGui::Text("Updating frame constant %.5f ms/frame", fCbtiming);
-	ImGui::Text("Render scene depth pre-pass %.5f ms/frame", depthPrePassTiming);
-	ImGui::Text("Render scene with shadows %.5f ms/frame", shadowSceneTiming);
-	ImGui::Text("Render shadow scene objects %.5f ms/frame", shadowSceneObjectTiming);
+	//ImGui::Text("Updating frame constant %.5f ms/frame", fCbtiming);
+	//ImGui::Text("Render scene depth pre-pass %.5f ms/frame", depthPrePassTiming);
+	//ImGui::Text("Render scene with shadows %.5f ms/frame", shadowSceneTiming);
+	//ImGui::Text("Render shadow scene objects %.5f ms/frame", shadowSceneObjectTiming);
 }
 
 
@@ -622,27 +622,37 @@ bool Renderer::InitializeBackBuffRTV()
 	mPostProcDepthBuffer = std::make_unique<Texture>();
 	mShadowDepthBuffer = std::make_unique<Texture>();
 
+	gBuffer_positionBuffer = std::make_unique<Texture>();
 	gBuffer_albedoBuffer = std::make_unique<Texture>();
 	gBuffer_normalBuffer = std::make_unique<Texture>();
 	gBuffer_specularBuffer = std::make_unique<Texture>();
 
 	// Post proc color and depth buffer 
-	mPostProcColorBuffer->texture =  CreateSimpleRenderTargetTexture(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
+	mPostProcColorBuffer->texture =  CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
 	mPostProcColorBuffer->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), mPostProcColorBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	mPostProcColorBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), mPostProcColorBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	
-	mPostProcDepthBuffer->texture = CreateSimpleDepthTexture(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
+	mPostProcDepthBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
 	mPostProcDepthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), mPostProcDepthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
 	// Backbuffer
-	mBackBufferTexture->texture = CreateSimpleDepthTexture(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
+	mBackBufferTexture->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
 	mBackBufferTexture->dsv =  CreateSimpleDepthstencilView(mpDevice.Get(), mBackBufferTexture->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	mBackBufferTexture->rtv = CreateRenderTargetViewFromSwapchain(mpDevice.Get(), mpSwapchain.Get());
 
 	// Buffer for shadow mapping
-	mShadowDepthBuffer->texture = CreateSimpleDepthTexture(mpDevice.Get(), 8096, 8096, GetDepthResourceFormat(DXGI_FORMAT_D24_UNORM_S8_UINT), D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
+	mShadowDepthBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), 8096, 8096, GetDepthResourceFormat(DXGI_FORMAT_D24_UNORM_S8_UINT), D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
 	mShadowDepthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), mShadowDepthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	mShadowDepthBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), mShadowDepthBuffer->texture, GetDepthSRVFormat(DXGI_FORMAT_D24_UNORM_S8_UINT));
+
+
+	gBuffer_positionBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
+	gBuffer_positionBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), gBuffer_positionBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
+	gBuffer_positionBuffer->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), gBuffer_positionBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
+
+	gBuffer_normalBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
+	gBuffer_normalBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), gBuffer_normalBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
+	gBuffer_normalBuffer->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), gBuffer_normalBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
 
 
@@ -677,6 +687,7 @@ bool Renderer::DestroyDirectX()
 	
 	ReleaseTexture(mShadowDepthBuffer.get());
 
+	ReleaseTexture(gBuffer_positionBuffer.get());
 	ReleaseTexture(gBuffer_albedoBuffer.get());
 	ReleaseTexture(gBuffer_normalBuffer.get());
 	ReleaseTexture(gBuffer_specularBuffer.get());
@@ -718,8 +729,6 @@ bool Renderer::InitializeViewportAndMatrices()
 	mViewport.MaxDepth = 1.0f;
 	mViewport.TopLeftX = 0.0f;
 	mViewport.TopLeftY = 0.0f;
-
-	
 
 	return true;
 }

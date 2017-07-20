@@ -127,6 +127,7 @@ private:
 	std::unique_ptr<Texture> mPostProcColorBuffer;
 	std::unique_ptr<Texture> mPostProcDepthBuffer;
 
+	std::unique_ptr<Texture> gBuffer_positionBuffer;
 	std::unique_ptr<Texture> gBuffer_albedoBuffer;
 	std::unique_ptr<Texture> gBuffer_normalBuffer;
 	std::unique_ptr<Texture> gBuffer_specularBuffer;
