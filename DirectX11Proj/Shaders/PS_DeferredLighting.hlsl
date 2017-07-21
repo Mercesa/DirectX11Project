@@ -21,5 +21,6 @@ float4 PSDeferredLighting(VSQuadOut quadIn) : SV_TARGET
 	float4 position = positionTexture.Load(int3(quadIn.position.xy, 0));
 	float4 normal = normalTexture.Load(int3(quadIn.position.xy, 0));
 
-	 return PerformLighting((float3)position, (float3)normal, albedo, 1.0f);
+	 //return PerformLighting((float3)position, (float3)normal, albedo, 1.0f);
+	return albedo;
 }

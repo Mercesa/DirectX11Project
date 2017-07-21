@@ -192,6 +192,7 @@
     <ClInclude Include="d3dShaderVS.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EngineTimer.h" />
+    <ClInclude Include="GenericMathValueStructs.h" />
     <ClInclude Include="GraphicsSettings.h" />
     <ClInclude Include="GraphicsStructures.h" />
     <ClInclude Include="imconfig.h" />

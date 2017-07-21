@@ -15,6 +15,7 @@
 
 #include "IScene.h"
 #include "d3d11HelperFile.h"
+#include "GenericMathValueStructs.h"
 
 class d3dRenderTexture;
 class d3dRenderDepthTexture;
@@ -98,6 +99,7 @@ private:
 	D3D11_VIEWPORT mViewport;
 	D3D11_VIEWPORT mShadowLightViewport;
 
+	
 	// IDXGI stuff
 	Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;
 	Microsoft::WRL::ComPtr<IDXGIAdapter> mAdapter;
@@ -137,5 +139,6 @@ private:
 	std::unique_ptr<Texture> gBuffer_normalBuffer;
 	std::unique_ptr<Texture> gBuffer_specularBuffer;
 	std::unique_ptr<Texture> gBuffer_depthBuffer;
+	std::unique_ptr<Texture> randomValueTexture;
 };
 

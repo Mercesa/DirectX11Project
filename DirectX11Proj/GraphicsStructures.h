@@ -50,7 +50,6 @@ struct RawMeshData
 	RawTextureData diffuseData;
 	RawTextureData specularData;
 	RawTextureData normalData;
-
 };
 
 

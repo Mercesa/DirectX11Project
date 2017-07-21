@@ -18,6 +18,8 @@
 #include "GraphicsStructures.h"
 #include "GraphicsSettings.h"
 
+#include <random>
+
 using namespace DirectX;
 
 Renderer::Renderer()
@@ -318,7 +320,6 @@ void Renderer::RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjec
 	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
 
 	BindStandardConstantBuffers();
-	RenderSceneDepthPrePass(aObjects);
 	RenderSceneGBufferFill(aObjects);
 	RenderSceneLightingPass(aObjects);
 }
@@ -434,7 +435,7 @@ void Renderer::RenderMaterial(d3dMaterial* const aMaterial)
 {
 	// Bind textures from material
 	ID3D11ShaderResourceView* aView = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpDiffuse)->srv;
-	mpDeviceContext->PSSetShaderResources(0, 1, &aView);
+	mpDeviceContext->PSSetShaderResources(0, 1, &randomValueTexture->srv);
 
 	ID3D11ShaderResourceView* aView2 = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpSpecular)->srv;
 	mpDeviceContext->PSSetShaderResources(1, 1, &aView2);
@@ -703,7 +704,7 @@ bool Renderer::InitializeBackBuffRTV()
 	gBuffer_normalBuffer = std::make_unique<Texture>();
 	gBuffer_specularBuffer = std::make_unique<Texture>();
 	gBuffer_depthBuffer = std::make_unique<Texture>();
-
+	randomValueTexture = std::make_unique<Texture>();
 
 	// Post proc color and depth buffer 
 	mPostProcColorBuffer->texture =  CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
@@ -740,6 +741,60 @@ bool Renderer::InitializeBackBuffRTV()
 	gBuffer_depthBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
 	gBuffer_depthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), gBuffer_depthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
 
+	std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);
+	std::default_random_engine generator;
+	
+	// Create hemisphere values in tangent space, 
+	// x from -1 to 1
+	// y from -1 to 1
+	// z from 0 to 1 because this is a hemisphere, not full sphere
+	
+	std::vector<VEC4f> randomValues;
+	for (int i = 0; i < 16; ++i)
+	{
+		VEC4f value;
+		// transform from range from 0 to 1  to -1 to 1
+ 		value.x = randomFloats(generator) *  1.0f; 
+		value.y = randomFloats(generator) *  1.0f;
+		value.z = randomFloats(generator) * 1.0f;
+		value.w = 1.0f;
+		randomValues.push_back(value);
+	}
+
+	D3D11_SUBRESOURCE_DATA srd;
+	srd.pSysMem =(void*)&randomValues[0];
+	// 4x4 pixel, so our pitch lines are 4
+	srd.SysMemPitch = sizeof(VEC4f) * 4;
+	srd.SysMemSlicePitch = 0;
+
+
+	D3D11_TEXTURE2D_DESC texDesc;
+	
+	// Setup the render target texture description.
+	// Set up the description of the depth buffer.
+	texDesc.Width = 4;
+	texDesc.Height = 4;
+	texDesc.MipLevels = 1;
+	texDesc.ArraySize = 1;
+	texDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	texDesc.CPUAccessFlags = 0;
+	texDesc.MiscFlags = 0;
+
+	HRESULT hr = mpDevice->CreateTexture2D(&texDesc, &srd, &randomValueTexture->texture);
+
+	randomValueTexture->srv = CreateSimpleShaderResourceView(mpDevice.Get(), randomValueTexture->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
+
+
+
+	if (FAILED(hr))
+	{
+		std::cout << "Failed to create custom texture";
+	}
+
 	return true;
 }
 
@@ -775,7 +830,9 @@ bool Renderer::DestroyDirectX()
 	ReleaseTexture(gBuffer_albedoBuffer.get());
 	ReleaseTexture(gBuffer_normalBuffer.get());
 	ReleaseTexture(gBuffer_specularBuffer.get());
+	ReleaseTexture(gBuffer_depthBuffer.get());
 
+	ReleaseTexture(randomValueTexture.get());
 
 	mRaster_backcull->Release();
 	mpDepthStencilState->Release();
