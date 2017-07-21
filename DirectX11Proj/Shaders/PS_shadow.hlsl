@@ -37,7 +37,7 @@ float ShadowMappingPCF(PixelInputType input)
 	projectTexCoord.x = input.lightViewPosition.x / input.lightViewPosition.w * 0.5f + 0.5f;
 	projectTexCoord.y = input.lightViewPosition.y / -input.lightViewPosition.w * 0.5f + 0.5f;
 
-	// For loop 
+	// Percentage close filtering
 	for (int y = -2; y < 2; ++y)
 	{
 		for (int x = -2; x < 2; ++x)

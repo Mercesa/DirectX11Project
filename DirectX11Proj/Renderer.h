@@ -55,6 +55,8 @@ private:
 	bool InitializeSamplerState();
 	bool InitializeViewportAndMatrices();
 
+	void BindStandardConstantBuffers();
+
 	void UpdateObjectConstantBuffers(IObject* const aObject);
 	void UpdateShadowLightConstantBuffers(d3dLightClass* const aDirectionalLight);
 	void UpdateFrameConstantBuffers(std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
@@ -72,6 +74,8 @@ private:
 	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
 
 	void RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aObjects);
+	void RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects);
+
 	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
 	void RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aObjects,
 		std::vector<std::unique_ptr<Light>>& aLights,

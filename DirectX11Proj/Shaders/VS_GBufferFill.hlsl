@@ -12,7 +12,6 @@ struct VertexInputType
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
-	float4 lightViewPosition : TEXCOORD1;
 	float3 normal : NORMAL;
 	float3 fragPos : FRAGPOSITION;
 	float3 tang : TANGENT;
@@ -32,12 +31,6 @@ PixelInputType GBufferFillVertexShader(VertexInputType input)
 
 	output.position = mul(output.position, viewMatrix);
 	output.position = mul(output.position, projectionMatrix);
-
-	// Calculate the position of the vertice as viewed by the light source.
-	output.lightViewPosition = mul(input.position, worldMatrix);
-	output.lightViewPosition = mul(output.lightViewPosition, lightViewMatrix);
-	output.lightViewPosition = mul(output.lightViewPosition, lightProjectionMatrix);
-
 
 	output.normal = mul(input.normal, (float3x3)worldMatrix);
 	output.normal = normalize(output.normal);

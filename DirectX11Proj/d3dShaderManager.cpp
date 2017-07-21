@@ -35,6 +35,9 @@ bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_GBufferFill.hlsl", "GBufferFillVertexShader", "vs_5_0", EVERTEX));
 	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_GBufferFill.hlsl", "GbufferFillPixelShader", "ps_5_0", EPIXEL));
 
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_DeferredLighting.hlsl", "VSDeferredLighting", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_DeferredLighting.hlsl", "PSDeferredLighting", "ps_5_0", EPIXEL));
+
 	LOG(INFO) << "ShaderManager: Finished initializing all shaders";
 
 	// Load actual shaders
@@ -88,8 +91,6 @@ d3dShaderPS* const d3dShaderManager::GetPixelShader(const char* aShaderPath)
 
 bool d3dShaderManager::LoadShaders(ID3D11Device* const apDevice)
 {
-	HRESULT result;
-
 	for (auto& e : mShadersInfo)
 	{
 		if (e.mShaderType == EVERTEX)

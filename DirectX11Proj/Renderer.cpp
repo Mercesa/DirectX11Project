@@ -196,6 +196,7 @@ void Renderer::RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aOb
 
 
 }
+static bool renderForward = true;
 
 
 void Renderer::RenderScene(
@@ -205,8 +206,15 @@ void Renderer::RenderScene(
 	Camera* const apCamera
 )
 {
-	//RenderSceneForward(aObjects, aLights, aDirectionalLight, apCamera);
-	RenderSceneDeferred(aObjects, aLights, aDirectionalLight, apCamera);
+	if (ImGui::MenuItem("Enabled", NULL, true))
+	{
+		RenderSceneForward(aObjects, aLights, aDirectionalLight, apCamera);
+	}
+
+	else
+	{
+		RenderSceneDeferred(aObjects, aLights, aDirectionalLight, apCamera);
+	}
 }
 
 void Renderer::RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aObjects)
@@ -216,7 +224,7 @@ void Renderer::RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aOb
 	
 	mpDeviceContext->ClearDepthStencilView(this->gBuffer_depthBuffer->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 	
-	ID3D11RenderTargetView* renderTargetArray[3] = { gBuffer_albedoBuffer->rtv, gBuffer_positionBuffer->rtv, gBuffer_normalBuffer->rtv };
+	ID3D11RenderTargetView* renderTargetArray[3] = { gBuffer_albedoBuffer->rtv, gBuffer_normalBuffer->rtv, gBuffer_positionBuffer->rtv };
 
 	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
 	mpDeviceContext->OMSetRenderTargets(3, renderTargetArray, gBuffer_depthBuffer->dsv);
@@ -244,52 +252,39 @@ void Renderer::RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aOb
 }
 
 
-void Renderer::RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera)
+void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects)
 {
-	//float color[4]{ clearColor[0], clearColor[1], clearColor[2], 1.0f };
-	apCamera->UpdateViewMatrix();
-	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
+	// Get the fullscreen shaders
+	d3dShaderVS*const tFVS = mpShaderManager->GetVertexShader("Shaders\\VS_DeferredLighting.hlsl");
+	d3dShaderPS*const tFPS = mpShaderManager->GetPixelShader("Shaders\\PS_DeferredLighting.hlsl");
 
 
-	ID3D11Buffer* tBuff = mpMatrixCB->GetBuffer();
-	mpDeviceContext->VSSetConstantBuffers(0, 1, &tBuff);
-	mpDeviceContext->PSSetConstantBuffers(0, 1, &tBuff);
+	mpDeviceContext->RSSetViewports(1, &mViewport);
+	mpDeviceContext->RSSetState(mRaster_backcull);
 
-	// Material info cb at {1}
-	tBuff = mpMaterialCB->GetBuffer();
-	mpDeviceContext->PSSetConstantBuffers(1, 1, &tBuff);
+	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
 
-	// Light info for lighting cb at {2}
-	tBuff = mpLightCB->GetBuffer();
-	mpDeviceContext->PSSetConstantBuffers(2, 1, &tBuff);
+	// Set backbuffer as RT
+	mpDeviceContext->OMSetRenderTargets(1, &this->mBackBufferTexture->rtv, mBackBufferTexture->dsv);
+	mpDeviceContext->ClearDepthStencilView(mBackBufferTexture->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-	// light matrix for shadows cb at {3}
-	tBuff = mpLightMatrixCB->GetBuffer();
-	mpDeviceContext->VSSetConstantBuffers(3, 1, &tBuff);
-	mpDeviceContext->PSSetConstantBuffers(3, 1, &tBuff);
+	
+	// Draw full screen quad
+	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
+	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	mpDeviceContext->VSSetShader(tFVS->GetVertexShader(), NULL, 0);
+	mpDeviceContext->PSSetShader(tFPS->GetPixelShader(), NULL, 0);
 
-	// Per object cb at {4}
-	tBuff = mpPerObjectCB->GetBuffer();
-	mpDeviceContext->VSSetConstantBuffers(4, 1, &tBuff);
-	mpDeviceContext->PSSetConstantBuffers(4, 1, &tBuff);
+	// Set gbuffer resources
+	mpDeviceContext->PSSetShaderResources(0, 1, &gBuffer_albedoBuffer->srv);
+	mpDeviceContext->PSSetShaderResources(1, 1, &gBuffer_positionBuffer->srv);
+	mpDeviceContext->PSSetShaderResources(2, 1, &gBuffer_normalBuffer->srv);
 
-	RenderSceneGBufferFill(aObjects);
+	mpDeviceContext->Draw(4, 0);
 }
 
-
-void Renderer::RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera)
+void Renderer::BindStandardConstantBuffers()
 {
-	float color[4]{ clearColor[0], clearColor[1], clearColor[2], 1.0f };
-
-	// Update frame constant buffers  
-
-
-	// Update and bind constant buffers
-	auto frameConstantBufferTimerStart = std::chrono::high_resolution_clock::now();
-	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
-
-
-	// bind buffers
 
 	// view/Proj matrix cb at {0}
 	ID3D11Buffer* tBuff = mpMatrixCB->GetBuffer();
@@ -299,7 +294,7 @@ void Renderer::RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObject
 	// Material info cb at {1}
 	tBuff = mpMaterialCB->GetBuffer();
 	mpDeviceContext->PSSetConstantBuffers(1, 1, &tBuff);
-	
+
 	// Light info for lighting cb at {2}
 	tBuff = mpLightCB->GetBuffer();
 	mpDeviceContext->PSSetConstantBuffers(2, 1, &tBuff);
@@ -313,7 +308,33 @@ void Renderer::RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObject
 	tBuff = mpPerObjectCB->GetBuffer();
 	mpDeviceContext->VSSetConstantBuffers(4, 1, &tBuff);
 	mpDeviceContext->PSSetConstantBuffers(4, 1, &tBuff);
+}
 
+
+void Renderer::RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera)
+{
+	//float color[4]{ clearColor[0], clearColor[1], clearColor[2], 1.0f };
+	apCamera->UpdateViewMatrix();
+	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
+
+	BindStandardConstantBuffers();
+	RenderSceneDepthPrePass(aObjects);
+	RenderSceneGBufferFill(aObjects);
+	RenderSceneLightingPass(aObjects);
+}
+
+
+void Renderer::RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera)
+{
+	float color[4]{ clearColor[0], clearColor[1], clearColor[2], 1.0f };
+
+
+	auto frameConstantBufferTimerStart = std::chrono::high_resolution_clock::now();
+	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
+
+
+	// bind buffers
+	BindStandardConstantBuffers();
 	
 	auto frameConstantBufferTimerEnd = std::chrono::high_resolution_clock::now();
 	auto renderSceneDepthPrePassTimerStart = std::chrono::high_resolution_clock::now();
@@ -382,8 +403,6 @@ void Renderer::RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aO
 		RenderObject(aObjects[i].get());
 	}
 }
-
-
 
 
 // Render scene to full screen quad
@@ -685,6 +704,7 @@ bool Renderer::InitializeBackBuffRTV()
 	gBuffer_specularBuffer = std::make_unique<Texture>();
 	gBuffer_depthBuffer = std::make_unique<Texture>();
 
+
 	// Post proc color and depth buffer 
 	mPostProcColorBuffer->texture =  CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
 	mPostProcColorBuffer->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), mPostProcColorBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
@@ -719,7 +739,6 @@ bool Renderer::InitializeBackBuffRTV()
 
 	gBuffer_depthBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
 	gBuffer_depthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), gBuffer_depthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
-
 
 	return true;
 }

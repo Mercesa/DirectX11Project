@@ -4,7 +4,6 @@ Texture2D diffuseTexture : register(t0);
 Texture2D specularTexture : register(t1);
 Texture2D normalTexture : register(t2);
 
-Texture2D depthMapTexture : register(t3);
 
 SamplerState SampleTypeClamp : register(s0);
 SamplerState SampleTypeWrap : register(s1);
@@ -14,7 +13,6 @@ SamplerState SampleTypeLinearWrap : register(s3);
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
-	float4 lightViewPosition : TEXCOORD1;
 	float3 normal : NORMAL;
 	float3 fragPos : FRAGPOSITION;
 	float3 tang : TANGENT;
@@ -33,10 +31,6 @@ struct PS_OUT
 PS_OUT GbufferFillPixelShader(PixelInputType input) : SV_Target
 {
 	PS_OUT o;
-
-	o.albedo = diffuseTexture.Sample(SampleTypeAnisotropicWrap, input.tex);
-	o.normal = diffuseTexture.Sample(SampleTypeAnisotropicWrap, input.tex);
-
 
 	if (hasDiffuse)
 	{
@@ -59,6 +53,5 @@ PS_OUT GbufferFillPixelShader(PixelInputType input) : SV_Target
 	}
 
 	o.position = float4(input.fragPos.rgb, 1.0f);
-
 	return o;
 }

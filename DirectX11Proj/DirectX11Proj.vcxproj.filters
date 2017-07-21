@@ -218,13 +218,17 @@
     <None Include="Shaders\fullScreenQuad_VS.hlsl">
       <Filter>Shaders</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Shaders\PS_GBufferFill.hlsl">
+    <None Include="Shaders\PS_GBufferFill.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\VS_GBufferFill.hlsl">
+    </None>
+    <None Include="Shaders\VS_GBufferFill.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
+    </None>
+    <None Include="Shaders\PS_DeferredLighting.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\VS_DeferredLighting.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
