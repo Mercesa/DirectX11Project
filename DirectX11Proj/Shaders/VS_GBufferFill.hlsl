@@ -27,11 +27,14 @@ PixelInputType GBufferFillVertexShader(VertexInputType input)
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul(input.position, worldMatrix);
+	output.position = mul(output.position, viewMatrix);
+
+	// Fragpos is in view space
 	output.fragPos = output.position;
 
-	output.position = mul(output.position, viewMatrix);
 	output.position = mul(output.position, projectionMatrix);
 
+	// normal is calculated in view space
 	output.normal = mul(input.normal, (float3x3)worldMatrix);
 	output.normal = normalize(output.normal);
 	

@@ -34,7 +34,7 @@ PS_OUT GbufferFillPixelShader(PixelInputType input) : SV_Target
 
 	if (hasDiffuse)
 	{
-		o.albedo = diffuseTexture.Sample(SampleTypeAnisotropicWrap, input.tex);
+		o.albedo = diffuseTexture.Sample(SampleTypeLinearWrap, input.tex);
 	}
 	
 	else
@@ -44,12 +44,15 @@ PS_OUT GbufferFillPixelShader(PixelInputType input) : SV_Target
 
 	if (hasNormal)
 	{
-		o.normal = float4(NormalSampleToWorldSpace(normalTexture.Sample(SampleTypeLinearWrap, input.tex), input.normal, input.tang).rgb, 0.0f);
+		// we put the w value of NormalSampleToWorldSpace to 0 since we are transforming a directio.
+		float4 normalInViewSpace = mul(float4(NormalSampleToWorldSpace(normalTexture.Sample(SampleTypeLinearWrap, input.tex).rgb, input.normal, input.tang), 0.0f), viewMatrix);
+		//normalInViewSpace = mul(normalInViewSpace.rgb, viewMatrix);
+		o.normal = float4(normalize(normalInViewSpace.rgb), 0.0f);
 	}
 
 	else
 	{
-		o.normal = float4(input.normal.rgb, 0.0f);
+		o.normal = mul(float4(input.normal.rgb, 0.0f), viewMatrix);
 	}
 
 	o.position = float4(input.fragPos.rgb, 1.0f);

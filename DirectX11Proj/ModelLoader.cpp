@@ -214,6 +214,8 @@ std::vector<RawMeshData> ModelLoader::LoadModel(const char* const aFilePath)
 	Assimp::Importer importer;
 
 	std::string filePathToBeLoaded = aFilePath;
+	
+	// If .assbin version of file exist, load that one
 	if (doesAssbinVersionExist)
 	{
 		LOG(INFO) << "ModelLoader Assbin version exists, loading";
@@ -225,8 +227,8 @@ std::vector<RawMeshData> ModelLoader::LoadModel(const char* const aFilePath)
 	{
 		LOG(INFO) << "ModelLoader Assbin version created of asset";
 		Exporter exporter;
-		scene = importer.ReadFile(filePathToBeLoaded.c_str(), aiProcess_GenUVCoords | aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_Fast | aiProcess_CalcTangentSpace);
-		exporter.Export(scene, "assbin", assbinString, aiProcess_GenUVCoords | aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_Fast | aiProcess_CalcTangentSpace);
+		scene = importer.ReadFile(filePathToBeLoaded.c_str(), aiProcess_FlipUVs | aiProcessPreset_TargetRealtime_Fast | aiProcess_CalcTangentSpace);
+		exporter.Export(scene, "assbin", assbinString, 0);
 	}
 
 

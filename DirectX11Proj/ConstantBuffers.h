@@ -1,11 +1,13 @@
 #pragma once
 
 #include "GraphicsStructures.h"
+#include "GenericMathValueStructs.h"
 
 struct cbMatrixBuffer
 {
 	XMMATRIX view;
 	XMMATRIX projection;
+	XMMATRIX viewMatrixInversed;
 
 	float gEyePosX;
 	float gEyePosY;
@@ -17,6 +19,8 @@ struct cbLightMatrix
 {
 	XMMATRIX lightViewMatrix;
 	XMMATRIX lightProjectionMatrix;
+	VEC3f kernelSamples[64];
+	VEC4f padding0[16];
 };
 
 struct cbMaterial

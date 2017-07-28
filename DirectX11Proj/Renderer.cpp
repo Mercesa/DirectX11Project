@@ -92,12 +92,14 @@ void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& 
 	// Transpose the matrices to prepare them for the shader.
 	XMMATRIX viewMatrix2 = XMMatrixTranspose(viewMatrix);
 	XMMATRIX projectionMatrix2 = XMMatrixTranspose(projectionMatrix);
+	XMMATRIX invView = XMMatrixTranspose((XMMatrixInverse(nullptr, apCamera->GetView())));
 
 	// Get a pointer to the data in the constant buffer.
 
 	// Copy the matrices into the constant buffer.
 	gMatrixBufferDataPtr->view = viewMatrix2;
 	gMatrixBufferDataPtr->projection = projectionMatrix2;
+	gMatrixBufferDataPtr->viewMatrixInversed = invView;
 	gMatrixBufferDataPtr->gEyePosX = apCamera->GetPosition3f().x;
 	gMatrixBufferDataPtr->gEyePosY = apCamera->GetPosition3f().y;
 	gMatrixBufferDataPtr->gEyePosZ = apCamera->GetPosition3f().z;
@@ -118,7 +120,6 @@ void Renderer::UpdateShadowLightConstantBuffers(d3dLightClass* const aDirectiona
 
 	gLightMatrixBufferDataPtr->lightViewMatrix = XMMatrixTranspose(viewMatrix);
 	gLightMatrixBufferDataPtr->lightProjectionMatrix = XMMatrixTranspose(projectionMatrix);
-
 	this->mpLightMatrixCB->UpdateBuffer((void*)gLightMatrixBufferDataPtr.get(), mpDeviceContext.Get());
 }
 
@@ -208,7 +209,9 @@ void Renderer::RenderScene(
 	Camera* const apCamera
 )
 {
-	if (ImGui::MenuItem("Enabled", NULL, true))
+	ImGui::MenuItem("Enabled", NULL, &renderForward);
+
+	if(renderForward)
 	{
 		RenderSceneForward(aObjects, aLights, aDirectionalLight, apCamera);
 	}
@@ -273,6 +276,8 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 	
 	// Draw full screen quad
 	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
+	mpDeviceContext->PSSetSamplers(1, 1, &mpPointWrapSampler);
+
 	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	mpDeviceContext->VSSetShader(tFVS->GetVertexShader(), NULL, 0);
 	mpDeviceContext->PSSetShader(tFPS->GetPixelShader(), NULL, 0);
@@ -281,6 +286,8 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 	mpDeviceContext->PSSetShaderResources(0, 1, &gBuffer_albedoBuffer->srv);
 	mpDeviceContext->PSSetShaderResources(1, 1, &gBuffer_positionBuffer->srv);
 	mpDeviceContext->PSSetShaderResources(2, 1, &gBuffer_normalBuffer->srv);
+	mpDeviceContext->PSSetShaderResources(3, 1, &randomValueTexture->srv);
+	mpDeviceContext->PSSetShaderResources(4, 1, &mShadowDepthBuffer->srv);
 
 	mpDeviceContext->Draw(4, 0);
 }
@@ -320,6 +327,7 @@ void Renderer::RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjec
 	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
 
 	BindStandardConstantBuffers();
+	RenderSceneDepthPrePass(aObjects);
 	RenderSceneGBufferFill(aObjects);
 	RenderSceneLightingPass(aObjects);
 }
@@ -435,7 +443,7 @@ void Renderer::RenderMaterial(d3dMaterial* const aMaterial)
 {
 	// Bind textures from material
 	ID3D11ShaderResourceView* aView = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpDiffuse)->srv;
-	mpDeviceContext->PSSetShaderResources(0, 1, &randomValueTexture->srv);
+	mpDeviceContext->PSSetShaderResources(0, 1, &aView);
 
 	ID3D11ShaderResourceView* aView2 = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpSpecular)->srv;
 	mpDeviceContext->PSSetShaderResources(1, 1, &aView2);
@@ -688,8 +696,12 @@ bool Renderer::InitializeDXGI()
 	return true;
 }
 
+float lerp(float v0, float v1, float t)
+{
+	return (1 - t) * v0 + t * v1;
+}
 
-bool Renderer::InitializeBackBuffRTV()
+bool Renderer::InitializeResources()
 {	
 	//mSceneRenderTexture = std::make_unique<d3dRenderTexture>();
 	//mSceneRenderTexture->Initialize(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, SCREEN_NEAR, SCREEN_FAR);
@@ -744,20 +756,17 @@ bool Renderer::InitializeBackBuffRTV()
 	std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);
 	std::default_random_engine generator;
 	
-	// Create hemisphere values in tangent space, 
-	// x from -1 to 1
-	// y from -1 to 1
-	// z from 0 to 1 because this is a hemisphere, not full sphere
 	
+	// create offset positions to sample for our SSAO
 	std::vector<VEC4f> randomValues;
 	for (int i = 0; i < 16; ++i)
 	{
 		VEC4f value;
 		// transform from range from 0 to 1  to -1 to 1
- 		value.x = randomFloats(generator) *  1.0f; 
-		value.y = randomFloats(generator) *  1.0f;
-		value.z = randomFloats(generator) * 1.0f;
-		value.w = 1.0f;
+ 		value.x = randomFloats(generator) *  2.0f - 1.0f; 
+		value.y = randomFloats(generator) *  2.0f - 1.0f;
+		value.z = 0.0f;
+		value.w = 0.0f;
 		randomValues.push_back(value);
 	}
 
@@ -788,13 +797,48 @@ bool Renderer::InitializeBackBuffRTV()
 
 	randomValueTexture->srv = CreateSimpleShaderResourceView(mpDevice.Get(), randomValueTexture->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
-
-
 	if (FAILED(hr))
 	{
 		std::cout << "Failed to create custom texture";
 	}
 
+	// we want x amount of kernels
+	// needs to be in tangent space
+	// Create hemisphere values in tangent space, 
+	// x from -1 to 1
+	// y from -1 to 1
+	// z from 0 to 1 because this is a hemisphere, not full sphere
+	// divide all values by 64
+
+	memset(&gLightMatrixBufferDataPtr->kernelSamples, 0, sizeof(VEC3f) * (size_t)64);
+
+	for (int i = 0; i < 64; ++i)
+	{
+		VEC3f value;
+		value.x = randomFloats(generator) * 2.0f - 1.0f;
+		value.y = randomFloats(generator) * 2.0f - 1.0f;
+		value.z = randomFloats(generator);
+
+		// normalize
+		float length = sqrt(value.x*value.x + value.y*value.y + value.z*value.z);
+		value.x /= length;
+		value.y /= length;
+		value.z /= length;
+		
+		float randValue = randomFloats(generator);
+		value.x *= randValue;
+		value.y *= randValue;
+		value.z *= randValue;
+
+		// 
+		float scale = (float)i / 64.0f;
+		scale = lerp(0.1f, 1.0f, scale * scale);
+		value.x *= scale;
+		value.y *= scale;
+		value.z *= scale;
+
+		gLightMatrixBufferDataPtr->kernelSamples[i] = value;
+	}
 	return true;
 }
 
@@ -837,10 +881,11 @@ bool Renderer::DestroyDirectX()
 	mRaster_backcull->Release();
 	mpDepthStencilState->Release();
 	mpAnisotropicWrapSampler->Release();
+	
 	mpLinearClampSampler->Release();
 	mpPointClampSampler->Release();
 	mpLinearWrapSampler->Release();
-
+	mpPointWrapSampler->Release();
 	return true;
 }
 
@@ -851,6 +896,7 @@ bool  Renderer::InitializeSamplerState()
 	mpPointClampSampler = CreateSamplerPointClamp(mpDevice.Get());
 	mpLinearClampSampler = CreateSamplerLinearClamp(mpDevice.Get());
 	mpLinearWrapSampler = CreateSamplerLinearWrap(mpDevice.Get());
+	mpPointWrapSampler = CreateSamplerPointWrap(mpDevice.Get());
 	return true;
 }
 
@@ -897,7 +943,7 @@ bool Renderer::InitializeDirectX()
 	}
 	LOG(INFO) << "Successfully initialized Swapchain";
 
-	if (!InitializeBackBuffRTV())
+	if (!InitializeResources())
 	{
 		LOG(INFO) << "Failed to create RTV with back buffer";
 		return false;

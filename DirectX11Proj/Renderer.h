@@ -50,7 +50,7 @@ private:
 	bool InitializeDXGI();
 	bool InitializeDeviceAndContext();
 	bool InitializeSwapchain();
-	bool InitializeBackBuffRTV();
+	bool InitializeResources();
 	bool InitializeDepthStencilView();
 	bool InitializeRasterstate();
 	bool InitializeSamplerState();
@@ -116,7 +116,8 @@ private:
 	ID3D11SamplerState* mpLinearWrapSampler;
 
 	ID3D11SamplerState* mpPointClampSampler;
-	
+	ID3D11SamplerState* mpPointWrapSampler;
+
 	// Constant buffers 
 	std::unique_ptr<d3dConstantBuffer> mpMatrixCB;
 	std::unique_ptr<d3dConstantBuffer> mpMaterialCB;
