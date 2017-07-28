@@ -192,6 +192,7 @@
     <ClInclude Include="d3dShaderVS.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EngineTimer.h" />
+    <ClInclude Include="GenericMathValueStructs.h" />
     <ClInclude Include="GraphicsSettings.h" />
     <ClInclude Include="GraphicsStructures.h" />
     <ClInclude Include="imconfig.h" />
@@ -251,6 +252,22 @@
       <FileType>Document</FileType>
     </None>
     <None Include="Shaders\fullScreenQuad_VS.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\PS_GBufferFill.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shaders\VS_GBufferFill.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\PS_DeferredLighting.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shaders\VS_DeferredLighting.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

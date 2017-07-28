@@ -183,6 +183,9 @@
     <ClInclude Include="WindowsAndDXIncludes.h">
       <Filter>Platform</Filter>
     </ClInclude>
+    <ClInclude Include="GenericMathValueStructs.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\VS_texture.hlsl">
@@ -216,6 +219,18 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\fullScreenQuad_VS.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PS_GBufferFill.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\VS_GBufferFill.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PS_DeferredLighting.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\VS_DeferredLighting.hlsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

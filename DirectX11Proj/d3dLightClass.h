@@ -41,7 +41,6 @@ private:
 
 	XMFLOAT3 mLookAt;
 
-
 	XMFLOAT4X4	mViewMatrix;
 	XMFLOAT4X4  mProjectionmatrix;
 	XMFLOAT4X4  mOrthoMatrix;

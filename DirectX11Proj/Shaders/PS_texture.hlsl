@@ -38,5 +38,5 @@ float4 TexturePixelShader(PixelInputType input) : SV_TARGET
 	{
 		diffuseColor = diffuseTexture.Sample(SampleType, input.uv);
 	}
-	return PerformLighting(input.fragPos, tNorm, diffuseColor, specColor);
+	return PerformLighting(input.fragPos, tNorm, diffuseColor, specColor, 1.0f);
 }

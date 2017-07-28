@@ -15,6 +15,7 @@
 
 #include "IScene.h"
 #include "d3d11HelperFile.h"
+#include "GenericMathValueStructs.h"
 
 class d3dRenderTexture;
 class d3dRenderDepthTexture;
@@ -49,11 +50,13 @@ private:
 	bool InitializeDXGI();
 	bool InitializeDeviceAndContext();
 	bool InitializeSwapchain();
-	bool InitializeBackBuffRTV();
+	bool InitializeResources();
 	bool InitializeDepthStencilView();
 	bool InitializeRasterstate();
 	bool InitializeSamplerState();
 	bool InitializeViewportAndMatrices();
+
+	void BindStandardConstantBuffers();
 
 	void UpdateObjectConstantBuffers(IObject* const aObject);
 	void UpdateShadowLightConstantBuffers(d3dLightClass* const aDirectionalLight);
@@ -65,8 +68,14 @@ private:
 	// Render functions
 	void RenderObject(IObject* const aObject);
 	void RenderMaterial(d3dMaterial* const aMaterial);
+
 	void RenderFullScreenQuad();
+	
 	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
+	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
+
+	void RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aObjects);
+	void RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects);
 
 	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
 	void RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aObjects,
@@ -90,9 +99,7 @@ private:
 	D3D11_VIEWPORT mViewport;
 	D3D11_VIEWPORT mShadowLightViewport;
 
-
-
-
+	
 	// IDXGI stuff
 	Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;
 	Microsoft::WRL::ComPtr<IDXGIAdapter> mAdapter;
@@ -109,7 +116,8 @@ private:
 	ID3D11SamplerState* mpLinearWrapSampler;
 
 	ID3D11SamplerState* mpPointClampSampler;
-	
+	ID3D11SamplerState* mpPointWrapSampler;
+
 	// Constant buffers 
 	std::unique_ptr<d3dConstantBuffer> mpMatrixCB;
 	std::unique_ptr<d3dConstantBuffer> mpMaterialCB;
@@ -131,8 +139,7 @@ private:
 	std::unique_ptr<Texture> gBuffer_albedoBuffer;
 	std::unique_ptr<Texture> gBuffer_normalBuffer;
 	std::unique_ptr<Texture> gBuffer_specularBuffer;
-
-
-
+	std::unique_ptr<Texture> gBuffer_depthBuffer;
+	std::unique_ptr<Texture> randomValueTexture;
 };
 

@@ -15,6 +15,7 @@ cbuffer MatrixBuffer : register(b0)
 {
 	matrix viewMatrix;
 	matrix projectionMatrix;
+	matrix viewMatrixInversed;
 
 	float3 gEyePos;
 	float1 pad0;
@@ -45,6 +46,8 @@ cbuffer LightMatrixBuffer : register (b3)
 {
 	matrix lightViewMatrix;
 	matrix lightProjectionMatrix;
+
+	float3 kernelSamples[64];
 }
 
 cbuffer PerObjectBuffer : register(b4)
@@ -117,25 +120,26 @@ float4 DoPointLight(Light light, float3 V, float3 P, float3 N, float4 diffTextur
 	return combined;
 }
 
-float4 DoDirectionalLight(Light light, float3 V, float3 P, float3 N, float4 diffTextureColor, float specTextureColor)
+float4 DoDirectionalLight(Light light, float3 V, float3 P, float3 N, float4 diffTextureColor, float specTextureColor, float aOcclusion)
 {
 	// Calculate light vector
+	
 	float3 L = normalize(-light.position.xyz);
 
 
 	// texture * normal dot product * light colour * attenuation
-	float4 ambientCol = diffTextureColor   *	float4(light.colour.rgb, 1.0);
+	float4 ambientCol = diffTextureColor   *	float4(light.colour.rgb * aOcclusion * 0.6f, 1.0);
 	float4 diffuseCol = diffTextureColor   *	DoDiffuse(light, L, N)		* float4(light.colour.rgb, 1.0f);
 	float4 specularCol = specTextureColor  *	DoSpecular(light, V, L, N)  * float4(light.colour.rgb, 1.0f);
 
 
-	float4 combined = (diffuseCol + specularCol);
+	float4 combined = diffuseCol + ambientCol;
 
 
 	return combined;
 }
 
-float4 PerformLighting(float3 aFragPosition, float3 aNormal, float4 aDiffMapSample, float aSpecMapSample)
+float4 PerformLighting(float3 aFragPosition, float3 aNormal, float4 aDiffMapSample, float aSpecMapSample, float aOcclusion)
 {
 	float4 tResultCol = float4(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -147,11 +151,47 @@ float4 PerformLighting(float3 aFragPosition, float3 aNormal, float4 aDiffMapSamp
 		// From frag position to eye 	
 		tResultCol += DoPointLight(arr[i], eyeDir, aFragPosition, normalize(aNormal), aDiffMapSample, aSpecMapSample);
 	}
-	tResultCol += DoDirectionalLight(directionalLight, eyeDir, aFragPosition, normalize(aNormal), aDiffMapSample, aSpecMapSample);
+	tResultCol += DoDirectionalLight(directionalLight, eyeDir, aFragPosition, normalize(aNormal), aDiffMapSample, aSpecMapSample, aOcclusion);
 
 	return tResultCol;
 }
 
+float4 DoDirectionalLightDeferred(Light light, float3 V, float3 P, float3 N, float4 diffTextureColor, float specTextureColor, float aOcclusion)
+{
+	// Calculate light vector
+
+	float3 L = normalize(-light.position.xyz);
+
+	L = (float3)mul(float4(L.rgb, 0.0), viewMatrix);
+
+
+
+	// texture * normal dot product * light colour * attenuation
+	float4 ambientCol = diffTextureColor   *	float4(light.colour.rgb * 0.6f * aOcclusion * 2.0f, 1.0);
+	float4 diffuseCol = diffTextureColor   *	DoDiffuse(light, L, N)		* float4(light.colour.rgb, 1.0f);
+	float4 specularCol = specTextureColor  *	DoSpecular(light, V, L, N)  * float4(light.colour.rgb, 1.0f);
+
+	float4 combined = ambientCol + diffuseCol;
+
+	return combined;
+}
+
+float4 PerformLightingDeferred(float3 aFragPosition, float3 aNormal, float4 aDiffMapSample, float aSpecMapSample, float aOcclusion)
+{
+	float4 tResultCol = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+	// Loop through all the lights(point lights in this case)
+	float3 eyeDir = normalize(-aFragPosition);
+
+	for (float i = 0; i < amountOfLights; ++i)
+	{
+		// From frag position to eye 	
+		tResultCol += DoPointLight(arr[i], eyeDir, aFragPosition, normalize(aNormal), aDiffMapSample, aSpecMapSample);
+	}
+	tResultCol += DoDirectionalLightDeferred(directionalLight, eyeDir, aFragPosition, normalize(aNormal), aDiffMapSample, aSpecMapSample, aOcclusion);
+
+	return tResultCol;
+}
 //float4 PerformDirectionalLight(float3 aFragPosition, float3 aNormal, float4 aDiffMapSample, float aSpecMapSample)
 //{
 //	float4 tResultCol = float4(0.0f, 0.0f, 0.0f, 0.0f);

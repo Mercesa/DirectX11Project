@@ -19,11 +19,10 @@ struct PixelInputType
 	float3 fragPos : FRAGPOSITION;
 	float3 tang : TANGENT;
 	float2 tex : TEXCOORD0;
-
 };
 
 
-float ShadowMappingPCF(PixelInputType input)
+float ShadowMappingPCF(float4 aLightviewPosition)
 {
 	float bias;
 	float2 projectTexCoord;
@@ -34,10 +33,10 @@ float ShadowMappingPCF(PixelInputType input)
 
 	bias = 0.001f;
 	// Project the coordinates and put them from -1 to 1   to   0 to 1
-	projectTexCoord.x = input.lightViewPosition.x / input.lightViewPosition.w * 0.5f + 0.5f;
-	projectTexCoord.y = input.lightViewPosition.y / -input.lightViewPosition.w * 0.5f + 0.5f;
+	projectTexCoord.x = aLightviewPosition.x / aLightviewPosition.w * 0.5f + 0.5f;
+	projectTexCoord.y = aLightviewPosition.y / -aLightviewPosition.w * 0.5f + 0.5f;
 
-	// For loop 
+	// Percentage close filtering
 	for (int y = -2; y < 2; ++y)
 	{
 		for (int x = -2; x < 2; ++x)
@@ -51,7 +50,7 @@ float ShadowMappingPCF(PixelInputType input)
 			{
 				depthValue = depthMapTexture.Sample(SampleTypeClamp, offsetProjTexCoord).r;
 
-				lightDepthValue = input.lightViewPosition.z / input.lightViewPosition.w;
+				lightDepthValue = aLightviewPosition.z / aLightviewPosition.w;
 
 				lightDepthValue -= bias;
 
@@ -69,7 +68,7 @@ float ShadowMappingPCF(PixelInputType input)
 
 float4 ShadowPixelShader(PixelInputType input) : SV_TARGET
 {
-	float shadowImpact = ShadowMappingPCF(input);
+	float shadowImpact = ShadowMappingPCF(input.lightViewPosition);
 
 	float3 tNorm = input.normal;
 	if (hasNormal)
@@ -89,7 +88,7 @@ float4 ShadowPixelShader(PixelInputType input) : SV_TARGET
 		diffuseColor = diffuseTexture.Sample(SampleTypeAnisotropicWrap, input.tex);
 	}
 	
-	float4 color = PerformLighting(input.fragPos, tNorm, diffuseColor, 1.0f) * shadowImpact;
+	float4 color = PerformLighting(input.fragPos, tNorm, diffuseColor, 1.0f, 1.0f) * shadowImpact;
 
 	return color;
 }

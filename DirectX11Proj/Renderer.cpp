@@ -18,6 +18,8 @@
 #include "GraphicsStructures.h"
 #include "GraphicsSettings.h"
 
+#include <random>
+
 using namespace DirectX;
 
 Renderer::Renderer()
@@ -65,9 +67,7 @@ static std::unique_ptr<cbPerObject> gPerObjectMatrixBufferDataPtr = std::make_un
 
 void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& apLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera)
 {
-
 	// Update light constant buffers
-
 	gLightBufferDataPtr->amountOfLights = static_cast<int>(apLights.size());
 
 	for (int i = 0; i < apLights.size(); ++i)
@@ -92,12 +92,14 @@ void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& 
 	// Transpose the matrices to prepare them for the shader.
 	XMMATRIX viewMatrix2 = XMMatrixTranspose(viewMatrix);
 	XMMATRIX projectionMatrix2 = XMMatrixTranspose(projectionMatrix);
+	XMMATRIX invView = XMMatrixTranspose((XMMatrixInverse(nullptr, apCamera->GetView())));
 
 	// Get a pointer to the data in the constant buffer.
 
 	// Copy the matrices into the constant buffer.
 	gMatrixBufferDataPtr->view = viewMatrix2;
 	gMatrixBufferDataPtr->projection = projectionMatrix2;
+	gMatrixBufferDataPtr->viewMatrixInversed = invView;
 	gMatrixBufferDataPtr->gEyePosX = apCamera->GetPosition3f().x;
 	gMatrixBufferDataPtr->gEyePosY = apCamera->GetPosition3f().y;
 	gMatrixBufferDataPtr->gEyePosZ = apCamera->GetPosition3f().z;
@@ -118,7 +120,6 @@ void Renderer::UpdateShadowLightConstantBuffers(d3dLightClass* const aDirectiona
 
 	gLightMatrixBufferDataPtr->lightViewMatrix = XMMatrixTranspose(viewMatrix);
 	gLightMatrixBufferDataPtr->lightProjectionMatrix = XMMatrixTranspose(projectionMatrix);
-
 	this->mpLightMatrixCB->UpdateBuffer((void*)gLightMatrixBufferDataPtr.get(), mpDeviceContext.Get());
 }
 
@@ -136,10 +137,7 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject)
 	gMaterialBufferDataPtr->hasSpecular = (int)(rm.GetTextureByID(tMat->mpSpecular)->srv == nullptr ? false : true);
 	gMaterialBufferDataPtr->hasNormal = (int)(rm.GetTextureByID(tMat->mpNormal)->srv == nullptr ? false : true);
 
-
-
 	mpMaterialCB->UpdateBuffer((void*)gMaterialBufferDataPtr.get(), mpDeviceContext.Get());
-
 
 	XMMATRIX worldMatrix2 = XMMatrixTranspose(XMLoadFloat4x4(&aObject->mWorldMatrix));
 	gPerObjectMatrixBufferDataPtr->worldMatrix = worldMatrix2;
@@ -182,7 +180,6 @@ void Renderer::RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aOb
 	mpDeviceContext->PSSetShader(tPS->GetPixelShader(), NULL, 0);
 
 
-	// Set the sampler state in the pixel shader.
 	mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
 
 	ID3D11ShaderResourceView* aView = mShadowDepthBuffer->srv;
@@ -190,17 +187,6 @@ void Renderer::RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aOb
 
 
 	auto renderSceneObjectsStart = std::chrono::high_resolution_clock::now();
-	
-	uint32_t bufferNumber;
-	bufferNumber = 1;
-	
-	ID3D11Buffer* tBuff = mpMaterialCB->GetBuffer();
-	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
-
-	bufferNumber = 4;
-	tBuff = mpPerObjectCB->GetBuffer();
-	mpDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
-	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
 	
 	// Render objects
 	for (int i = 0; i < aObjects.size(); ++i)
@@ -213,6 +199,7 @@ void Renderer::RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aOb
 
 
 }
+static bool renderForward = true;
 
 
 void Renderer::RenderScene(
@@ -222,8 +209,127 @@ void Renderer::RenderScene(
 	Camera* const apCamera
 )
 {
+	ImGui::MenuItem("Enabled", NULL, &renderForward);
+
+	if(renderForward)
+	{
+		RenderSceneForward(aObjects, aLights, aDirectionalLight, apCamera);
+	}
+
+	else
+	{
+		RenderSceneDeferred(aObjects, aLights, aDirectionalLight, apCamera);
+	}
+}
+
+void Renderer::RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aObjects)
+{
+	mpDeviceContext->RSSetViewports(1, &mViewport);
+	mpDeviceContext->RSSetState(mRaster_backcull);
 	
-	RenderSceneForward(aObjects, aLights, aDirectionalLight, apCamera);
+	mpDeviceContext->ClearDepthStencilView(this->gBuffer_depthBuffer->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	
+	ID3D11RenderTargetView* renderTargetArray[3] = { gBuffer_albedoBuffer->rtv, gBuffer_normalBuffer->rtv, gBuffer_positionBuffer->rtv };
+
+	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
+	mpDeviceContext->OMSetRenderTargets(3, renderTargetArray, gBuffer_depthBuffer->dsv);
+	
+	d3dShaderVS*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_GBufferFill.hlsl");
+	d3dShaderPS*const tPS = mpShaderManager->GetPixelShader("Shaders\\PS_GBufferFill.hlsl");
+	
+	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
+	mpDeviceContext->PSSetSamplers(1, 1, &mpLinearClampSampler);
+	mpDeviceContext->PSSetSamplers(2, 1, &mpAnisotropicWrapSampler);
+	mpDeviceContext->PSSetSamplers(3, 1, &mpLinearWrapSampler);
+
+	// Set the vertex and pixel shaders that will be used to render this triangle.
+	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
+	mpDeviceContext->PSSetShader(tPS->GetPixelShader(), NULL, 0);
+
+	// Set the sampler state in the pixel shader.
+	mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
+	
+	for (int i = 0; i < aObjects.size(); ++i)
+	{
+		UpdateObjectConstantBuffers(aObjects[i].get());
+		RenderObject(aObjects[i].get());
+	}
+}
+
+
+void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects)
+{
+	// Get the fullscreen shaders
+	d3dShaderVS*const tFVS = mpShaderManager->GetVertexShader("Shaders\\VS_DeferredLighting.hlsl");
+	d3dShaderPS*const tFPS = mpShaderManager->GetPixelShader("Shaders\\PS_DeferredLighting.hlsl");
+
+
+	mpDeviceContext->RSSetViewports(1, &mViewport);
+	mpDeviceContext->RSSetState(mRaster_backcull);
+
+	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
+
+	// Set backbuffer as RT
+	mpDeviceContext->OMSetRenderTargets(1, &this->mBackBufferTexture->rtv, mBackBufferTexture->dsv);
+	mpDeviceContext->ClearDepthStencilView(mBackBufferTexture->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+	
+	// Draw full screen quad
+	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
+	mpDeviceContext->PSSetSamplers(1, 1, &mpPointWrapSampler);
+
+	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	mpDeviceContext->VSSetShader(tFVS->GetVertexShader(), NULL, 0);
+	mpDeviceContext->PSSetShader(tFPS->GetPixelShader(), NULL, 0);
+
+	// Set gbuffer resources
+	mpDeviceContext->PSSetShaderResources(0, 1, &gBuffer_albedoBuffer->srv);
+	mpDeviceContext->PSSetShaderResources(1, 1, &gBuffer_positionBuffer->srv);
+	mpDeviceContext->PSSetShaderResources(2, 1, &gBuffer_normalBuffer->srv);
+	mpDeviceContext->PSSetShaderResources(3, 1, &randomValueTexture->srv);
+	mpDeviceContext->PSSetShaderResources(4, 1, &mShadowDepthBuffer->srv);
+
+	mpDeviceContext->Draw(4, 0);
+}
+
+void Renderer::BindStandardConstantBuffers()
+{
+
+	// view/Proj matrix cb at {0}
+	ID3D11Buffer* tBuff = mpMatrixCB->GetBuffer();
+	mpDeviceContext->VSSetConstantBuffers(0, 1, &tBuff);
+	mpDeviceContext->PSSetConstantBuffers(0, 1, &tBuff);
+
+	// Material info cb at {1}
+	tBuff = mpMaterialCB->GetBuffer();
+	mpDeviceContext->PSSetConstantBuffers(1, 1, &tBuff);
+
+	// Light info for lighting cb at {2}
+	tBuff = mpLightCB->GetBuffer();
+	mpDeviceContext->PSSetConstantBuffers(2, 1, &tBuff);
+
+	// light matrix for shadows cb at {3}
+	tBuff = mpLightMatrixCB->GetBuffer();
+	mpDeviceContext->VSSetConstantBuffers(3, 1, &tBuff);
+	mpDeviceContext->PSSetConstantBuffers(3, 1, &tBuff);
+
+	// Per object cb at {4}
+	tBuff = mpPerObjectCB->GetBuffer();
+	mpDeviceContext->VSSetConstantBuffers(4, 1, &tBuff);
+	mpDeviceContext->PSSetConstantBuffers(4, 1, &tBuff);
+}
+
+
+void Renderer::RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera)
+{
+	//float color[4]{ clearColor[0], clearColor[1], clearColor[2], 1.0f };
+	apCamera->UpdateViewMatrix();
+	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
+
+	BindStandardConstantBuffers();
+	RenderSceneDepthPrePass(aObjects);
+	RenderSceneGBufferFill(aObjects);
+	RenderSceneLightingPass(aObjects);
 }
 
 
@@ -231,27 +337,15 @@ void Renderer::RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObject
 {
 	float color[4]{ clearColor[0], clearColor[1], clearColor[2], 1.0f };
 
-	// Update frame constant buffers  
 
-
-	// Update and bind constant buffers
 	auto frameConstantBufferTimerStart = std::chrono::high_resolution_clock::now();
 	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
 
-	ID3D11Buffer* tBuff = mpLightMatrixCB->GetBuffer();
-	mpDeviceContext->VSSetConstantBuffers(3, 1, &tBuff);
-	mpDeviceContext->PSSetConstantBuffers(3, 1, &tBuff);
 
-	tBuff = mpLightCB->GetBuffer();
-	mpDeviceContext->PSSetConstantBuffers(2, 1, &tBuff);
-
-	tBuff = mpMatrixCB->GetBuffer();
-	mpDeviceContext->VSSetConstantBuffers(0, 1, &tBuff);
-	mpDeviceContext->PSSetConstantBuffers(0, 1, &tBuff);
-
+	// bind buffers
+	BindStandardConstantBuffers();
+	
 	auto frameConstantBufferTimerEnd = std::chrono::high_resolution_clock::now();
-
-
 	auto renderSceneDepthPrePassTimerStart = std::chrono::high_resolution_clock::now();
 	RenderSceneDepthPrePass(aObjects);
 	auto renderSceneDepthPrePassTimerEnd = std::chrono::high_resolution_clock::now();
@@ -268,6 +362,8 @@ void Renderer::RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObject
 	static int frames = 0;
 	++frames;
 
+
+	// every 15 frames update
 	static float fCbtiming = 0.0f;
 	static float depthPrePassTiming = 0.0f;
 	static float shadowSceneTiming = 0.0f;
@@ -280,10 +376,11 @@ void Renderer::RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObject
 		shadowSceneObjectTiming = objectRenderingTime;
 	}
 
-	//ImGui::Text("Updating frame constant %.5f ms/frame", fCbtiming);
-	//ImGui::Text("Render scene depth pre-pass %.5f ms/frame", depthPrePassTiming);
-	//ImGui::Text("Render scene with shadows %.5f ms/frame", shadowSceneTiming);
-	//ImGui::Text("Render shadow scene objects %.5f ms/frame", shadowSceneObjectTiming);
+
+	ImGui::Text("Updating frame constant %.5f ms/frame", fCbtiming);
+	ImGui::Text("Render scene depth pre-pass %.5f ms/frame", depthPrePassTiming);
+	ImGui::Text("Render scene with shadows %.5f ms/frame", shadowSceneTiming);
+	ImGui::Text("Render shadow scene objects %.5f ms/frame", shadowSceneObjectTiming);
 }
 
 
@@ -308,18 +405,6 @@ void Renderer::RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aO
 
 	// Set the sampler state in the pixel shader.
 	mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
-
-	uint32_t bufferNumber;
-	bufferNumber = 1;
-
-	// bind buffers
-	ID3D11Buffer* tBuff = mpMaterialCB->GetBuffer();
-	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
-
-	bufferNumber = 4;
-	tBuff = mpPerObjectCB->GetBuffer();
-	mpDeviceContext->VSSetConstantBuffers(bufferNumber, 1, &tBuff);
-	mpDeviceContext->PSSetConstantBuffers(bufferNumber, 1, &tBuff);
 
 	for (int i = 0; i < aObjects.size(); ++i)
 	{
@@ -611,8 +696,12 @@ bool Renderer::InitializeDXGI()
 	return true;
 }
 
+float lerp(float v0, float v1, float t)
+{
+	return (1 - t) * v0 + t * v1;
+}
 
-bool Renderer::InitializeBackBuffRTV()
+bool Renderer::InitializeResources()
 {	
 	//mSceneRenderTexture = std::make_unique<d3dRenderTexture>();
 	//mSceneRenderTexture->Initialize(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, SCREEN_NEAR, SCREEN_FAR);
@@ -626,6 +715,8 @@ bool Renderer::InitializeBackBuffRTV()
 	gBuffer_albedoBuffer = std::make_unique<Texture>();
 	gBuffer_normalBuffer = std::make_unique<Texture>();
 	gBuffer_specularBuffer = std::make_unique<Texture>();
+	gBuffer_depthBuffer = std::make_unique<Texture>();
+	randomValueTexture = std::make_unique<Texture>();
 
 	// Post proc color and depth buffer 
 	mPostProcColorBuffer->texture =  CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
@@ -645,6 +736,11 @@ bool Renderer::InitializeBackBuffRTV()
 	mShadowDepthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), mShadowDepthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	mShadowDepthBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), mShadowDepthBuffer->texture, GetDepthSRVFormat(DXGI_FORMAT_D24_UNORM_S8_UINT));
 
+	
+	// Every buffer in the gbuffer needs a shader resource view and render target view, SRV for texture access, RTV to render 
+	gBuffer_albedoBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
+	gBuffer_albedoBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), gBuffer_albedoBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
+	gBuffer_albedoBuffer->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), gBuffer_albedoBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
 	gBuffer_positionBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
 	gBuffer_positionBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), gBuffer_positionBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
@@ -654,8 +750,95 @@ bool Renderer::InitializeBackBuffRTV()
 	gBuffer_normalBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), gBuffer_normalBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
 	gBuffer_normalBuffer->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), gBuffer_normalBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
 
+	gBuffer_depthBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
+	gBuffer_depthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), gBuffer_depthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
+
+	std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);
+	std::default_random_engine generator;
+	
+	
+	// create offset positions to sample for our SSAO
+	std::vector<VEC4f> randomValues;
+	for (int i = 0; i < 16; ++i)
+	{
+		VEC4f value;
+		// transform from range from 0 to 1  to -1 to 1
+ 		value.x = randomFloats(generator) *  2.0f - 1.0f; 
+		value.y = randomFloats(generator) *  2.0f - 1.0f;
+		value.z = 0.0f;
+		value.w = 0.0f;
+		randomValues.push_back(value);
+	}
+
+	D3D11_SUBRESOURCE_DATA srd;
+	srd.pSysMem =(void*)&randomValues[0];
+	// 4x4 pixel, so our pitch lines are 4
+	srd.SysMemPitch = sizeof(VEC4f) * 4;
+	srd.SysMemSlicePitch = 0;
 
 
+	D3D11_TEXTURE2D_DESC texDesc;
+	
+	// Setup the render target texture description.
+	// Set up the description of the depth buffer.
+	texDesc.Width = 4;
+	texDesc.Height = 4;
+	texDesc.MipLevels = 1;
+	texDesc.ArraySize = 1;
+	texDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
+	texDesc.Usage = D3D11_USAGE_IMMUTABLE;
+	texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	texDesc.CPUAccessFlags = 0;
+	texDesc.MiscFlags = 0;
+
+	HRESULT hr = mpDevice->CreateTexture2D(&texDesc, &srd, &randomValueTexture->texture);
+
+	randomValueTexture->srv = CreateSimpleShaderResourceView(mpDevice.Get(), randomValueTexture->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
+
+	if (FAILED(hr))
+	{
+		std::cout << "Failed to create custom texture";
+	}
+
+	// we want x amount of kernels
+	// needs to be in tangent space
+	// Create hemisphere values in tangent space, 
+	// x from -1 to 1
+	// y from -1 to 1
+	// z from 0 to 1 because this is a hemisphere, not full sphere
+	// divide all values by 64
+
+	memset(&gLightMatrixBufferDataPtr->kernelSamples, 0, sizeof(VEC3f) * (size_t)64);
+
+	for (int i = 0; i < 64; ++i)
+	{
+		VEC3f value;
+		value.x = randomFloats(generator) * 2.0f - 1.0f;
+		value.y = randomFloats(generator) * 2.0f - 1.0f;
+		value.z = randomFloats(generator);
+
+		// normalize
+		float length = sqrt(value.x*value.x + value.y*value.y + value.z*value.z);
+		value.x /= length;
+		value.y /= length;
+		value.z /= length;
+		
+		float randValue = randomFloats(generator);
+		value.x *= randValue;
+		value.y *= randValue;
+		value.z *= randValue;
+
+		// 
+		float scale = (float)i / 64.0f;
+		scale = lerp(0.1f, 1.0f, scale * scale);
+		value.x *= scale;
+		value.y *= scale;
+		value.z *= scale;
+
+		gLightMatrixBufferDataPtr->kernelSamples[i] = value;
+	}
 	return true;
 }
 
@@ -691,15 +874,18 @@ bool Renderer::DestroyDirectX()
 	ReleaseTexture(gBuffer_albedoBuffer.get());
 	ReleaseTexture(gBuffer_normalBuffer.get());
 	ReleaseTexture(gBuffer_specularBuffer.get());
+	ReleaseTexture(gBuffer_depthBuffer.get());
 
+	ReleaseTexture(randomValueTexture.get());
 
 	mRaster_backcull->Release();
 	mpDepthStencilState->Release();
 	mpAnisotropicWrapSampler->Release();
+	
 	mpLinearClampSampler->Release();
 	mpPointClampSampler->Release();
 	mpLinearWrapSampler->Release();
-
+	mpPointWrapSampler->Release();
 	return true;
 }
 
@@ -710,6 +896,7 @@ bool  Renderer::InitializeSamplerState()
 	mpPointClampSampler = CreateSamplerPointClamp(mpDevice.Get());
 	mpLinearClampSampler = CreateSamplerLinearClamp(mpDevice.Get());
 	mpLinearWrapSampler = CreateSamplerLinearWrap(mpDevice.Get());
+	mpPointWrapSampler = CreateSamplerPointWrap(mpDevice.Get());
 	return true;
 }
 
@@ -756,7 +943,7 @@ bool Renderer::InitializeDirectX()
 	}
 	LOG(INFO) << "Successfully initialized Swapchain";
 
-	if (!InitializeBackBuffRTV())
+	if (!InitializeResources())
 	{
 		LOG(INFO) << "Failed to create RTV with back buffer";
 		return false;
