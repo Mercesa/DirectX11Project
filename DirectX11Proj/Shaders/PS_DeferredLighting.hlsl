@@ -17,6 +17,7 @@ struct VSQuadOut {
 };
 
 
+// Shadow mapping with percentage close filtering 
 float ShadowMappingPCF(float4 aLightviewPosition)
 {
 	float bias;
@@ -61,31 +62,27 @@ float ShadowMappingPCF(float4 aLightviewPosition)
 	return shadowValue;
 }
 
-float4 PSDeferredLighting(VSQuadOut quadIn) : SV_TARGET
-{ 
+// Screen space ambient occlusion function
+float SSAO(float3 aViewSpacePosition, float3 aViewSpaceNormal, float2 aTexCoord)
+{
 	float2 noiseScale = float2(1024.0f / 4.0f, 768.0f / 4.0f);
-	// Loads a texture with the x and y screen position
-	float4 albedo = albedoTexture.Load(int3(quadIn.position.xy, 0));
-	float3 position = (float3)positionTexture.Load(int3(quadIn.position.xy, 0));
-	float3 normal = (float3)normalTexture.Load(int3(quadIn.position.xy, 0));
-	float3 randomVec = (float3)noiseTexture.Sample(SamplePointWrap, quadIn.texcoord * noiseScale);
+	float3 randomVec = (float3)noiseTexture.Sample(SamplePointWrap, aTexCoord * noiseScale);
 
-
-	float3 tangent = normalize(randomVec - normal*dot(randomVec, normal));
-	float3 bitangent = cross(normal, tangent);
-	float3x3 TBN = float3x3(tangent, bitangent, normal);
+	float3 tangent = normalize(randomVec - aViewSpaceNormal*dot(randomVec, aViewSpaceNormal));
+	float3 bitangent = cross(aViewSpaceNormal, tangent);
+	float3x3 TBN = float3x3(tangent, bitangent, aViewSpaceNormal);
 
 	float occlusion = 0.0f;
-	
+
 	for (int i = 0; i < 64; ++i)
 	{
 		float3 samp = mul(kernelSamples[i], TBN);
-		samp = position + samp * 0.5f;
+		samp = aViewSpacePosition + samp * 0.5f;
 
 		float4 offset = float4(samp.rgb, 1.0f);
 		offset = mul(offset, projectionMatrix);
-		
-		offset.x /= offset.w;		
+
+		offset.x /= offset.w;
 		offset.y /= -offset.w;
 		offset.z /= offset.w;
 
@@ -93,14 +90,31 @@ float4 PSDeferredLighting(VSQuadOut quadIn) : SV_TARGET
 		offset.xyz = offset.xyz * 0.5f + 0.5f;
 
 		float sampleDepth = positionTexture.Sample(SamplePointWrap, offset.xy).z;
-		float rangeCheck = smoothstep(0.0f, 1.0f, 0.5f / abs(position.z - sampleDepth));
+		float rangeCheck = smoothstep(0.0f, 1.0f, 0.5f / abs(aViewSpacePosition.z - sampleDepth));
 		occlusion += (sampleDepth >= samp.z + 0.01f ? 1.0 : 0.0) * rangeCheck;
 	}
+	return occlusion;
+}
 
-	float4 newPosition = mul(float4(position.xyz, 1.0f), viewMatrixInversed);
 
-	//position = float3(newPosition.xyz);
-	float4 lightViewPosition = mul(mul(float4(newPosition.xyz, 1.0f), lightViewMatrix), lightProjectionMatrix);
+float4 PSDeferredLighting(VSQuadOut quadIn) : SV_TARGET
+{ 
+	// Loads a texture with the x and y screen position
+	float4 albedo = albedoTexture.Load(int3(quadIn.position.xy, 0));
+	float3 position = (float3)positionTexture.Load(int3(quadIn.position.xy, 0));
+	float3 normal = (float3)normalTexture.Load(int3(quadIn.position.xy, 0));
+
+	float occlusion = SSAO(position, normal, quadIn.texcoord);
+
+	
+	// Calculate the world space position by multiplying by the inverse view matrix
+	// position is in view space
+	// Multiplied by the inverse view space will take it to world space
+	float4 worldSpacePosition = mul(float4(position.xyz, 1.0f), viewMatrixInversed);
+
+	// Transform the world space position to light projection space
+	float4 lightViewPosition = mul(mul(float4(worldSpacePosition.xyz, 1.0f), lightViewMatrix), lightProjectionMatrix);
+	
 	float shadowImpact = ShadowMappingPCF(lightViewPosition);
 
 	occlusion =	((occlusion / 64.0f));

@@ -53,7 +53,7 @@ private:
 	std::vector<Texture*> mLoadedTextures;
 
 
-	d3dMaterial* LoadTexturesFromMaterial(const RawMeshData& aMeshData);
+	Material* LoadTexturesFromMaterial(const RawMeshData& aMeshData);
 	Texture* LoadTexture(RawTextureData aData);
 
 	// Load models as one

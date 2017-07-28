@@ -40,12 +40,6 @@
     <ClCompile Include="d3dShaderManager.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
-    <ClCompile Include="d3dShaderVS.cpp">
-      <Filter>D3DSetup\D3DShaderTypes</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dShaderPS.cpp">
-      <Filter>D3DSetup\D3DShaderTypes</Filter>
-    </ClCompile>
     <ClCompile Include="d3dLightClass.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
@@ -108,13 +102,7 @@
     <ClInclude Include="d3dShaderManager.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
-    <ClInclude Include="d3dShaderVS.h">
-      <Filter>D3DSetup\D3DShaderTypes</Filter>
-    </ClInclude>
     <ClInclude Include="ShaderHelperFunctions.h">
-      <Filter>D3DSetup\D3DShaderTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dShaderPS.h">
       <Filter>D3DSetup\D3DShaderTypes</Filter>
     </ClInclude>
     <ClInclude Include="d3dLightClass.h">
@@ -231,6 +219,9 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\VS_DeferredLighting.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\CS_GuassianBlur.hlsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

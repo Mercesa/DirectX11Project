@@ -8,11 +8,10 @@
 #include <wrl.h>
 #include <windows.h>
 
+#include "d3d11HelperFile.h"
 
-class d3dShaderVS;
-class d3dShaderPS;
 
-enum eShaderTypes { EVERTEX, EPIXEL };
+enum eShaderTypes { EVERTEX, EPIXEL, ECOMPUTE };
 
 
 struct ShaderInfo
@@ -37,16 +36,19 @@ public:
 	d3dShaderManager();
 	~d3dShaderManager();
 
+	void ReleaseResources();
+
 	bool InitializeShaders(ID3D11Device* const apDevice);
 
-	d3dShaderVS* const GetVertexShader(const char* aShaderPath);
-	d3dShaderPS* const GetPixelShader(const char* aShaderPath);
+	VertexShader* const GetVertexShader(const char* aShaderPath);
+	PixelShader* const GetPixelShader(const char* aShaderPath);
 
 private:
 	std::vector<ShaderInfo> mShadersInfo;
 
-	std::map<const char*, std::unique_ptr<d3dShaderVS>> mVertexShaders;
-	std::map<const char*, std::unique_ptr<d3dShaderPS>>mPixelShaders;
+	std::map<const char*, std::unique_ptr<VertexShader>> mVertexShaders;
+	std::map<const char*, std::unique_ptr<PixelShader>>	mPixelShaders;
+	std::map<const char*, std::unique_ptr<ComputeShader>>	mComputeShaders;
 
 	bool LoadShaders(ID3D11Device* const apDevice);
 };

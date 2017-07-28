@@ -13,7 +13,8 @@
 #include "GraphicsStructures.h"
 
 
-
+// These ID structs are special due to their explicit constructors
+// This prevents issues such as using a texture ID for loading a model ID
 struct TexID
 {
 	explicit TexID(uint32_t id) : id(id) {}
@@ -63,9 +64,27 @@ struct Buffer
 	size_t amountOfElements = 0;
 };
 
-struct d3dMaterial
+struct VertexShader
 {
-	d3dMaterial() : mpDiffuse(0), mpNormal(0), mpSpecular(0) {}
+	ID3D11VertexShader* shader;
+	ID3D11InputLayout* inputLayout;
+};
+
+struct PixelShader
+{
+	ID3D11PixelShader* shader;
+};
+
+struct ComputeShader
+{
+	ID3D11ComputeShader* shader;
+};
+
+
+
+struct Material
+{
+	Material() : mpDiffuse(0), mpNormal(0), mpSpecular(0) {}
 	TexID mpDiffuse = TexID();
 	TexID mpSpecular = TexID();
 	TexID mpNormal = TexID();
@@ -77,9 +96,31 @@ struct Model
 {
 	Buffer* vertexBuffer;
 	Buffer* indexBuffer;
-	d3dMaterial* material;
+	Material* material;
 };
 
+static void ReleaseVertexShader(VertexShader* aVShader)
+{
+	assert(aVShader != nullptr);
+	if (aVShader->shader != nullptr)
+	{
+		aVShader->shader->Release();
+	}
+
+	if (aVShader->inputLayout != nullptr)
+	{
+		aVShader->inputLayout->Release();
+	}
+}
+
+static void ReleasePixelShader(PixelShader* aVShader)
+{
+	assert(aVShader != nullptr);
+	if (aVShader->shader != nullptr)
+	{
+		aVShader->shader->Release();
+	}
+}
 
 static void ReleaseTexture(Texture* aTexture)
 {
@@ -138,10 +179,62 @@ static void ReleaseModel(Model* aModel)
 		delete aModel->material;
 	}
 }
+
+
 /*
-***********************
-* RASTERIZER FUNCTIONS
-***********************
+*******************************
+* VERTEX BUFFER LAYOUT FUNCTIONS
+*******************************
+*/
+
+// Argument will be changed internally
+static void CreateVertexbufferLayoutDefault(D3D11_INPUT_ELEMENT_DESC* const aLayout)
+	{
+		aLayout[0].SemanticName = "POSITION";
+		aLayout[0].SemanticIndex = 0;
+		aLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		aLayout[0].InputSlot = 0;
+		aLayout[0].AlignedByteOffset = 0;
+		aLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		aLayout[0].InstanceDataStepRate = 0;
+		
+		aLayout[1].SemanticName = "TEXCOORD";
+		aLayout[1].SemanticIndex = 0;
+		aLayout[1].Format = DXGI_FORMAT_R32G32_FLOAT;
+		aLayout[1].InputSlot = 0;
+		aLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		aLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		aLayout[1].InstanceDataStepRate = 0;
+		
+		aLayout[2].SemanticName = "NORMAL";
+		aLayout[2].SemanticIndex = 0;
+		aLayout[2].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		aLayout[2].InputSlot = 0;
+		aLayout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		aLayout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		aLayout[2].InstanceDataStepRate = 0;
+		
+		aLayout[3].SemanticName = "BITANGENT";
+		aLayout[3].SemanticIndex = 0;
+		aLayout[3].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		aLayout[3].InputSlot = 0;
+		aLayout[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		aLayout[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		aLayout[3].InstanceDataStepRate = 0;
+		
+		aLayout[4].SemanticName = "TANGENT";
+		aLayout[4].SemanticIndex = 0;
+		aLayout[4].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+		aLayout[4].InputSlot = 0;
+		aLayout[4].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+		aLayout[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+		aLayout[4].InstanceDataStepRate = 0;
+	}
+
+/*
+*******************************
+* RASTERIZER CREATION FUNCTIONS
+*******************************
 */
 static ID3D11RasterizerState* CreateRSDefault(ID3D11Device* const aDevice)
 {
@@ -413,14 +506,11 @@ static ID3D11DepthStencilState* CreateDepthStateDefault(ID3D11Device* const aDev
 }
 
 
-
-
 /*
 ********************************
 **RENDER TARGET VIEW FUNCTIONS**
 ********************************
 */
-
 
 static ID3D11Texture2D* CreateSimpleTexture2D(ID3D11Device* const aDevice, uint32_t aWidth, uint32_t aHeight, DXGI_FORMAT aFormat, UINT aBindFlags)
 {
