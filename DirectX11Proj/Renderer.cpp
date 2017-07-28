@@ -7,8 +7,6 @@
 #include "IScene.h"
 #include "d3dConstantBuffer.h"
 #include "d3dShaderManager.h"
-#include "d3dShaderVS.h"
-#include "d3dShaderPS.h"
 
 
 #include "ResourceManager.h"
@@ -130,7 +128,7 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject)
 	
 	// Update material
 	Model* const tModel = ResourceManager::GetInstance().GetModelByID(aObject->mpModel);
-	d3dMaterial* const tMat = tModel->material;
+	Material* const tMat = tModel->material;
 
 	// Check if texture exists or not
 	gMaterialBufferDataPtr->hasDiffuse = (int)(rm.GetTextureByID(tMat->mpDiffuse)->srv == nullptr ? false : true);
@@ -165,8 +163,8 @@ void Renderer::RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aOb
 
 	apCamera->UpdateViewMatrix();
 
-	d3dShaderVS*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_shadow.hlsl");
-	d3dShaderPS*const tPS = mpShaderManager->GetPixelShader("Shaders\\PS_shadow.hlsl");
+	VertexShader*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_shadow.hlsl");
+	PixelShader*const tPS = mpShaderManager->GetPixelShader("Shaders\\PS_shadow.hlsl");
 
 
 	// Set samplers
@@ -176,11 +174,11 @@ void Renderer::RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aOb
 	mpDeviceContext->PSSetSamplers(3, 1, &mpLinearWrapSampler);
 
 	// Set the vertex and pixel shaders that will be used to render this triangle.
-	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
-	mpDeviceContext->PSSetShader(tPS->GetPixelShader(), NULL, 0);
+	mpDeviceContext->VSSetShader(tVS->shader, NULL, 0);
+	mpDeviceContext->PSSetShader(tPS->shader, NULL, 0);
 
 
-	mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
+	mpDeviceContext->IASetInputLayout(tVS->inputLayout);
 
 	ID3D11ShaderResourceView* aView = mShadowDepthBuffer->srv;
 	mpDeviceContext->PSSetShaderResources(3, 1, &aView);
@@ -234,8 +232,8 @@ void Renderer::RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aOb
 	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
 	mpDeviceContext->OMSetRenderTargets(3, renderTargetArray, gBuffer_depthBuffer->dsv);
 	
-	d3dShaderVS*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_GBufferFill.hlsl");
-	d3dShaderPS*const tPS = mpShaderManager->GetPixelShader("Shaders\\PS_GBufferFill.hlsl");
+	VertexShader *const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_GBufferFill.hlsl");
+	PixelShader*const tPS = mpShaderManager->GetPixelShader("Shaders\\PS_GBufferFill.hlsl");
 	
 	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
 	mpDeviceContext->PSSetSamplers(1, 1, &mpLinearClampSampler);
@@ -243,11 +241,11 @@ void Renderer::RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aOb
 	mpDeviceContext->PSSetSamplers(3, 1, &mpLinearWrapSampler);
 
 	// Set the vertex and pixel shaders that will be used to render this triangle.
-	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
-	mpDeviceContext->PSSetShader(tPS->GetPixelShader(), NULL, 0);
+	mpDeviceContext->VSSetShader(tVS->shader, NULL, 0);
+	mpDeviceContext->PSSetShader(tPS->shader, NULL, 0);
 
 	// Set the sampler state in the pixel shader.
-	mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
+	mpDeviceContext->IASetInputLayout(tVS->inputLayout);
 	
 	for (int i = 0; i < aObjects.size(); ++i)
 	{
@@ -260,8 +258,8 @@ void Renderer::RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aOb
 void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects)
 {
 	// Get the fullscreen shaders
-	d3dShaderVS*const tFVS = mpShaderManager->GetVertexShader("Shaders\\VS_DeferredLighting.hlsl");
-	d3dShaderPS*const tFPS = mpShaderManager->GetPixelShader("Shaders\\PS_DeferredLighting.hlsl");
+	VertexShader*const tFVS = mpShaderManager->GetVertexShader("Shaders\\VS_DeferredLighting.hlsl");
+	PixelShader*const tFPS = mpShaderManager->GetPixelShader("Shaders\\PS_DeferredLighting.hlsl");
 
 
 	mpDeviceContext->RSSetViewports(1, &mViewport);
@@ -279,8 +277,8 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 	mpDeviceContext->PSSetSamplers(1, 1, &mpPointWrapSampler);
 
 	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	mpDeviceContext->VSSetShader(tFVS->GetVertexShader(), NULL, 0);
-	mpDeviceContext->PSSetShader(tFPS->GetPixelShader(), NULL, 0);
+	mpDeviceContext->VSSetShader(tFVS->shader, NULL, 0);
+	mpDeviceContext->PSSetShader(tFPS->shader, NULL, 0);
 
 	// Set gbuffer resources
 	mpDeviceContext->PSSetShaderResources(0, 1, &gBuffer_albedoBuffer->srv);
@@ -395,16 +393,16 @@ void Renderer::RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aO
 	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
 	mpDeviceContext->OMSetRenderTargets(0, nullptr, mShadowDepthBuffer->dsv);
 
-	d3dShaderVS*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_depth.hlsl");
+	VertexShader*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_depth.hlsl");
 	//d3dShaderPS*const tPS = mpShaderManager->GetPixelShader("Shaders\\PS_depth.hlsl");
 
 	//UpdateFrameConstantBuffers(aScene);
 
 	// Set the vertex and pixel shaders that will be used to render this triangle.
-	mpDeviceContext->VSSetShader(tVS->GetVertexShader(), NULL, 0);
+	mpDeviceContext->VSSetShader(tVS->shader, NULL, 0);
 
 	// Set the sampler state in the pixel shader.
-	mpDeviceContext->IASetInputLayout(tVS->mpLayout.Get());
+	mpDeviceContext->IASetInputLayout(tVS->inputLayout);
 
 	for (int i = 0; i < aObjects.size(); ++i)
 	{
@@ -418,8 +416,8 @@ void Renderer::RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aO
 void Renderer::RenderFullScreenQuad()
 {
 	// Get the fullscreen shaders
-	d3dShaderVS*const tFVS = mpShaderManager->GetVertexShader("Shaders\\fullScreenQuad_VS.hlsl");
-	d3dShaderPS*const tFPS = mpShaderManager->GetPixelShader("Shaders\\fullScreenQuad_PS.hlsl");
+	VertexShader*const tFVS = mpShaderManager->GetVertexShader("Shaders\\fullScreenQuad_VS.hlsl");
+	PixelShader*const tFPS = mpShaderManager->GetPixelShader("Shaders\\fullScreenQuad_PS.hlsl");
 
 
 	mpDeviceContext->RSSetViewports(1, &mViewport);
@@ -433,13 +431,13 @@ void Renderer::RenderFullScreenQuad()
 	// Draw full screen quad
 	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
 	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	mpDeviceContext->VSSetShader(tFVS->GetVertexShader(), NULL, 0);
-	mpDeviceContext->PSSetShader(tFPS->GetPixelShader(), NULL, 0);
+	mpDeviceContext->VSSetShader(tFVS->shader, NULL, 0);
+	mpDeviceContext->PSSetShader(tFPS->shader, NULL, 0);
 	mpDeviceContext->PSSetShaderResources(0, 1, &mPostProcColorBuffer->srv);
 	mpDeviceContext->Draw(4, 0);
 }
 
-void Renderer::RenderMaterial(d3dMaterial* const aMaterial)
+void Renderer::RenderMaterial(Material* const aMaterial)
 {
 	// Bind textures from material
 	ID3D11ShaderResourceView* aView = ResourceManager::GetInstance().GetTextureByID(aMaterial->mpDiffuse)->srv;
@@ -462,7 +460,7 @@ void Renderer::RenderObject(IObject* const aObject)
 	uint32_t indices = (uint32_t)model->indexBuffer->amountOfElements;
 
 	// Bind textures from material
-	d3dMaterial* const aMaterial = model->material;
+	Material* const aMaterial = model->material;
 	
 	if (aMaterial != nullptr)
 	{
@@ -863,6 +861,8 @@ bool  Renderer::InitializeRasterstate()
 
 bool Renderer::DestroyDirectX()
 {
+	mpShaderManager->ReleaseResources();
+
 	ReleaseTexture(mBackBufferTexture.get());
 	
 	ReleaseTexture(mPostProcColorBuffer.get());

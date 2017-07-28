@@ -83,9 +83,9 @@ Texture* ResourceManager::LoadTexture(RawTextureData aData)
 }
 
 
-d3dMaterial* ResourceManager::LoadTexturesFromMaterial(const RawMeshData& aMeshData)
+Material* ResourceManager::LoadTexturesFromMaterial(const RawMeshData& aMeshData)
 {
-	d3dMaterial* tpMat = new d3dMaterial();
+	Material* tpMat = new Material();
 
 	assert(tpMat);
 

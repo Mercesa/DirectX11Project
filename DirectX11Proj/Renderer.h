@@ -67,7 +67,7 @@ private:
 
 	// Render functions
 	void RenderObject(IObject* const aObject);
-	void RenderMaterial(d3dMaterial* const aMaterial);
+	void RenderMaterial(Material* const aMaterial);
 
 	void RenderFullScreenQuad();
 	
