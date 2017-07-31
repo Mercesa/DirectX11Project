@@ -55,6 +55,14 @@ cbuffer PerObjectBuffer : register(b4)
 	matrix worldMatrix;
 }
 
+cbuffer BlurBuffer : register(b5)
+{
+	int blurHorizontal;
+	int pad0B;
+	int pad1B;
+	int pad2B;
+}
+
 float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangentW)
 {
 	// Transform from 0 1 to -1.0f 2.0f;

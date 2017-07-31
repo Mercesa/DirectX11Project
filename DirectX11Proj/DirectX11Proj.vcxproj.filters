@@ -224,5 +224,17 @@
     <None Include="Shaders\CS_GuassianBlur.hlsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Shaders\PS_Blur.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PS_SSAO.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\VS_Blur.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\VS_SSAO.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -47,3 +47,11 @@ struct cbPerObject
 {
 	XMMATRIX worldMatrix;
 };
+
+struct cbBlurParameters
+{
+	int blurHorizontal;
+	int pad0;
+	int pad1;
+	int pad2;
+};
