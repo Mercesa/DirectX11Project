@@ -132,7 +132,6 @@ private:
 	std::unique_ptr<d3dShaderManager> mpShaderManager;
 
 	std::unique_ptr<Texture> mBackBufferTexture;
-	std::unique_ptr<Texture> mBackBufferDepthTexture;
 	std::unique_ptr<Texture> mShadowDepthBuffer;
 
 	std::unique_ptr<Texture> mAmbientOcclusionTexture;

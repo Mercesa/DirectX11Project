@@ -123,17 +123,46 @@ void PlayerSceneExample::Init()
 				this->mObjects.push_back(std::move(tpObject));
 			}
 			//
-			tModels = ResourceManager::GetInstance().LoadModels("Models\\Lucy\\Lucy.obj");
-			tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
-			//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
-			for (int i = 0; i < tModels.size(); ++i)
-			{
-				std::unique_ptr<IObject> tpObject = std::make_unique<IObject>();
-				tpObject->mpModel = tModels[i];
-				XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(0.1f, 0.1f, 0.1f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
+		//	tModels = ResourceManager::GetInstance().LoadModels("Models\\Lucy\\Lucy.obj");
+		//	tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
+		//	//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
+		//	for (int i = 0; i < tModels.size(); ++i)
+		//	{
+		//		std::unique_ptr<IObject> tpObject = std::make_unique<IObject>();
+		//		tpObject->mpModel = tModels[i];
+		//		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(0.1f, 0.1f, 0.1f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
+		//	
+		//		this->mObjects.push_back(std::move(tpObject));
+		//	}
+
+
 			
-				this->mObjects.push_back(std::move(tpObject));
-			}
+			//RawMeshData data;
+			//data.diffuseData.filepath = "sunsetcube1024.dds";
+			//data.diffuseData.isValid = true;
+			//
+			//data.specularData.isValid = false;
+			//data.normalData.isValid = false;
+			
+			//Material* tM = ResourceManager::GetInstance().LoadTexturesFromMaterial(data);
+
+
+		//	tModels = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\Sphere.obj");
+		//
+		//	//delete ResourceManager::GetInstance().GetModelByID(tModels[0])->material;
+		//	
+		//	//ResourceManager::GetInstance().GetModelByID(tModels[0])->material = tM;
+		//
+		//	tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 6.0f);
+		//	//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
+		//	for (int i = 0; i < tModels.size(); ++i)
+		//	{
+		//		std::unique_ptr<IObject> tpObject = std::make_unique<IObject>();
+		//		tpObject->mpModel = tModels[i];
+		//		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(1.0f, 1.0f, 1.0f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
+		//
+		//		this->mObjects.push_back(std::move(tpObject));
+		//	}
 
 
 			//tModels = ResourceManager::GetInstance().LoadModels("Models\\Empire\\lost_empire.obj");

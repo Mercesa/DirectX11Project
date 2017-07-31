@@ -949,11 +949,11 @@ bool Renderer::DestroyDirectX()
 	mpShaderManager->ReleaseResources();
 
 	ReleaseTexture(mBackBufferTexture.get());
-	
+	ReleaseTexture(mShadowDepthBuffer.get());
+
 	ReleaseTexture(mPostProcColorBuffer.get());
 	ReleaseTexture(mPostProcDepthBuffer.get());
 	
-	ReleaseTexture(mShadowDepthBuffer.get());
 
 	ReleaseTexture(gBuffer_positionBuffer.get());
 	ReleaseTexture(gBuffer_albedoBuffer.get());

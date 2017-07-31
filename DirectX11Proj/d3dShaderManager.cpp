@@ -23,6 +23,11 @@ void d3dShaderManager::ReleaseResources()
 	{
 		ReleasePixelShader(e.second.get());
 	}
+
+	for (auto& e : mComputeShaders)
+	{
+		ReleaseComputeShader(e.second.get());
+	}
 }
 
 bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)

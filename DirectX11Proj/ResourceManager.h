@@ -39,6 +39,8 @@ public:
 	Model* const GetModelByID(const ModelID& aID) const;
 	Texture* const GetTextureByID(const TexID& aID) const;
 
+	Material* LoadTexturesFromMaterial(const RawMeshData& aMeshData);
+
 private:
 	ResourceManager();
 	
@@ -53,7 +55,6 @@ private:
 	std::vector<Texture*> mLoadedTextures;
 
 
-	Material* LoadTexturesFromMaterial(const RawMeshData& aMeshData);
 	Texture* LoadTexture(RawTextureData aData);
 
 	// Load models as one

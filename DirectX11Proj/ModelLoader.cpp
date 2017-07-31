@@ -143,6 +143,19 @@ void ProcessMaterial(aiMesh* a_Mesh, const aiScene* a_Scene, RawMeshData& aMeshd
 			
 		}
 	}
+
+	// No material present with object
+	//else
+	//{
+	//	aMeshdata.diffuseData.isValid = false;
+	//	aMeshdata.normalData.isValid = false;
+	//	aMeshdata.specularData.isValid = false;
+	//
+	//	aMeshdata.diffuseData.filepath = "";
+	//	aMeshdata.specularData.filepath = "";
+	//	aMeshdata.normalData.filepath = "";
+	//
+	//}
 }
 
 
@@ -241,6 +254,6 @@ std::vector<RawMeshData> ModelLoader::LoadModel(const char* const aFilePath)
 
 	std::vector<RawMeshData> tData;
 	ProcessNode(scene->mRootNode, scene, tData);
-	
+
 	return tData;
 }

@@ -48,7 +48,7 @@ private:
 
 	std::map<const char*, std::unique_ptr<VertexShader>> mVertexShaders;
 	std::map<const char*, std::unique_ptr<PixelShader>>	mPixelShaders;
-	std::map<const char*, std::unique_ptr<ComputeShader>>	mComputeShaders;
+	std::map<const char*, std::unique_ptr<ComputeShader>> mComputeShaders;
 
 	bool LoadShaders(ID3D11Device* const apDevice);
 };

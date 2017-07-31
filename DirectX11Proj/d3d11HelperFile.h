@@ -81,7 +81,6 @@ struct ComputeShader
 };
 
 
-
 struct Material
 {
 	Material() : mpDiffuse(0), mpNormal(0), mpSpecular(0) {}
@@ -113,12 +112,21 @@ static void ReleaseVertexShader(VertexShader* aVShader)
 	}
 }
 
-static void ReleasePixelShader(PixelShader* aVShader)
+static void ReleasePixelShader(PixelShader* aPShader)
 {
-	assert(aVShader != nullptr);
-	if (aVShader->shader != nullptr)
+	assert(aPShader != nullptr);
+	if (aPShader->shader != nullptr)
 	{
-		aVShader->shader->Release();
+		aPShader->shader->Release();
+	}
+}
+
+static void ReleaseComputeShader(ComputeShader* aCShader)
+{
+	assert(aCShader != nullptr);
+	if (aCShader->shader != nullptr)
+	{
+		aCShader->shader->Release();
 	}
 }
 
