@@ -30,9 +30,11 @@ public:
 	bool HasBeenInitialized() { return mInitialized; }
 
 	Camera* const GetCamera() { return mpCamera.get(); }
+	IObject* const GetSkyboxSphere() { return mpSkyboxSphere.get(); }
 
 protected:
 	std::unique_ptr<Camera> mpCamera;
+	std::unique_ptr<IObject> mpSkyboxSphere;
 
 private:
 	bool mInitialized;

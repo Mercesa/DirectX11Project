@@ -197,8 +197,13 @@ void Renderer::RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aOb
 	auto renderSceneObjectsEnd = std::chrono::high_resolution_clock::now();
 	objectRenderingTime = std::chrono::duration_cast<std::chrono::microseconds>(renderSceneObjectsEnd - renderSceneObjectsStart).count() / 1000.0f;
 
+}
+
+void Renderer::RenderSceneSkybox()
+{
 
 }
+
 static bool renderForward = true;
 
 
@@ -284,6 +289,9 @@ void Renderer::RenderBlurPass()
 	this->mpBlurCB->UpdateBuffer((void*)gBlurParamatersDataPtr.get(), mpDeviceContext.Get());
 
 	mpDeviceContext->Draw(4, 0);
+
+	ID3D11ShaderResourceView* pNullSRV = nullptr;
+	mpDeviceContext->PSSetShaderResources(0, 1, &pNullSRV);
 
 	mpDeviceContext->OMSetRenderTargets(1, &this->mAmbientOcclusionTexture->rtv, nullptr);
 	mpDeviceContext->PSSetShaderResources(0, 1, &mAmbientOcclusionBufferTexture->srv);

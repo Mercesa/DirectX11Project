@@ -60,6 +60,8 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 	//mpCamera->LookAt(XMFLOAT3(0.0f, 10.0f, -5.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
 	mpCamera->UpdateViewMatrix();
 	//std::cout << mpCamera->GetPosition3f().z << std::endl;
+
+	XMStoreFloat4x4(&mpSkyboxSphere->mWorldMatrix, XMMatrixTranslation(mpCamera->GetPosition3f().x, mpCamera->GetPosition3f().y, mpCamera->GetPosition3f().z));
 }
 
 void PlayerSceneExample::Init()
@@ -137,32 +139,30 @@ void PlayerSceneExample::Init()
 
 
 			
-			//RawMeshData data;
-			//data.diffuseData.filepath = "sunsetcube1024.dds";
-			//data.diffuseData.isValid = true;
-			//
-			//data.specularData.isValid = false;
-			//data.normalData.isValid = false;
+
+			// Prepare skybox sphere
+			RawMeshData data;
+			data.diffuseData.filepath = "textures\\sunsetcube1024.dds";
+			data.diffuseData.isValid = true;
+
+			data.specularData.isValid = false;
+			data.normalData.isValid = false;
+
+			Material* tM = ResourceManager::GetInstance().LoadTexturesFromMaterial(data);
+
+
+			tModels = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\Sphere.obj");
+			delete ResourceManager::GetInstance().GetModelByID(tModels[0])->material;
+			ResourceManager::GetInstance().GetModelByID(tModels[0])->material = tM;
+		
+			tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 6.0f);
+			//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
 			
-			//Material* tM = ResourceManager::GetInstance().LoadTexturesFromMaterial(data);
-
-
-		//	tModels = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\Sphere.obj");
-		//
-		//	//delete ResourceManager::GetInstance().GetModelByID(tModels[0])->material;
-		//	
-		//	//ResourceManager::GetInstance().GetModelByID(tModels[0])->material = tM;
-		//
-		//	tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 6.0f);
-		//	//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
-		//	for (int i = 0; i < tModels.size(); ++i)
-		//	{
-		//		std::unique_ptr<IObject> tpObject = std::make_unique<IObject>();
-		//		tpObject->mpModel = tModels[i];
-		//		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(1.0f, 1.0f, 1.0f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
-		//
-		//		this->mObjects.push_back(std::move(tpObject));
-		//	}
+		
+			mpSkyboxSphere->mpModel = tModels[0];
+			XMStoreFloat4x4(&mpSkyboxSphere->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(1.0f, 1.0f, 1.0f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
+		
+			
 
 
 			//tModels = ResourceManager::GetInstance().LoadModels("Models\\Empire\\lost_empire.obj");

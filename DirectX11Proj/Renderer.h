@@ -77,7 +77,7 @@ private:
 	void RenderBlurPass();
 	void RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aObjects);
 	void RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects);
-
+	void RenderSceneSkybox();
 
 	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
 	void RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aObjects,
