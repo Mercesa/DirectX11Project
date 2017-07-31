@@ -49,6 +49,12 @@ bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_DeferredLighting.hlsl", "VSDeferredLighting", "vs_5_0", EVERTEX));
 	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_DeferredLighting.hlsl", "PSDeferredLighting", "ps_5_0", EPIXEL));
 
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_SSAO.hlsl", "VSDeferredLighting", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_SSAO.hlsl", "PSDeferredLighting", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_Blur.hlsl", "VSDeferredLighting", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_Blur.hlsl", "PSDeferredLighting", "ps_5_0", EPIXEL));
+
 	mShadersInfo.push_back(ShaderInfo("Shaders\\CS_GuassianBlur.hlsl", "CSMain", "cs_5_0", ECOMPUTE));
 
 	LOG(INFO) << "ShaderManager: Finished initializing all shaders";

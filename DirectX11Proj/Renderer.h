@@ -64,7 +64,6 @@ private:
 	
 	void CreateConstantBuffers();
 
-
 	// Render functions
 	void RenderObject(IObject* const aObject);
 	void RenderMaterial(Material* const aMaterial);
@@ -74,8 +73,11 @@ private:
 	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
 	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
 
+	void RenderSceneSSAOPass();
+	void RenderBlurPass();
 	void RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aObjects);
 	void RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects);
+
 
 	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
 	void RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aObjects,
@@ -124,6 +126,7 @@ private:
 	std::unique_ptr<d3dConstantBuffer> mpLightCB;
 	std::unique_ptr<d3dConstantBuffer> mpLightMatrixCB;
 	std::unique_ptr<d3dConstantBuffer> mpPerObjectCB;
+	std::unique_ptr<d3dConstantBuffer> mpBlurCB;
 
 	// Shader manager
 	std::unique_ptr<d3dShaderManager> mpShaderManager;
@@ -131,6 +134,9 @@ private:
 	std::unique_ptr<Texture> mBackBufferTexture;
 	std::unique_ptr<Texture> mBackBufferDepthTexture;
 	std::unique_ptr<Texture> mShadowDepthBuffer;
+
+	std::unique_ptr<Texture> mAmbientOcclusionTexture;
+	std::unique_ptr<Texture> mAmbientOcclusionBufferTexture;
 
 	std::unique_ptr<Texture> mPostProcColorBuffer;
 	std::unique_ptr<Texture> mPostProcDepthBuffer;

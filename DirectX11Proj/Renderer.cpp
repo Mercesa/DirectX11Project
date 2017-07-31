@@ -50,6 +50,7 @@ void Renderer::CreateConstantBuffers()
 	mpLightCB = std::make_unique<d3dConstantBuffer>(sizeof(cbLights), nullptr, mpDevice.Get());
 	mpPerObjectCB = std::make_unique<d3dConstantBuffer>(sizeof(cbPerObject), nullptr, mpDevice.Get());
 	mpLightMatrixCB = std::make_unique<d3dConstantBuffer>(sizeof(cbLightMatrix), nullptr, mpDevice.Get());
+	mpBlurCB = std::make_unique<d3dConstantBuffer>(sizeof(cbBlurParameters), nullptr, mpDevice.Get());
 
 	LOG(INFO) << "Constant buffers created";
 }
@@ -61,6 +62,7 @@ static std::unique_ptr<cbMaterial> gMaterialBufferDataPtr = std::make_unique<cbM
 static std::unique_ptr<cbMatrixBuffer> gMatrixBufferDataPtr = std::make_unique<cbMatrixBuffer>();
 static std::unique_ptr<cbLightMatrix> gLightMatrixBufferDataPtr = std::make_unique<cbLightMatrix>();
 static std::unique_ptr<cbPerObject> gPerObjectMatrixBufferDataPtr = std::make_unique<cbPerObject>();
+static std::unique_ptr<cbBlurParameters> gBlurParamatersDataPtr = std::make_unique<cbBlurParameters>();
 
 
 void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& apLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera)
@@ -254,6 +256,77 @@ void Renderer::RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aOb
 	}
 }
 
+void Renderer::RenderBlurPass()
+{
+	VertexShader*const tFVS = mpShaderManager->GetVertexShader("Shaders\\VS_Blur.hlsl");
+	PixelShader*const tFPS = mpShaderManager->GetPixelShader("Shaders\\PS_Blur.hlsl");
+
+
+	mpDeviceContext->RSSetViewports(1, &mViewport);
+	mpDeviceContext->RSSetState(mRaster_backcull);
+
+	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
+
+
+
+	// Draw full screen quad
+	//mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
+	mpDeviceContext->PSSetSamplers(1, 1, &mpPointWrapSampler);
+
+	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	mpDeviceContext->VSSetShader(tFVS->shader, NULL, 0);
+	mpDeviceContext->PSSetShader(tFPS->shader, NULL, 0);
+
+	// Set gbuffer resources
+	mpDeviceContext->OMSetRenderTargets(1, &this->mAmbientOcclusionBufferTexture->rtv, nullptr);
+	mpDeviceContext->PSSetShaderResources(0, 1, &mAmbientOcclusionTexture->srv);
+	gBlurParamatersDataPtr->blurHorizontal = true;
+	this->mpBlurCB->UpdateBuffer((void*)gBlurParamatersDataPtr.get(), mpDeviceContext.Get());
+
+	mpDeviceContext->Draw(4, 0);
+
+	mpDeviceContext->OMSetRenderTargets(1, &this->mAmbientOcclusionTexture->rtv, nullptr);
+	mpDeviceContext->PSSetShaderResources(0, 1, &mAmbientOcclusionBufferTexture->srv);
+	gBlurParamatersDataPtr->blurHorizontal = false;
+	this->mpBlurCB->UpdateBuffer((void*)gBlurParamatersDataPtr.get(), mpDeviceContext.Get());
+
+	mpDeviceContext->Draw(4, 0);
+}
+
+
+void Renderer::RenderSceneSSAOPass()
+{
+	// Get the fullscreen shaders
+	VertexShader*const tFVS = mpShaderManager->GetVertexShader("Shaders\\VS_SSAO.hlsl");
+	PixelShader*const tFPS = mpShaderManager->GetPixelShader("Shaders\\PS_SSAO.hlsl");
+
+
+	mpDeviceContext->RSSetViewports(1, &mViewport);
+	mpDeviceContext->RSSetState(mRaster_backcull);
+
+	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
+
+	// Set backbuffer as RT
+	mpDeviceContext->OMSetRenderTargets(1, &this->mAmbientOcclusionTexture->rtv, nullptr);
+	//mpDeviceContext->ClearDepthStencilView(mBackBufferTexture->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+
+	// Draw full screen quad
+	//mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
+	mpDeviceContext->PSSetSamplers(1, 1, &mpPointWrapSampler);
+
+	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	mpDeviceContext->VSSetShader(tFVS->shader, NULL, 0);
+	mpDeviceContext->PSSetShader(tFPS->shader, NULL, 0);
+
+	// Set gbuffer resources
+	mpDeviceContext->PSSetShaderResources(0, 1, &gBuffer_albedoBuffer->srv);
+	mpDeviceContext->PSSetShaderResources(1, 1, &gBuffer_positionBuffer->srv);
+	mpDeviceContext->PSSetShaderResources(2, 1, &gBuffer_normalBuffer->srv);
+	mpDeviceContext->PSSetShaderResources(3, 1, &randomValueTexture->srv);
+
+	mpDeviceContext->Draw(4, 0);
+}
 
 void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects)
 {
@@ -284,7 +357,7 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 	mpDeviceContext->PSSetShaderResources(0, 1, &gBuffer_albedoBuffer->srv);
 	mpDeviceContext->PSSetShaderResources(1, 1, &gBuffer_positionBuffer->srv);
 	mpDeviceContext->PSSetShaderResources(2, 1, &gBuffer_normalBuffer->srv);
-	mpDeviceContext->PSSetShaderResources(3, 1, &randomValueTexture->srv);
+	mpDeviceContext->PSSetShaderResources(3, 1, &mAmbientOcclusionTexture->srv);
 	mpDeviceContext->PSSetShaderResources(4, 1, &mShadowDepthBuffer->srv);
 
 	mpDeviceContext->Draw(4, 0);
@@ -292,7 +365,6 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 
 void Renderer::BindStandardConstantBuffers()
 {
-
 	// view/Proj matrix cb at {0}
 	ID3D11Buffer* tBuff = mpMatrixCB->GetBuffer();
 	mpDeviceContext->VSSetConstantBuffers(0, 1, &tBuff);
@@ -315,6 +387,9 @@ void Renderer::BindStandardConstantBuffers()
 	tBuff = mpPerObjectCB->GetBuffer();
 	mpDeviceContext->VSSetConstantBuffers(4, 1, &tBuff);
 	mpDeviceContext->PSSetConstantBuffers(4, 1, &tBuff);
+
+	tBuff = mpBlurCB->GetBuffer();
+	mpDeviceContext->PSSetConstantBuffers(5, 1, &tBuff);
 }
 
 
@@ -327,6 +402,8 @@ void Renderer::RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjec
 	BindStandardConstantBuffers();
 	RenderSceneDepthPrePass(aObjects);
 	RenderSceneGBufferFill(aObjects);
+	RenderSceneSSAOPass();
+	RenderBlurPass();
 	RenderSceneLightingPass(aObjects);
 }
 
@@ -716,6 +793,9 @@ bool Renderer::InitializeResources()
 	gBuffer_depthBuffer = std::make_unique<Texture>();
 	randomValueTexture = std::make_unique<Texture>();
 
+	mAmbientOcclusionTexture = std::make_unique<Texture>();
+	mAmbientOcclusionBufferTexture = std::make_unique<Texture>();
+
 	// Post proc color and depth buffer 
 	mPostProcColorBuffer->texture =  CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
 	mPostProcColorBuffer->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), mPostProcColorBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
@@ -734,7 +814,6 @@ bool Renderer::InitializeResources()
 	mShadowDepthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), mShadowDepthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	mShadowDepthBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), mShadowDepthBuffer->texture, GetDepthSRVFormat(DXGI_FORMAT_D24_UNORM_S8_UINT));
 
-	
 	// Every buffer in the gbuffer needs a shader resource view and render target view, SRV for texture access, RTV to render 
 	gBuffer_albedoBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
 	gBuffer_albedoBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), gBuffer_albedoBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
@@ -750,6 +829,16 @@ bool Renderer::InitializeResources()
 
 	gBuffer_depthBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
 	gBuffer_depthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), gBuffer_depthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
+
+	// Our ambient occlusion texture is R32 format 
+	mAmbientOcclusionTexture->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
+	mAmbientOcclusionTexture->srv = CreateSimpleShaderResourceView(mpDevice.Get(), mAmbientOcclusionTexture->texture, DXGI_FORMAT_R32_FLOAT);
+	mAmbientOcclusionTexture->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), mAmbientOcclusionTexture->texture, DXGI_FORMAT_R32_FLOAT);
+
+	// Buffer texture used during the blur
+	mAmbientOcclusionBufferTexture->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
+	mAmbientOcclusionBufferTexture->srv = CreateSimpleShaderResourceView(mpDevice.Get(), mAmbientOcclusionBufferTexture->texture, DXGI_FORMAT_R32_FLOAT);
+	mAmbientOcclusionBufferTexture->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), mAmbientOcclusionBufferTexture->texture, DXGI_FORMAT_R32_FLOAT);
 
 	std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);
 	std::default_random_engine generator;
@@ -844,10 +933,6 @@ bool Renderer::InitializeResources()
 bool  Renderer::InitializeDepthStencilView()
 {
 	mpDepthStencilState = CreateDepthStateDefault(mpDevice.Get());
-
-	//this->mSceneDepthPrepassTexture = std::make_unique<d3dRenderDepthTexture>();
-	//this->mSceneDepthPrepassTexture->Initialize(mpDevice.Get(), 2048, 2048, SCREEN_NEAR, SCREEN_FAR);
-
 	return true;
 }
 
@@ -877,6 +962,9 @@ bool Renderer::DestroyDirectX()
 	ReleaseTexture(gBuffer_depthBuffer.get());
 
 	ReleaseTexture(randomValueTexture.get());
+
+	ReleaseTexture(mAmbientOcclusionTexture.get());
+	ReleaseTexture(mAmbientOcclusionBufferTexture.get());
 
 	mRaster_backcull->Release();
 	mpDepthStencilState->Release();
