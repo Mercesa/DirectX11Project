@@ -273,6 +273,36 @@ static ID3D11RasterizerState* CreateRSDefault(ID3D11Device* const aDevice)
 	return tRaster;
 }
 
+static ID3D11RasterizerState* CreateRSNoCull(ID3D11Device* const aDevice)
+{
+	ID3D11RasterizerState* tRaster = nullptr;
+	D3D11_RASTERIZER_DESC rasterDesc;
+	HRESULT result;
+
+	rasterDesc.AntialiasedLineEnable = false;
+	rasterDesc.CullMode = D3D11_CULL_NONE;
+	rasterDesc.DepthBias = 0;
+	rasterDesc.DepthBiasClamp = 0.0f;
+	rasterDesc.DepthClipEnable = true;
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
+	rasterDesc.FrontCounterClockwise = false;
+	rasterDesc.MultisampleEnable = false;
+	rasterDesc.ScissorEnable = false;
+	rasterDesc.SlopeScaledDepthBias = 0.0f;
+
+
+	result = aDevice->CreateRasterizerState(&rasterDesc, &tRaster);
+
+	if (FAILED(result))
+	{
+		LOG(INFO) << "CreateRSNoCull failed";
+		return nullptr;
+	}
+
+	return tRaster;
+}
+
+
 
 static ID3D11RasterizerState* CreateRSWireFrame(ID3D11Device* const aDevice)
 {
@@ -485,6 +515,47 @@ static ID3D11DepthStencilState* CreateDepthStateDefault(ID3D11Device* const aDev
 	depthStencilDesc.DepthEnable = true;
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	depthStencilDesc.StencilEnable = true;
+	depthStencilDesc.StencilReadMask = 0xFF;
+	depthStencilDesc.StencilWriteMask = 0xFF;
+
+	// Stencil operations if pixel is front-facing.
+	depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	// Stencil operations if pixel is back-facing.
+	depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	result = aDevice->CreateDepthStencilState(&depthStencilDesc, &tDepthStencilState);
+
+	if (FAILED(result))
+	{
+		LOG(ERROR) << "Failed to create depth-stencil state";
+		return nullptr;
+	}
+
+	return tDepthStencilState;
+}
+
+static ID3D11DepthStencilState* CreateDepthStateLessEqual(ID3D11Device* const aDevice)
+{
+	ID3D11DepthStencilState* tDepthStencilState;
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+	HRESULT result;
+
+	// Initialize the description of the stencil state.
+	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+
+	// Set up the description of the stencil state.
+	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 
 	depthStencilDesc.StencilEnable = true;
 	depthStencilDesc.StencilReadMask = 0xFF;

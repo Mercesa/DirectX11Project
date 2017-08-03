@@ -88,6 +88,12 @@
     <ClCompile Include="Camera.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
+    <ClCompile Include="FrustumG.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PlayerSceneExample.h">
@@ -174,6 +180,12 @@
     <ClInclude Include="GenericMathValueStructs.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
+    <ClInclude Include="FrustumG.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\VS_texture.hlsl">
@@ -236,13 +248,9 @@
     <None Include="Shaders\VS_SSAO.hlsl">
       <Filter>Shaders</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Shaders\VS_Skybox.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\PS_Skybox.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
+    <None Include="Shaders\VS_Skybox.hlsl" />
+    <None Include="Shaders\PS_Skybox.hlsl">
+      <Filter>Utility</Filter>
+    </None>
   </ItemGroup>
 </Project>

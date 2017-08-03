@@ -25,6 +25,7 @@ Renderer::Renderer()
 }
 
 
+
 Renderer::~Renderer()
 {
 }
@@ -199,8 +200,23 @@ void Renderer::RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aOb
 
 }
 
-void Renderer::RenderSceneSkybox()
+void Renderer::RenderSceneSkybox(IObject* const aObject)
 {
+	mpDeviceContext->RSSetState(mRaster_noCull);
+	mpDeviceContext->OMSetDepthStencilState(mDepthStencilStateLessEqual, 1);
+
+	mpDeviceContext->OMSetRenderTargets(1, &mPostProcColorBuffer->rtv, this->mPostProcDepthBuffer->dsv);
+
+	VertexShader*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_Skybox.hlsl");
+	PixelShader *const tPS = mpShaderManager->GetPixelShader("Shaders\\PS_Skybox.hlsl");
+
+	mpDeviceContext->VSSetShader(tVS->shader, NULL, 0);
+	mpDeviceContext->PSSetShader(tPS->shader, NULL, 0);
+
+	mpDeviceContext->IASetInputLayout(tVS->inputLayout);
+	UpdateObjectConstantBuffers(aObject);
+	RenderObject(aObject); 
+	
 
 }
 
@@ -211,14 +227,15 @@ void Renderer::RenderScene(
 	std::vector<std::unique_ptr<IObject>>& aObjects,
 	std::vector<std::unique_ptr<Light>>& aLights,
 	d3dLightClass* const aDirectionalLight,
-	Camera* const apCamera
+	Camera* const apCamera,
+	IObject* const aSkybox
 )
 {
 	ImGui::MenuItem("Enabled", NULL, &renderForward);
 
 	if(renderForward)
 	{
-		RenderSceneForward(aObjects, aLights, aDirectionalLight, apCamera);
+		RenderSceneForward(aObjects, aLights, aDirectionalLight, apCamera, aSkybox);
 	}
 
 	else
@@ -290,6 +307,8 @@ void Renderer::RenderBlurPass()
 
 	mpDeviceContext->Draw(4, 0);
 
+	// IMPORTANT, need to do this nullptr hack otherwise it will complain about the resource still being bound as shader resource
+	// (since we are using the same resources in the previous blurr pass
 	ID3D11ShaderResourceView* pNullSRV = nullptr;
 	mpDeviceContext->PSSetShaderResources(0, 1, &pNullSRV);
 
@@ -416,14 +435,17 @@ void Renderer::RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjec
 }
 
 
-void Renderer::RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera)
+void Renderer::RenderSceneForward(
+std::vector<std::unique_ptr<IObject>>& aObjects, 
+std::vector<std::unique_ptr<Light>>& aLights, 
+d3dLightClass* const aDirectionalLight,
+Camera* const apCamera, 
+IObject* const aSkybox)
 {
 	float color[4]{ clearColor[0], clearColor[1], clearColor[2], 1.0f };
 
-
 	auto frameConstantBufferTimerStart = std::chrono::high_resolution_clock::now();
 	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
-
 
 	// bind buffers
 	BindStandardConstantBuffers();
@@ -437,8 +459,8 @@ void Renderer::RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObject
 	RenderSceneWithShadows(aObjects, aLights, aDirectionalLight, apCamera);
 	auto renderSceneWithShadowsTimerEnd = std::chrono::high_resolution_clock::now();
 
-	// Scene prep
-
+	RenderSceneSkybox(aSkybox);
+	
 	// Render post processing quad
 	RenderFullScreenQuad();
 
@@ -941,6 +963,8 @@ bool Renderer::InitializeResources()
 bool  Renderer::InitializeDepthStencilView()
 {
 	mpDepthStencilState = CreateDepthStateDefault(mpDevice.Get());
+	mDepthStencilStateLessEqual = CreateDepthStateLessEqual(mpDevice.Get());
+
 	return true;
 }
 
@@ -948,6 +972,8 @@ bool  Renderer::InitializeDepthStencilView()
 bool  Renderer::InitializeRasterstate()
 {
 	this->mRaster_backcull = CreateRSDefault(mpDevice.Get());
+	this->mRaster_noCull = CreateRSNoCull(mpDevice.Get());
+
 	return true;
 }
 
@@ -976,8 +1002,11 @@ bool Renderer::DestroyDirectX()
 
 	mRaster_backcull->Release();
 	mpDepthStencilState->Release();
-	mpAnisotropicWrapSampler->Release();
 	
+	mRaster_noCull->Release();
+	mDepthStencilStateLessEqual->Release();
+	
+	mpAnisotropicWrapSampler->Release();
 	mpLinearClampSampler->Release();
 	mpPointClampSampler->Release();
 	mpLinearWrapSampler->Release();

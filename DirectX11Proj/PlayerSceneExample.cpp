@@ -148,7 +148,7 @@ void PlayerSceneExample::Init()
 			data.specularData.isValid = false;
 			data.normalData.isValid = false;
 
-			Material* tM = ResourceManager::GetInstance().LoadTexturesFromMaterial(data);
+			Material* tM = ResourceManager::GetInstance().LoadCubeMapTexturesFromMaterial(data);
 
 
 			tModels = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\Sphere.obj");
@@ -160,7 +160,7 @@ void PlayerSceneExample::Init()
 			
 		
 			mpSkyboxSphere->mpModel = tModels[0];
-			XMStoreFloat4x4(&mpSkyboxSphere->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(1.0f, 1.0f, 1.0f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
+			//XMStoreFloat4x4(&mpSkyboxSphere->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(1.0f, 1.0f, 1.0f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
 		
 			
 

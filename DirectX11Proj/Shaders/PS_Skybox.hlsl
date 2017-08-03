@@ -1,5 +1,3 @@
-
-
 TextureCube skyboxTexture : register(t0);
 
 SamplerState samTriLinearSam
@@ -15,7 +13,7 @@ struct PixelInputType
     float3 positionUV : TEXCOORD0;
 };
 
-float4 ColorPixelShader(PixelInputType input) : SV_TARGET
+float4 SkyboxPixelShader(PixelInputType input) : SV_TARGET
 {
 	return skyboxTexture.Sample(samTriLinearSam, input.positionUV);
 }

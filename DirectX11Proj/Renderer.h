@@ -29,7 +29,7 @@ public:
 	void Initialize(HWND aHwnd);
 
 	 
-	void RenderScene(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
+	void RenderScene(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera, IObject* const aSkybox);
 	//void Destroy();
 
 	//void OnResize();
@@ -70,14 +70,14 @@ private:
 
 	void RenderFullScreenQuad();
 	
-	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
+	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera, IObject* const aSkybox);
 	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
 
 	void RenderSceneSSAOPass();
 	void RenderBlurPass();
 	void RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aObjects);
 	void RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects);
-	void RenderSceneSkybox();
+	void RenderSceneSkybox(IObject* const aObject);
 
 	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
 	void RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aObjects,
@@ -102,6 +102,8 @@ private:
 	D3D11_VIEWPORT mShadowLightViewport;
 
 	
+
+
 	// IDXGI stuff
 	Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;
 	Microsoft::WRL::ComPtr<IDXGIAdapter> mAdapter;
@@ -110,6 +112,10 @@ private:
 	ID3D11DepthStencilState* mpDepthStencilState;
 	ID3D11RasterizerState* mRaster_backcull;
 	
+
+	ID3D11RasterizerState* mRaster_noCull;
+	ID3D11DepthStencilState* mDepthStencilStateLessEqual;
+
 	//Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRaster_frontcull; not used yet
 
 	// Samplers

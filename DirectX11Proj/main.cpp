@@ -419,7 +419,7 @@ void Render()
 		//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}
 
-	mpRenderer->RenderScene(mpPlayerScene->mObjects, mpPlayerScene->mLights, mpPlayerScene->mDirectionalLight.get(), mpPlayerScene->GetCamera());
+	mpRenderer->RenderScene(mpPlayerScene->mObjects, mpPlayerScene->mLights, mpPlayerScene->mDirectionalLight.get(), mpPlayerScene->GetCamera(), mpPlayerScene->GetSkyboxSphere());
 	auto frameConstantBufferTimerEnd = std::chrono::high_resolution_clock::now();
 
 	float performance = std::chrono::duration_cast<std::chrono::microseconds>(frameConstantBufferTimerEnd - frameConstantBufferTimerStart).count() / 1000.0f;

@@ -40,6 +40,7 @@ public:
 	Texture* const GetTextureByID(const TexID& aID) const;
 
 	Material* LoadTexturesFromMaterial(const RawMeshData& aMeshData);
+	Material* LoadCubeMapTexturesFromMaterial(const RawMeshData& aMeshData);
 
 private:
 	ResourceManager();
@@ -56,6 +57,7 @@ private:
 
 
 	Texture* LoadTexture(RawTextureData aData);
+	Texture* LoadTextureCube(RawTextureData aData);
 
 	// Load models as one
 	// Load models as a list

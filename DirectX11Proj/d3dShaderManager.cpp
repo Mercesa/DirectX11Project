@@ -62,6 +62,9 @@ bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 
 	mShadersInfo.push_back(ShaderInfo("Shaders\\CS_GuassianBlur.hlsl", "CSMain", "cs_5_0", ECOMPUTE));
 
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_Skybox.hlsl", "SkyboxVertexShader", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_Skybox.hlsl", "SkyboxPixelShader", "ps_5_0", EPIXEL));
+
 	LOG(INFO) << "ShaderManager: Finished initializing all shaders";
 
 	// Load actual shaders
