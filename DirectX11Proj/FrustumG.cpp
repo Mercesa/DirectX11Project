@@ -35,7 +35,7 @@ void FrustumG::SetCamDef(glm::vec3 p, glm::vec3 l, glm::vec3 u)
 	glm::vec3 dir, nc, fc, X, Y, Z;
 
 	Z = p - l;
-	glm::normalize(Z);
+	Z= glm::normalize(Z);
 
 	X = glm::cross(u, Z);
 

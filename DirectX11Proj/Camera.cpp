@@ -6,9 +6,11 @@
 
 using namespace DirectX;
 
+#include "GraphicsSettings.h"
+
 Camera::Camera()
 {
-	SetLens(0.25f*MathHelper::Pi, 1.0f, 1.0f, 1000.0f);
+	SetLens(0.5f*MathHelper::Pi, GraphicsSettings::gCurrentScreenWidth / GraphicsSettings::gCurrentScreenHeight, 1.0f, 1000.0f);
 }
 
 Camera::~Camera()

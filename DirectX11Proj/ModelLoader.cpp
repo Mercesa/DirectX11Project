@@ -143,19 +143,6 @@ void ProcessMaterial(aiMesh* a_Mesh, const aiScene* a_Scene, RawMeshData& aMeshd
 			
 		}
 	}
-
-	// No material present with object
-	//else
-	//{
-	//	aMeshdata.diffuseData.isValid = false;
-	//	aMeshdata.normalData.isValid = false;
-	//	aMeshdata.specularData.isValid = false;
-	//
-	//	aMeshdata.diffuseData.filepath = "";
-	//	aMeshdata.specularData.filepath = "";
-	//	aMeshdata.normalData.filepath = "";
-	//
-	//}
 }
 
 
@@ -207,8 +194,52 @@ bool is_file_exist(const char *fileName)
 	return infile.good();
 }
 
+VEC4f ModelLoader::GenerateSphereBound(std::vector<VertexData>& aData)
+{
+	size_t dataSize = aData.size();
+
+	float minX = 10000000.0f;
+	float maxX = -10000000.0f;
+
+	float minY = 10000000.0f;
+	float maxY = -10000000.0f;
+	
+	float minZ = 10000000.0f;
+	float maxZ = -10000000.0f;
+
+
+	// Get the min and max per axis
+	for (int i = 0; i < dataSize; ++i)
+	{
+		maxX = max(aData[i].position.x, maxX);
+		minX = min(aData[i].position.x, minX);
+
+		maxY = max(aData[i].position.y, maxY);
+		minY = min(aData[i].position.y, minY);
+
+		maxZ = max(aData[i].position.z, maxZ);
+		minZ = min(aData[i].position.z, minZ);
+	}
+
+	VEC4f pivot;
+	// Calculate the pivot point
+	pivot.x = (maxX + minX) / 2.0f;
+	pivot.y = (maxY + minY) / 2.0f;
+	pivot.z = (maxZ + minZ) / 2.0f;
+	
+	// calculate furthest radius from every axis
+	float range = max(abs((maxX - minX)) /2.0f, abs((maxY - minY)) / 2.0f);
+	range = max(range, abs((maxZ - minZ)) / 2.0f);
+
+	// set range in w
+	pivot.w = range;
+
+	return pivot;
+}
+
+
 // LoadModel implicitly exports a file to assbin right now, and next time it will load the assbin version if possible
-std::vector<RawMeshData> ModelLoader::LoadModel(const char* const aFilePath)
+std::vector<RawMeshData> ModelLoader::LoadModel(const char* aFilePath, bool aGenerateAABB)
 {
 	bool doesAssbinVersionExist = false;
 	// Set directory string and c_string
@@ -254,6 +285,14 @@ std::vector<RawMeshData> ModelLoader::LoadModel(const char* const aFilePath)
 
 	std::vector<RawMeshData> tData;
 	ProcessNode(scene->mRootNode, scene, tData);
+
+	if (aGenerateAABB)
+	{
+		for (int i = 0; i < tData.size(); ++i)
+		{
+			tData[i].sphericalCollider = GenerateSphereBound(tData[i].vertices);
+		}
+	}
 
 	return tData;
 }

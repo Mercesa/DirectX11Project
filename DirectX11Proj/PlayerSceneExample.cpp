@@ -70,6 +70,7 @@ void PlayerSceneExample::Init()
 	
 	
 	std::vector<ModelID> tModels;
+	std::vector<ModelID> modelSphere;
 
 	
 	XMMATRIX tScaleMat = tScaleMat = XMMatrixScaling(1.0f, 1.0f, 1.0f);
@@ -109,18 +110,40 @@ void PlayerSceneExample::Init()
 	//	this->mObjects.push_back(std::move(tpObject));
 	//}
 
+	modelSphere = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\Sphere.obj", false);
+
 	for (int y = 0; y < 1; ++y)
 	{
 		for (int x = 0; x < 1; ++x)
 		{
-			tModels = ResourceManager::GetInstance().LoadModels("Models\\Sponza\\Sponza.obj");
-			tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
+			tModels = ResourceManager::GetInstance().LoadModels("Models\\Sponza\\Sponza.obj", true);
 			//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
 			for (int i = 0; i < tModels.size(); ++i)
 			{
 				std::unique_ptr<IObject> tpObject = std::make_unique<IObject>();
 				tpObject->mpModel = tModels[i];
+				
+				Model* tMod = ResourceManager::GetInstance().GetModelByID(tModels[i]);
 				XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
+				
+				
+				if (tMod->sphereCollider.w < 100.0f)
+				{
+					std::unique_ptr<IObject> tpObjectSphere = std::make_unique<IObject>();
+					tpObjectSphere->mpModel = modelSphere[0];
+					XMStoreFloat4x4(&tpObjectSphere->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
+
+
+					XMMATRIX sphereMatrix = XMLoadFloat4x4(&tpObjectSphere->mWorldMatrix);
+					sphereMatrix = XMMatrixMultiply(sphereMatrix, XMMatrixMultiply(XMMatrixScaling(tMod->sphereCollider.w, tMod->sphereCollider.w, tMod->sphereCollider.w), XMMatrixTranslation(tMod->sphereCollider.x / 100.0f, tMod->sphereCollider.y / 100.0f, tMod->sphereCollider.z / 100.0f)));
+					XMStoreFloat4x4(&tpObjectSphere->mWorldMatrix, sphereMatrix);
+					
+					tpObjectSphere->mCastShadow = false;
+					this->mObjects.push_back(std::move(tpObjectSphere));
+
+
+				}
+				
 
 				this->mObjects.push_back(std::move(tpObject));
 			}
@@ -151,7 +174,7 @@ void PlayerSceneExample::Init()
 			Material* tM = ResourceManager::GetInstance().LoadCubeMapTexturesFromMaterial(data);
 
 
-			tModels = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\Sphere.obj");
+			tModels = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\Sphere.obj", false);
 			delete ResourceManager::GetInstance().GetModelByID(tModels[0])->material;
 			ResourceManager::GetInstance().GetModelByID(tModels[0])->material = tM;
 		

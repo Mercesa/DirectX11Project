@@ -18,11 +18,11 @@ public:
 
 	ModelID mpModel;
 	XMFLOAT4X4 mWorldMatrix;
+	bool mCastShadow = true;
 
 protected:
 	// premature initialization just so I dont forget in general
 	bool mIsActive = false;
-	bool mCastShadow = false;
 	bool mHasBeenInitialized = false;
 		
 };

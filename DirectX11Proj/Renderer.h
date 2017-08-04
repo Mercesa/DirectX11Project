@@ -19,6 +19,7 @@
 
 class d3dRenderTexture;
 class d3dRenderDepthTexture;
+class FrustumG;
 
 class Renderer
 {
@@ -102,6 +103,8 @@ private:
 	D3D11_VIEWPORT mShadowLightViewport;
 
 	
+	std::unique_ptr<FrustumG> mMainCamCullFrustum;
+	Model* frustumModel;
 
 
 	// IDXGI stuff

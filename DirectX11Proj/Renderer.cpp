@@ -15,6 +15,7 @@
 #include "camera.h"
 #include "GraphicsStructures.h"
 #include "GraphicsSettings.h"
+#include "FrustumG.h"
 
 #include <random>
 
@@ -40,6 +41,10 @@ void Renderer::Initialize(HWND aHwnd)
 	ResourceManager::GetInstance().mpDevice = this->mpDevice.Get();
 	mpShaderManager = std::make_unique<d3dShaderManager>();
 	mpShaderManager->InitializeShaders(mpDevice.Get());
+
+	mMainCamCullFrustum = std::make_unique<FrustumG>();
+	mMainCamCullFrustum->SetCamInternals(MathHelper::Pi * 0.5f, GraphicsSettings::gCurrentScreenWidth / GraphicsSettings::gCurrentScreenHeight, 1.0f, 1000.0f);
+
 }
 
 
@@ -198,6 +203,33 @@ void Renderer::RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aOb
 	auto renderSceneObjectsEnd = std::chrono::high_resolution_clock::now();
 	objectRenderingTime = std::chrono::duration_cast<std::chrono::microseconds>(renderSceneObjectsEnd - renderSceneObjectsStart).count() / 1000.0f;
 
+
+	VertexShader*const tVS2 = mpShaderManager->GetVertexShader("Shaders\\VS_texture.hlsl");
+	PixelShader*const tPS2 = mpShaderManager->GetPixelShader("Shaders\\PS_texture.hlsl");
+	mpDeviceContext->VSSetShader(tVS2->shader, NULL, 0);
+	mpDeviceContext->PSSetShader(tPS2->shader, NULL, 0);
+
+	unsigned int stride;
+	unsigned int offset;
+
+	// Set vertex buffer stride and offset.
+	stride = sizeof(VertexData);
+	offset = 0;
+
+	// Set the vertex buffer to active in the input assembler so it can be rendered.
+
+	ID3D11Buffer* tBuffer = frustumModel->vertexBuffer->buffer;
+
+	mpDeviceContext->IASetVertexBuffers(0, 1, &tBuffer, &stride, &offset);
+
+	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
+	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+
+	mpDeviceContext->Draw(2, 0);
+
+
+
+
 }
 
 void Renderer::RenderSceneSkybox(IObject* const aObject)
@@ -221,7 +253,7 @@ void Renderer::RenderSceneSkybox(IObject* const aObject)
 }
 
 static bool renderForward = true;
-
+static bool firstFrame = true;
 
 void Renderer::RenderScene(
 	std::vector<std::unique_ptr<IObject>>& aObjects,
@@ -232,6 +264,33 @@ void Renderer::RenderScene(
 )
 {
 	ImGui::MenuItem("Enabled", NULL, &renderForward);
+
+	glm::vec3 camPos = glm::vec3(apCamera->GetPosition3f().x, apCamera->GetPosition3f().y, apCamera->GetPosition3f().z);
+	glm::vec3 lookPos = glm::vec3(apCamera->GetLook3f().x, apCamera->GetLook3f().y, apCamera->GetLook3f().z);
+	glm::vec3 upVec = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	if (firstFrame)
+	{
+		mMainCamCullFrustum->SetCamDef(camPos, lookPos, upVec);
+		
+		RawMeshData mData;
+		VertexData vData;
+		vData.position.x = 0.0f;
+		vData.position.y = 0.0f;
+		vData.position.z = 1.0f;
+
+		mData.vertices.push_back(vData);
+
+		vData.position.x = 1.0f;
+		vData.position.y = 0.0f;
+		vData.position.z = 1.0f;
+
+		mData.vertices.push_back(vData);
+
+		frustumModel =  CreateSimpleModelFromRawData(mpDevice.Get(), mData);
+
+		firstFrame = false;
+	}
 
 	if(renderForward)
 	{
@@ -513,8 +572,11 @@ void Renderer::RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aO
 
 	for (int i = 0; i < aObjects.size(); ++i)
 	{
-		UpdateObjectConstantBuffers(aObjects[i].get());
-		RenderObject(aObjects[i].get());
+		if (aObjects[i]->GetCastShadow())
+		{
+			UpdateObjectConstantBuffers(aObjects[i].get());
+			RenderObject(aObjects[i].get());
+		}
 	}
 }
 
@@ -999,6 +1061,8 @@ bool Renderer::DestroyDirectX()
 
 	ReleaseTexture(mAmbientOcclusionTexture.get());
 	ReleaseTexture(mAmbientOcclusionBufferTexture.get());
+
+	ReleaseModel(frustumModel);
 
 	mRaster_backcull->Release();
 	mpDepthStencilState->Release();

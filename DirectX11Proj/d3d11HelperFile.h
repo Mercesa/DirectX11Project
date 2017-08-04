@@ -11,7 +11,7 @@
 
 #include <cassert>
 #include "GraphicsStructures.h"
-
+#include "GenericMathValueStructs.h"
 
 // These ID structs are special due to their explicit constructors
 // This prevents issues such as using a texture ID for loading a model ID
@@ -96,6 +96,9 @@ struct Model
 	Buffer* vertexBuffer;
 	Buffer* indexBuffer;
 	Material* material;
+
+	// x y z are for the center of the sphere, the w is for the radius
+	VEC4f sphereCollider;
 };
 
 static void ReleaseVertexShader(VertexShader* aVShader)
@@ -843,7 +846,6 @@ static Model* CreateSimpleModelFromRawData(ID3D11Device* aDevice, const RawMeshD
 
 	model->indexBuffer->buffer = CreateSimpleBuffer(aDevice, (void*)(aData.indices.data()), sizeof(unsigned long) * indicesSize, (uint32_t)indicesSize, D3D11_BIND_INDEX_BUFFER, D3D11_USAGE_DEFAULT);
 	model->indexBuffer->amountOfElements = indicesSize;
-
 
 	return model;
 }

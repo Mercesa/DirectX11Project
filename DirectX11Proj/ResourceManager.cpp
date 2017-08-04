@@ -216,7 +216,7 @@ Material* ResourceManager::LoadTexturesFromMaterial(const RawMeshData& aMeshData
 }
 
 // TODO, create a function for model loader which just asks for the next model, this removes it from the model list
-std::vector<ModelID> ResourceManager::LoadModels(std::string aFilePath)
+std::vector<ModelID> ResourceManager::LoadModels(std::string aFilePath, bool aGenerateAABB)
 {
 
 	// Early out
@@ -226,16 +226,21 @@ std::vector<ModelID> ResourceManager::LoadModels(std::string aFilePath)
 	}
 
 	std::vector<ModelID> tModels;
-	const std::vector<RawMeshData>& tMeshes = ModelLoader::LoadModel(aFilePath.c_str());
+	const std::vector<RawMeshData>& tMeshes = ModelLoader::LoadModel(aFilePath.c_str(), aGenerateAABB);
 
 	for (unsigned int i = 0; i < tMeshes.size(); ++i)
 	{
 		const RawMeshData& tData = tMeshes[i];
 
+		// Create buffers from raw data
 		Model* tMod = CreateSimpleModelFromRawData(mpDevice, tData);
 
+		// Set radius
+		tMod->sphereCollider = tData.sphericalCollider;
 
+		// Load materials
 		tMod->material = LoadTexturesFromMaterial(tData);
+
 		assert(tMod->material != nullptr);
 		ModelID id = ModelID((uint32_t)modelData.size());
 		tModels.push_back(id);

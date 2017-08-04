@@ -32,7 +32,7 @@ public:
 		return instance;
 	}
 
-	std::vector<ModelID> LoadModels(std::string aFilePath);
+	std::vector<ModelID> LoadModels(std::string aFilePath, bool aGenerateAABB);
 
 	ID3D11Device* mpDevice;
 

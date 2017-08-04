@@ -4,6 +4,8 @@
 #include <DirectXMath.h>
 #include <vector>
 
+#include "GenericMathValueStructs.h"
+
 using namespace DirectX;
 
 enum eLightTypes
@@ -50,6 +52,8 @@ struct RawMeshData
 	RawTextureData diffuseData;
 	RawTextureData specularData;
 	RawTextureData normalData;
+
+	VEC4f sphericalCollider;
 };
 
 
