@@ -35,9 +35,8 @@ float ShadowMappingPCF(float4 aLightviewPosition)
 	{
 		for (int x = -2; x < 2; ++x)
 		{
-			// Hardcode the resolution for now
-			float texelSize = 1.0f / 8096.0f;
-			float2 offsetProjTexCoord = projectTexCoord + float2(x*texelSize, y*texelSize);
+			float2 texelSize = float2(1.0f / shadowMapWidth, 1.0f / shadowMapHeight);
+			float2 offsetProjTexCoord = projectTexCoord + float2(x, y) * texelSize;
 
 			// Clamp the coordinates
 			if ((saturate(offsetProjTexCoord.x) == offsetProjTexCoord.x) && saturate(offsetProjTexCoord.y) == offsetProjTexCoord.y)

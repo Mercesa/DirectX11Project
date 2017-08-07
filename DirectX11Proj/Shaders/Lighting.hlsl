@@ -44,6 +44,11 @@ cbuffer LightBuffer : register(b2)
 
 cbuffer LightMatrixBuffer : register (b3)
 {
+	float shadowMapWidth;
+	float shadowMapHeight;
+	float lmbPad01;
+	float lmPad01;
+
 	matrix lightViewMatrix;
 	matrix lightProjectionMatrix;
 

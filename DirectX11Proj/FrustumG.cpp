@@ -20,31 +20,33 @@ void FrustumG::SetCamInternals(float angle, float ratio, float nearD, float farD
 	this->nearD = nearD;
 	this->farD = farD;
 
-	tang = (float)tanf(ANG2RAD * angle * 0.5f);
-
-	nh = tang*nearD;
+	tang = (float)tan(angle * 0.5f);
+	nh = tang*nearD *2.0f;
 	nw = nh * ratio;
 
-	fh = tang*farD;
+	fh = tang*farD * 2.0f;
 	fw = fh * ratio;
 }
 
 
 void FrustumG::SetCamDef(glm::vec3 p, glm::vec3 l, glm::vec3 u)
 {
-	glm::vec3 dir, nc, fc, X, Y, Z;
+	glm::vec3 nc, fc, X, Y, Z;
 
-	Z = p - l;
+	glm::vec3 l2 = p + l;
+	Z = p - l2;
+
 	Z= glm::normalize(Z);
 
 	X = glm::cross(u, Z);
-
+	X = normalize(X);
 	Y = glm::cross(Z, X);
 
 	nc = p - Z * nearD;
 	fc = p - Z * farD;
 
-
+	//std::cout << "nc: " << nc.x << " " << nc.y << " " << nc.z << std::endl;
+	//std::cout << "pos: "<< p.x << " " << p.y << " " << p.z << std::endl;
 	// Near plane points
 	ntl = nc + Y * nh - X * nw;
 	ntr = nc + Y * nh + X * nw;

@@ -19,17 +19,19 @@ void Plane::Set3Points(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
 {
 	glm::vec3 aux1, aux2;
 
+	// Create a vector to generate normal
 	aux1 = v1 - v2;
 	aux2 = v3 - v2;
 
+	// Create normal using the two vectors that align on the same plane
 	normal = cross(aux2, aux1);
 	normal = normalize(normal);
 	
 	point = v2;
 
+	// It is possible to figure out the distance from the plane by projecting with the dot product
 	d = -(glm::dot(normal, point));
 }
-
 
 float Plane::Distance(glm::vec3& p)
 {

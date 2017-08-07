@@ -17,8 +17,7 @@
 #include "d3d11HelperFile.h"
 #include "GenericMathValueStructs.h"
 
-class d3dRenderTexture;
-class d3dRenderDepthTexture;
+
 class FrustumG;
 
 class Renderer
@@ -42,7 +41,6 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11Device1> mpDevice1;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext1> mpDeviceContext1;
 
-	float clearColor[3] = { 0.0f, 0.0f, 0.0f };
 
 		bool DestroyDirectX();
 
@@ -52,9 +50,6 @@ private:
 	bool InitializeDeviceAndContext();
 	bool InitializeSwapchain();
 	bool InitializeResources();
-	bool InitializeDepthStencilView();
-	bool InitializeRasterstate();
-	bool InitializeSamplerState();
 	bool InitializeViewportAndMatrices();
 
 	void BindStandardConstantBuffers();
@@ -71,17 +66,17 @@ private:
 
 	void RenderFullScreenQuad();
 	
-	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera, IObject* const aSkybox);
-	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
+	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera, IObject* const aSkybox);
+	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
 
 	void RenderSceneSSAOPass();
 	void RenderBlurPass();
-	void RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aObjects);
+	void RenderSceneGBufferFill(std::vector<IObject*>& aObjects);
 	void RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects);
 	void RenderSceneSkybox(IObject* const aObject);
 
 	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
-	void RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aObjects,
+	void RenderSceneWithShadows(std::vector<IObject*>& aObjects,
 		std::vector<std::unique_ptr<Light>>& aLights,
 		d3dLightClass* const aDirectionalLight,
 		Camera* const apCamera);
@@ -100,11 +95,10 @@ private:
 	HWND windowHandle;
 
 	D3D11_VIEWPORT mViewport;
-	D3D11_VIEWPORT mShadowLightViewport;
 
 	
 	std::unique_ptr<FrustumG> mMainCamCullFrustum;
-	Model* frustumModel;
+
 
 
 	// IDXGI stuff
@@ -141,7 +135,6 @@ private:
 	std::unique_ptr<d3dShaderManager> mpShaderManager;
 
 	std::unique_ptr<Texture> mBackBufferTexture;
-	std::unique_ptr<Texture> mShadowDepthBuffer;
 
 	std::unique_ptr<Texture> mAmbientOcclusionTexture;
 	std::unique_ptr<Texture> mAmbientOcclusionBufferTexture;
@@ -155,5 +148,7 @@ private:
 	std::unique_ptr<Texture> gBuffer_specularBuffer;
 	std::unique_ptr<Texture> gBuffer_depthBuffer;
 	std::unique_ptr<Texture> randomValueTexture;
+
+	std::unique_ptr<ShadowMap> shadowMap01;
 };
 

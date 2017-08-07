@@ -28,9 +28,10 @@ struct PixelInputType
 PixelInputType TextureVertexShader(VertexInputType input)
 {
     PixelInputType output;
-	
-	output.position = input.position;
 	output.position.w = 1.0f;
+
+	output.position = mul(input.position, viewMatrix);
+	output.position = mul(input.position, projectionMatrix);
 	
 	output.uv = input.uv;
 	output.norm = input.normal;

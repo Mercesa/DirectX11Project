@@ -57,11 +57,11 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 	{
 		mpCamera->Strafe(0.1f * aDT);
 	}
-	//mpCamera->LookAt(XMFLOAT3(0.0f, 10.0f, -5.0f), XMFLOAT3(0.0f, 0.0f, 0.0f), XMFLOAT3(0.0f, 1.0f, 0.0f));
+
 	mpCamera->UpdateViewMatrix();
 	//std::cout << mpCamera->GetPosition3f().z << std::endl;
 
-	XMStoreFloat4x4(&mpSkyboxSphere->mWorldMatrix, XMMatrixTranslation(mpCamera->GetPosition3f().x, mpCamera->GetPosition3f().y, mpCamera->GetPosition3f().z));
+	mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(mpCamera->GetPosition3f().x, mpCamera->GetPosition3f().y, mpCamera->GetPosition3f().z)));
 }
 
 void PlayerSceneExample::Init()
@@ -112,9 +112,9 @@ void PlayerSceneExample::Init()
 
 	modelSphere = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\Sphere.obj", false);
 
-	for (int y = 0; y < 1; ++y)
+	for (int y = 0; y < 1; y++)
 	{
-		for (int x = 0; x < 1; ++x)
+		for (int x = 0; x < 1; x++)
 		{
 			tModels = ResourceManager::GetInstance().LoadModels("Models\\Sponza\\Sponza.obj", true);
 			//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
@@ -124,25 +124,34 @@ void PlayerSceneExample::Init()
 				tpObject->mpModel = tModels[i];
 				
 				Model* tMod = ResourceManager::GetInstance().GetModelByID(tModels[i]);
-				XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
-				
-				
-				if (tMod->sphereCollider.w < 100.0f)
-				{
-					std::unique_ptr<IObject> tpObjectSphere = std::make_unique<IObject>();
-					tpObjectSphere->mpModel = modelSphere[0];
-					XMStoreFloat4x4(&tpObjectSphere->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
+				//XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
+				tpObject->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(x * 50.0f, 0.0f, y* 50.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.01f)));
 
 
-					XMMATRIX sphereMatrix = XMLoadFloat4x4(&tpObjectSphere->mWorldMatrix);
-					sphereMatrix = XMMatrixMultiply(sphereMatrix, XMMatrixMultiply(XMMatrixScaling(tMod->sphereCollider.w, tMod->sphereCollider.w, tMod->sphereCollider.w), XMMatrixTranslation(tMod->sphereCollider.x / 100.0f, tMod->sphereCollider.y / 100.0f, tMod->sphereCollider.z / 100.0f)));
-					XMStoreFloat4x4(&tpObjectSphere->mWorldMatrix, sphereMatrix);
-					
-					tpObjectSphere->mCastShadow = false;
-					this->mObjects.push_back(std::move(tpObjectSphere));
+				glm::vec4 position = glm::vec4(tMod->sphereCollider.x, tMod->sphereCollider.y, tMod->sphereCollider.z, 1.0f);
+				tpObject->mSpherePosition = glm::translate(glm::mat4(), glm::vec3(x*50.0f, 0.0f, y*50.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.01f)) * position;
+				tpObject->mSpherePosition.w = tMod->sphereCollider.w * 0.01f;
 
 
-				}
+				//if (tMod->sphereCollider.w < 100.0f)
+				//{
+				//	
+				//	std::unique_ptr<IObject> tpObjectSphere = std::make_unique<IObject>();
+				//	tpObjectSphere->mpModel = modelSphere[0];
+				//	
+				//	tpObjectSphere->mWorldMatrix = glm::transpose(glm::transpose(tpObject->mWorldMatrix) * glm::translate(glm::mat4(), glm::vec3(tMod->sphereCollider.x, tMod->sphereCollider.y, tMod->sphereCollider.z)) * glm::scale(glm::mat4(), glm::vec3(tMod->sphereCollider.w)));
+				//	
+				//	glm::vec4 position = glm::vec4(tMod->sphereCollider.x, tMod->sphereCollider.y, tMod->sphereCollider.z,1.0f);
+				//	tpObjectSphere->mSpherePosition = glm::translate(glm::mat4(), glm::vec3(x*50.0f, 0.0f, y*50.0f)) * position;
+				//
+				//
+				//	//XMStoreFloat4x4(&tpObjectSphere->mWorldMatrix, sphereMatrix);
+				//	
+				//	tpObjectSphere->mCastShadow = false;
+				//	this->mObjects.push_back(std::move(tpObjectSphere));
+				//
+				//
+				//}
 				
 
 				this->mObjects.push_back(std::move(tpObject));
@@ -178,7 +187,6 @@ void PlayerSceneExample::Init()
 			delete ResourceManager::GetInstance().GetModelByID(tModels[0])->material;
 			ResourceManager::GetInstance().GetModelByID(tModels[0])->material = tM;
 		
-			tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 6.0f);
 			//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
 			
 		

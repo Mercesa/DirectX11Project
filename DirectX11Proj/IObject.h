@@ -1,6 +1,11 @@
 #pragma once
 
 #include "d3d11HelperFile.h"
+
+#include <glm\gtx\common.hpp>
+#include <glm\gtc\matrix_transform.hpp>
+#include <glm\common.hpp>
+
 class IObject
 {
 public:
@@ -17,7 +22,9 @@ public:
 
 
 	ModelID mpModel;
-	XMFLOAT4X4 mWorldMatrix;
+	glm::mat4x4 mWorldMatrix;
+	glm::vec4 mSpherePosition;
+
 	bool mCastShadow = true;
 
 protected:

@@ -80,7 +80,6 @@ struct ComputeShader
 	ID3D11ComputeShader* shader;
 };
 
-
 struct Material
 {
 	Material() : mpDiffuse(0), mpNormal(0), mpSpecular(0) {}
@@ -88,7 +87,6 @@ struct Material
 	TexID mpSpecular = TexID();
 	TexID mpNormal = TexID();
 };
-
 
 // A model is nothing more than something with a vertexbuffer and index buffer
 struct Model
@@ -99,6 +97,16 @@ struct Model
 
 	// x y z are for the center of the sphere, the w is for the radius
 	VEC4f sphereCollider;
+};
+
+struct ShadowMap 
+{
+	D3D11_VIEWPORT viewport;
+
+	Texture* resource;
+
+	uint32_t width = 0; 
+	uint32_t height = 0;
 };
 
 static void ReleaseVertexShader(VertexShader* aVShader)

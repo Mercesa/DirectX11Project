@@ -2,6 +2,7 @@
 
 #include "GraphicsStructures.h"
 #include "GenericMathValueStructs.h"
+#include <glm\common.hpp>
 
 struct cbMatrixBuffer
 {
@@ -15,12 +16,18 @@ struct cbMatrixBuffer
 	float pad0;
 };
 
+
 struct cbLightMatrix
 {
+	float shadowMapWidth;
+	float shadowMapheight;
+	float pad0;
+	float pad1;
 	XMMATRIX lightViewMatrix;
 	XMMATRIX lightProjectionMatrix;
+
 	VEC3f kernelSamples[64];
-	VEC4f padding0[16];
+	VEC4f pad[16];
 };
 
 struct cbMaterial
@@ -45,7 +52,7 @@ struct cbLights
 
 struct cbPerObject
 {
-	XMMATRIX worldMatrix;
+	glm::mat4 worldMatrix;
 };
 
 struct cbBlurParameters
