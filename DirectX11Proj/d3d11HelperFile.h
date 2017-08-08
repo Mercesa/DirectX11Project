@@ -271,7 +271,6 @@ static ID3D11RasterizerState* CreateRSDefault(ID3D11Device* const aDevice)
 	rasterDesc.MultisampleEnable = false;
 	rasterDesc.ScissorEnable = false;
 	rasterDesc.SlopeScaledDepthBias = 0.0f;
-	
 
 	result = aDevice->CreateRasterizerState(&rasterDesc, &tRaster);
 	

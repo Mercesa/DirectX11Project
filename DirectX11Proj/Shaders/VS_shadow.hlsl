@@ -44,8 +44,6 @@ PixelInputType ShadowVertexShader(VertexInputType input)
 	output.normal = normalize(output.normal);
 	
 	output.tang = mul(input.tangent, (float3x3)worldMatrix);
-	
-
 
 	// Store the texture coordinates for the pixel shader.
 	output.tex = input.tex;

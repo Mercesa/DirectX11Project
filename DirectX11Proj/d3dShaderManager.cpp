@@ -43,7 +43,6 @@ bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_shadow.hlsl", "ShadowPixelShader", "ps_5_0", EPIXEL));
 
 	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_depth.hlsl", "DepthVertexShader", "vs_5_0", EVERTEX));
-	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_depth.hlsl", "DepthPixelShader", "ps_5_0", EPIXEL));
 
 	mShadersInfo.push_back(ShaderInfo("Shaders\\fullScreenQuad_VS.hlsl", "VertShader", "vs_5_0", EVERTEX));
 	mShadersInfo.push_back(ShaderInfo("Shaders\\fullScreenQuad_PS.hlsl", "PixShader", "ps_5_0", EPIXEL));
@@ -64,6 +63,10 @@ bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 
 	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_Skybox.hlsl", "SkyboxVertexShader", "vs_5_0", EVERTEX));
 	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_Skybox.hlsl", "SkyboxPixelShader", "ps_5_0", EPIXEL));
+
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_DeferredLightingVolumes.hlsl", "VSDeferredLightVolumes", "vs_5_0", EVERTEX));
+
 
 	LOG(INFO) << "ShaderManager: Finished initializing all shaders";
 

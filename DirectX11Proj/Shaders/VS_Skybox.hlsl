@@ -19,7 +19,6 @@ PixelInputType SkyboxVertexShader(VertexInputType input)
 {
     PixelInputType output;
     
-
 	// Calculate the position of the vertex against the world, view, and projection matrices.
     output.position = mul(input.position, worldMatrix);
     output.position = mul(output.position, viewMatrix);

@@ -19,7 +19,7 @@ void Plane::Set3Points(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
 {
 	glm::vec3 aux1, aux2;
 
-	// Create a vector to generate normal
+	// Create two vectors which are perpendicular
 	aux1 = v1 - v2;
 	aux2 = v3 - v2;
 

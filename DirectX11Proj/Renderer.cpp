@@ -70,6 +70,8 @@ void Renderer::RenderScene(
 	IObject* const aSkybox
 )
 {
+	
+
 	ImGui::MenuItem("Enabled", NULL, &renderForward);
 	ImGui::MenuItem("UpdateCullFrustum", NULL, &UpdateCullFrustum);
 
@@ -170,6 +172,7 @@ void Renderer::RenderSceneForward(
 	static float depthPrePassTiming = 0.0f;
 	static float shadowSceneTiming = 0.0f;
 	static float shadowSceneObjectTiming = 0.0f;
+	static int drawCalls = 0; 
 	if (frames % 15 == 0)
 	{
 		fCbtiming = std::chrono::duration_cast<std::chrono::microseconds>(frameConstantBufferTimerEnd - frameConstantBufferTimerStart).count() / 1000.0f;
@@ -178,11 +181,13 @@ void Renderer::RenderSceneForward(
 		shadowSceneObjectTiming = objectRenderingTime;
 	}
 
+	drawCalls = static_cast<int>(mCulledObjects.size());
 
 	ImGui::Text("Updating frame constant %.5f ms/frame", fCbtiming);
 	ImGui::Text("Render scene depth pre-pass %.5f ms/frame", depthPrePassTiming);
 	ImGui::Text("Render scene with shadows %.5f ms/frame", shadowSceneTiming);
 	ImGui::Text("Render shadow scene objects %.5f ms/frame", shadowSceneObjectTiming);
+	ImGui::Text("Drawcalls: %i ", drawCalls);
 }
 
 
@@ -292,9 +297,6 @@ void Renderer::RenderSceneWithShadows(std::vector<IObject*>& aObjects,
 	mpDeviceContext->RSSetViewports(1, &mViewport);
 	mpDeviceContext->RSSetState(mRaster_backcull);
 
-	//float color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-
-	//mpDeviceContext->ClearRenderTargetView(this->mPostProcColorBuffer->rtv, color);
 	mpDeviceContext->ClearDepthStencilView(this->mPostProcDepthBuffer->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
@@ -856,8 +858,18 @@ float lerp(float v0, float v1, float t)
 
 bool Renderer::InitializeResources()
 {	
-	//mSceneRenderTexture = std::make_unique<d3dRenderTexture>();
-	//mSceneRenderTexture->Initialize(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, SCREEN_NEAR, SCREEN_FAR);
+	D3D11_QUERY_DESC descQuery;
+
+
+	descQuery.Query = D3D11_QUERY_TIMESTAMP;
+	descQuery.MiscFlags = 0;
+
+	mpDevice->CreateQuery(&descQuery, &this->queryTestTimestampBegin);
+	mpDevice->CreateQuery(&descQuery, &this->queryTestTimestampEnd);
+
+	descQuery.Query = D3D11_QUERY_TIMESTAMP_DISJOINT;
+	mpDevice->CreateQuery(&descQuery, &this->queryTestDisjoint);
+
 
 	// Create sampler states
 	mpAnisotropicWrapSampler = CreateSamplerAnisotropicWrap(mpDevice.Get());

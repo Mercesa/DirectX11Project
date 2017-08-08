@@ -59,9 +59,9 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 	}
 
 	mpCamera->UpdateViewMatrix();
-	//std::cout << mpCamera->GetPosition3f().z << std::endl;
 
 	mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(mpCamera->GetPosition3f().x, mpCamera->GetPosition3f().y, mpCamera->GetPosition3f().z)));
+	//mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(0.0f)));
 }
 
 void PlayerSceneExample::Init()
@@ -170,8 +170,6 @@ void PlayerSceneExample::Init()
 		//	}
 
 
-			
-
 			// Prepare skybox sphere
 			RawMeshData data;
 			data.diffuseData.filepath = "textures\\sunsetcube1024.dds";
@@ -215,8 +213,8 @@ void PlayerSceneExample::Init()
 	// Create light, set diffuse and position, add light to list
 	//std::unique_ptr<Light> tpLight = std::make_unique<Light>();
 	//tpLight->diffuseColor = XMFLOAT3(1.0f, 0.0f, 1.0f);
-	//tpLight->position = XMFLOAT3(0.0f, 0.0f, 0.0f);
-	//
+	//tpLight->position = XMFLOAT3(0.0f, 2.0f, 0.0f);
+	////
 	//this->mLights.push_back(std::move(tpLight));
 
 	mDirectionalLight = std::make_unique<d3dLightClass>();

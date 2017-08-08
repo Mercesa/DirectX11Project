@@ -9,11 +9,16 @@ Texture2D depthMapTexture : register(t4);
 SamplerState SamplePointClamp : register(s0);
 SamplerState SamplePointWrap : register(s1);
 
-struct VSQuadOut {
-	float4 position : SV_Position;
-	float2 texcoord: TexCoord;
-};
+//struct VSQuadOut {
+//	float4 position : SV_Position;
+//	float2 texcoord: TexCoord;
+//};
+struct PixelInputType
+{
+	float4 position : SV_POSITION;
 
+	float2 tex : TEXCOORD0;
+};
 
 // Shadow mapping with percentage close filtering 
 float ShadowMappingPCF(float4 aLightviewPosition)
@@ -26,8 +31,11 @@ float ShadowMappingPCF(float4 aLightviewPosition)
 	float shadowValue = 0.0f;
 
 	bias = 0.001f;
-	// Project the coordinates and put them from -1 to 1   to   0 to 1
+	// transform from -w to w by perspective division
+	// Range transform -1,1 to 0,1
 	projectTexCoord.x = aLightviewPosition.x / aLightviewPosition.w * 0.5f + 0.5f;
+
+	// Y is inversed, as such we divide by -pos.w
 	projectTexCoord.y = aLightviewPosition.y / -aLightviewPosition.w * 0.5f + 0.5f;
 
 	// Percentage close filtering
@@ -43,6 +51,7 @@ float ShadowMappingPCF(float4 aLightviewPosition)
 			{
 				depthValue = depthMapTexture.Sample(SamplePointClamp, offsetProjTexCoord).r;
 
+				// Perspective divide
 				lightDepthValue = aLightviewPosition.z / aLightviewPosition.w;
 
 				lightDepthValue -= bias;
@@ -59,13 +68,20 @@ float ShadowMappingPCF(float4 aLightviewPosition)
 	return shadowValue;
 }
 
-float4 PSDeferredLighting(VSQuadOut quadIn) : SV_TARGET
+float4 PSDeferredLighting(PixelInputType input) : SV_TARGET
 { 
 	// Loads a texture with the x and y screen position
-	float4 albedo = albedoTexture.Load(int3(quadIn.position.xy, 0));
-	float3 position = (float3)positionTexture.Load(int3(quadIn.position.xy, 0));
-	float3 normal = (float3)normalTexture.Load(int3(quadIn.position.xy, 0));
-	float occlusion = occlusionTexture.Load(int3(quadIn.position.xy, 0)).r;
+	//float4 albedo = albedoTexture.Load(int3(quadIn.position.xy, 0));
+	//float3 position = (float3)positionTexture.Load(int3(quadIn.position.xy, 0));
+	//float3 normal = (float3)normalTexture.Load(int3(quadIn.position.xy, 0));
+	//float occlusion = occlusionTexture.Load(int3(quadIn.position.xy, 0)).r;
+
+	float4 albedo = albedoTexture.Sample(SamplePointClamp, input.tex);
+	float3 position = positionTexture.Sample(SamplePointClamp, input.tex);
+	float3 normal = normalTexture.Sample(SamplePointClamp, input.tex);
+	float occlusion = occlusionTexture.Sample(SamplePointClamp, input.tex);
+
+
 
 	// Calculate the world space position by multiplying by the inverse view matrix
 	// position is in view space

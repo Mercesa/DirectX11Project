@@ -318,9 +318,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	mpRenderer->Initialize(windowHandle);
 	ImGui_ImplDX11_Init(windowHandle, mpRenderer->mpDevice.Get(), mpRenderer->mpDeviceContext.Get());
 
-	//unsigned char* pixels;
-	//int width, height;
-	//ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 	mpPlayerScene = std::make_unique<PlayerSceneExample>();
 	mpPlayerScene->Init();
 
@@ -381,19 +378,42 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 }
 
 
+void CollectTimeStamps(ID3D11DeviceContext* apContext)
+{
+	while (apContext->GetData(mpRenderer->queryTestDisjoint, NULL, 0, 0) == S_FALSE)
+	{
+		Sleep(1);
+	}
+
+	D3D10_QUERY_DATA_TIMESTAMP_DISJOINT tsDisjoint;
+	apContext->GetData(mpRenderer->queryTestDisjoint, &tsDisjoint, sizeof(tsDisjoint), 0);
+
+	if (tsDisjoint.Disjoint)
+	{
+		return;
+	}
+
+	UINT64 tsBeginFrame, tsEndFrame;
+	apContext->GetData(mpRenderer->queryTestTimestampBegin, &tsBeginFrame, sizeof(UINT64), 0);
+	apContext->GetData(mpRenderer->queryTestTimestampEnd, &tsEndFrame, sizeof(UINT64), 0);
+
+	float frameTime = float(tsBeginFrame - tsEndFrame) / float(tsDisjoint.Frequency) * 1000.0f;
+
+	//std::cout << frameTime << std::endl;
+}
+
 void Render()
 {
-	auto frameConstantBufferTimerStart = std::chrono::high_resolution_clock::now();
+	mpRenderer->mpDeviceContext->Begin(mpRenderer->queryTestDisjoint);
+	mpRenderer->mpDeviceContext->End(mpRenderer->queryTestTimestampBegin);
 
 	bool hasBeenSelected = false;
 	if (GraphicsSettings::gShowDebugWindow)
 	{
 		ShowTitleMenu();
 		
-		
 		static float f = 0.0f;
 		
-		ImGui::Text("Hello, world!");
 		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
 		
 		for (int i = 0; i < mpPlayerScene->mLights.size(); ++i)
@@ -414,18 +434,10 @@ void Render()
 
 		mpPlayerScene->mDirectionalLight->GenerateViewMatrix();
 
-
-		//ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-		//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 	}
 
 	mpRenderer->RenderScene(mpPlayerScene->mObjects, mpPlayerScene->mLights, mpPlayerScene->mDirectionalLight.get(), mpPlayerScene->GetCamera(), mpPlayerScene->GetSkyboxSphere());
-	auto frameConstantBufferTimerEnd = std::chrono::high_resolution_clock::now();
 
-	float performance = std::chrono::duration_cast<std::chrono::microseconds>(frameConstantBufferTimerEnd - frameConstantBufferTimerStart).count() / 1000.0f;
-
-
-	ImGui::Text("Rendering total: %.3f ms/frame", performance);
 
 	ImGui::Render();
 
@@ -433,4 +445,8 @@ void Render()
 
 	mpRenderer->mpSwapchain->Present((GraphicsSettings::gIsVsyncEnabled ? 1 : 0), 0);
 
+	mpRenderer->mpDeviceContext->End(mpRenderer->queryTestTimestampEnd);
+	mpRenderer->mpDeviceContext->End(mpRenderer->queryTestDisjoint);
+
+	CollectTimeStamps(mpRenderer->mpDeviceContext.Get());
 }

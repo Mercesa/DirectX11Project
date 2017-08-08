@@ -42,7 +42,13 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext1> mpDeviceContext1;
 
 
-		bool DestroyDirectX();
+	ID3D11Query* queryTestTimestampBegin;
+	ID3D11Query* queryTestTimestampEnd;
+
+	ID3D11Query* queryTestDisjoint;
+
+
+	bool DestroyDirectX();
 
 private:
 	bool InitializeDirectX();
@@ -84,9 +90,6 @@ private:
 	
 	void RenderBuffers(ID3D11DeviceContext* const apDeviceContext, Model* const aModel);
 
-	const float SCREEN_FAR = 1000.0f;
-	const float SCREEN_NEAR = 2.0f;
-
 	int gVideoCardMemoryAmount;
 	char gVideoCardDescription[128];
 
@@ -96,10 +99,7 @@ private:
 
 	D3D11_VIEWPORT mViewport;
 
-	
 	std::unique_ptr<FrustumG> mMainCamCullFrustum;
-
-
 
 	// IDXGI stuff
 	Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;
@@ -150,5 +150,6 @@ private:
 	std::unique_ptr<Texture> randomValueTexture;
 
 	std::unique_ptr<ShadowMap> shadowMap01;
+
 };
 

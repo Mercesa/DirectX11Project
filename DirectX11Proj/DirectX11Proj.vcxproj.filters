@@ -209,9 +209,6 @@
     <None Include="Shaders\PS_shadow.hlsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\PS_depth.hlsl">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shaders\VS_depth.hlsl">
       <Filter>Shaders</Filter>
     </None>
@@ -248,9 +245,14 @@
     <None Include="Shaders\VS_SSAO.hlsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\VS_Skybox.hlsl" />
     <None Include="Shaders\PS_Skybox.hlsl">
-      <Filter>Utility</Filter>
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\VS_Skybox.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\VS_DeferredLightingVolumes.hlsl">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -13,7 +13,7 @@ ResourceManager::ResourceManager()
 
 void ResourceManager::Shutdown()
 {
-
+	// Clean up properly
 	for (int i = 0; i < modelData.size(); ++i)
 	{
 		ReleaseModel(modelData[i]);
@@ -35,6 +35,7 @@ void ResourceManager::Shutdown()
 	LOG(INFO) << "ResourceManager cleaned up";
 }
 
+// Get ID functions to get our assets based on ID
 Model* const ResourceManager::GetModelByID(const ModelID& aID) const
 {
 	if (aID.GetID() >= modelData.size())
@@ -58,6 +59,7 @@ Texture* const ResourceManager::GetTextureByID(const TexID& aID) const
 }
 
 #include <D3Dcommon.h>
+// Load texture for directx 
 Texture* ResourceManager::LoadTexture(RawTextureData aData)
 {
 	// Convert string texture filepath to wstring
@@ -77,10 +79,10 @@ Texture* ResourceManager::LoadTexture(RawTextureData aData)
 		LOG(WARNING) << "ResourceManager: Texture could not initialize " << aData.filepath;
 	}
 
-
 	return tpTextureClass;
 }
 
+// Loads a cubemap texture 
 Texture* ResourceManager::LoadTextureCube(RawTextureData aData)
 {
 	// Convert string texture filepath to wstring
@@ -90,9 +92,7 @@ Texture* ResourceManager::LoadTextureCube(RawTextureData aData)
 
 	auto tpTextureClass = new Texture();
 	assert(tpTextureClass);
-	// if the single texture could not initialize
 
-	
 	D3DX11_IMAGE_LOAD_INFO loadSMInfo;
 
 	loadSMInfo.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
@@ -125,14 +125,17 @@ Texture* ResourceManager::LoadTextureCube(RawTextureData aData)
 }
 
 
-
 Material* ResourceManager::LoadCubeMapTexturesFromMaterial(const RawMeshData& aMeshData)
 {
 	Material* tpMat = new Material();
 
 	assert(tpMat);
 
+	// For every texture in the material check if it already exists
+	// If exists, use the existing texture
+	// if it does not exist, load new texture and put it into texture database
 
+	// Diffuse texture
 	if (this->stringTextureMap.find(aMeshData.diffuseData.filepath) != stringTextureMap.end())
 	{
 		tpMat->mpDiffuse = stringTextureMap[aMeshData.diffuseData.filepath];
@@ -144,6 +147,7 @@ Material* ResourceManager::LoadCubeMapTexturesFromMaterial(const RawMeshData& aM
 		stringTextureMap.insert(std::pair<std::string, TexID>(aMeshData.diffuseData.filepath, tpMat->mpDiffuse));
 	}
 
+	// Specular texture
 	if (this->stringTextureMap.find(aMeshData.specularData.filepath) != stringTextureMap.end())
 	{
 		tpMat->mpSpecular = stringTextureMap[aMeshData.specularData.filepath];
@@ -155,6 +159,7 @@ Material* ResourceManager::LoadCubeMapTexturesFromMaterial(const RawMeshData& aM
 		stringTextureMap.insert(std::pair<std::string, TexID>(aMeshData.specularData.filepath, tpMat->mpSpecular));
 	}
 
+	// Normal texture
 	if (this->stringTextureMap.find(aMeshData.normalData.filepath) != stringTextureMap.end())
 	{
 		tpMat->mpNormal = stringTextureMap[aMeshData.normalData.filepath];
@@ -212,7 +217,6 @@ Material* ResourceManager::LoadTexturesFromMaterial(const RawMeshData& aMeshData
 	}
 
 	return tpMat;
-	//mLoadedTextures.push_back(std::move(tpTextureClass));
 }
 
 // TODO, create a function for model loader which just asks for the next model, this removes it from the model list

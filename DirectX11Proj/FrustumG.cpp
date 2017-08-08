@@ -20,6 +20,7 @@ void FrustumG::SetCamInternals(float angle, float ratio, float nearD, float farD
 	this->nearD = nearD;
 	this->farD = farD;
 
+	// Calculate the near and far plane width/height
 	tang = (float)tan(angle * 0.5f);
 	nh = tang*nearD *2.0f;
 	nw = nh * ratio;
@@ -33,21 +34,23 @@ void FrustumG::SetCamDef(glm::vec3 p, glm::vec3 l, glm::vec3 u)
 {
 	glm::vec3 nc, fc, X, Y, Z;
 
+	// We need l2 assuming l is only a forward vector, not the actual vector
 	glm::vec3 l2 = p + l;
 	Z = p - l2;
 
+
+	// Create X Y Z axis with cross products
 	Z= glm::normalize(Z);
 
 	X = glm::cross(u, Z);
 	X = normalize(X);
 	Y = glm::cross(Z, X);
 
+	// Get the near and far plane
 	nc = p - Z * nearD;
 	fc = p - Z * farD;
 
-	//std::cout << "nc: " << nc.x << " " << nc.y << " " << nc.z << std::endl;
-	//std::cout << "pos: "<< p.x << " " << p.y << " " << p.z << std::endl;
-	// Near plane points
+	// near plane points
 	ntl = nc + Y * nh - X * nw;
 	ntr = nc + Y * nh + X * nw;
 

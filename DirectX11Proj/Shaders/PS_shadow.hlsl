@@ -76,19 +76,21 @@ float4 ShadowPixelShader(PixelInputType input) : SV_TARGET
 		tNorm = NormalSampleToWorldSpace(normalTexture.Sample(SampleTypeLinearWrap, input.tex), input.normal , input.tang);
 	}
 
-	float4 specColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
-	if (hasSpecular)
-	{
-		specColor = specularTexture.Sample(SampleTypeAnisotropicWrap, input.tex);
-	}
-
 	float4 diffuseColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	if (hasDiffuse)
 	{
 		diffuseColor = diffuseTexture.Sample(SampleTypeAnisotropicWrap, input.tex);
 	}
+
+	float specularIntensity = 0.0f;
+	if (hasSpecular)
+	{
+		specularIntensity = specularTexture.Sample(SampleTypeAnisotropicWrap, input.tex);
+	}
 	
-	float4 color = PerformLighting(input.fragPos, tNorm, diffuseColor, 1.0f, 1.0f) * shadowImpact;
+	//diffuseColor = float4(specularIntensity, specularIntensity, specularIntensity, 1.0f);
+
+	float4 color = PerformLighting(input.fragPos, tNorm, diffuseColor, specularIntensity, 1.0f) * shadowImpact;
 
 	return color;
 }
