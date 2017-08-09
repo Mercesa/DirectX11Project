@@ -62,3 +62,11 @@ struct cbBlurParameters
 	int pad1;
 	int pad2;
 };
+
+struct cbGenericAttributesBuffer
+{
+	float screenWidth;
+	float screenHeight;
+	float nearPlaneDistance;
+	float farPlaneDistance;
+};

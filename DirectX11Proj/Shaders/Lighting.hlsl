@@ -68,6 +68,16 @@ cbuffer BlurBuffer : register(b5)
 	int pad2B;
 }
 
+cbuffer GenericAttributesBuffer : register(b6)
+{
+	float screenWidth;			// 4 bytes
+	float screenHeight;			// 8 bytes
+	float nearPlaneDistance;	// 12 bytes
+	float farPlaneDistance;		// 16 bytes
+
+	
+}
+
 float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangentW)
 {
 	// Transform from 0 1 to -1.0f 2.0f;

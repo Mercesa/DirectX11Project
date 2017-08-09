@@ -35,6 +35,7 @@ static std::unique_ptr<cbMatrixBuffer> gMatrixBufferDataPtr = std::make_unique<c
 static std::unique_ptr<cbLightMatrix> gLightMatrixBufferDataPtr = std::make_unique<cbLightMatrix>();
 static std::unique_ptr<cbPerObject> gPerObjectMatrixBufferDataPtr = std::make_unique<cbPerObject>();
 static std::unique_ptr<cbBlurParameters> gBlurParamatersDataPtr = std::make_unique<cbBlurParameters>();
+static std::unique_ptr<cbGenericAttributesBuffer> gGenericAttributesDataPtr = std::make_unique<cbGenericAttributesBuffer>();
 
 
 Renderer::Renderer()
@@ -62,6 +63,21 @@ void Renderer::Initialize(HWND aHwnd)
 	mMainCamCullFrustum->SetCamInternals(MathHelper::Pi * 0.5f, 1.333f, 1.0f, 1000.0f);
 }
 
+void Renderer::CullObjects(std::vector<std::unique_ptr<IObject>>& aObjectsToCull, FrustumG* const aCullFrustum)
+{
+	size_t aLoopSize = aObjectsToCull.size();
+
+	for (int i = 0; i < aLoopSize; ++i)
+	{
+		IObject* const tObj = aObjectsToCull[i].get();
+
+		if (aCullFrustum->sphereInFrustum(tObj->mSpherePosition) == 1)
+		{
+			mCulledObjects.push_back(tObj);
+		}
+	}
+}
+
 void Renderer::RenderScene(
 	std::vector<std::unique_ptr<IObject>>& aObjects,
 	std::vector<std::unique_ptr<Light>>& aLights,
@@ -70,8 +86,6 @@ void Renderer::RenderScene(
 	IObject* const aSkybox
 )
 {
-	
-
 	ImGui::MenuItem("Enabled", NULL, &renderForward);
 	ImGui::MenuItem("UpdateCullFrustum", NULL, &UpdateCullFrustum);
 
@@ -94,15 +108,12 @@ void Renderer::RenderScene(
 	}
 
 	mCulledObjects.clear();
-	for (int i = 0; i < aObjects.size(); ++i)
-	{
-		glm::vec3 proxyVec = glm::vec3(aObjects[i]->mSpherePosition);
 
-		if (this->mMainCamCullFrustum->sphereInFrustum(aObjects[i]->mSpherePosition) == 1)
-		{
-			mCulledObjects.push_back(aObjects[i].get());
-		}
-	}
+	CullObjects(aObjects, mMainCamCullFrustum.get());
+
+	BindStandardConstantBuffers();
+	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
+	UpdateGenericConstantBuffer(GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, apCamera->GetNearZ(), apCamera->GetFarZ());
 
 	if (renderForward)
 	{
@@ -111,7 +122,7 @@ void Renderer::RenderScene(
 
 	else
 	{
-		RenderSceneDeferred(aObjects, mCulledObjects, aLights, aDirectionalLight, apCamera);
+		RenderSceneDeferred(aObjects, mCulledObjects, aLights, aDirectionalLight, apCamera, aSkybox);
 	}
 }
 
@@ -121,17 +132,14 @@ void Renderer::RenderSceneDeferred(
 	std::vector<IObject*>& aCulledObjects, 
 	std::vector<std::unique_ptr<Light>>& aLights, 
 	d3dLightClass* const aDirectionalLight, 
-	Camera* const apCamera)
+	Camera* const apCamera,
+	IObject* const aSkyboxObject)
 {
-
-	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
-
-	BindStandardConstantBuffers();
 	RenderSceneDepthPrePass(aObjects);
 	RenderSceneGBufferFill(aCulledObjects);
 	RenderSceneSSAOPass();
 	RenderBlurPass();
-	RenderSceneLightingPass(aObjects);
+	RenderSceneLightingPass(aObjects, aSkyboxObject);
 }
 
 
@@ -143,13 +151,6 @@ void Renderer::RenderSceneForward(
 	Camera* const apCamera,
 	IObject* const aSkybox)
 {
-	auto frameConstantBufferTimerStart = std::chrono::high_resolution_clock::now();
-	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
-
-	// bind buffers
-	BindStandardConstantBuffers();
-
-	auto frameConstantBufferTimerEnd = std::chrono::high_resolution_clock::now();
 	auto renderSceneDepthPrePassTimerStart = std::chrono::high_resolution_clock::now();
 	RenderSceneDepthPrePass(aObjects);
 	auto renderSceneDepthPrePassTimerEnd = std::chrono::high_resolution_clock::now();
@@ -175,7 +176,7 @@ void Renderer::RenderSceneForward(
 	static int drawCalls = 0; 
 	if (frames % 15 == 0)
 	{
-		fCbtiming = std::chrono::duration_cast<std::chrono::microseconds>(frameConstantBufferTimerEnd - frameConstantBufferTimerStart).count() / 1000.0f;
+		//fCbtiming = std::chrono::duration_cast<std::chrono::microseconds>(frameConstantBufferTimerEnd - frameConstantBufferTimerStart).count() / 1000.0f;
 		depthPrePassTiming = std::chrono::duration_cast<std::chrono::microseconds>(renderSceneDepthPrePassTimerEnd - renderSceneDepthPrePassTimerStart).count() / 1000.0f;
 		shadowSceneTiming = std::chrono::duration_cast<std::chrono::microseconds>(renderSceneWithShadowsTimerEnd - renderSceneWithShadowsTimerStart).count() / 1000.0f;
 		shadowSceneObjectTiming = objectRenderingTime;
@@ -200,8 +201,19 @@ void Renderer::CreateConstantBuffers()
 	mpPerObjectCB = std::make_unique<d3dConstantBuffer>(sizeof(cbPerObject), nullptr, mpDevice.Get());
 	mpLightMatrixCB = std::make_unique<d3dConstantBuffer>(sizeof(cbLightMatrix), nullptr, mpDevice.Get());
 	mpBlurCB = std::make_unique<d3dConstantBuffer>(sizeof(cbBlurParameters), nullptr, mpDevice.Get());
+	mpGenericAttributesBufferCB = std::make_unique<d3dConstantBuffer>(sizeof(cbGenericAttributesBuffer), nullptr, mpDevice.Get());
 
 	LOG(INFO) << "Constant buffers created";
+}
+
+void Renderer::UpdateGenericConstantBuffer(float aScreenWidth, float aScreenHeight, float nearPlaneDistance, float farPlaneDistance)
+{
+	gGenericAttributesDataPtr->screenWidth = aScreenWidth;
+	gGenericAttributesDataPtr->screenHeight = aScreenHeight;
+	gGenericAttributesDataPtr->nearPlaneDistance = nearPlaneDistance;
+	gGenericAttributesDataPtr->farPlaneDistance = farPlaneDistance;
+
+	mpGenericAttributesBufferCB->UpdateBuffer((void*)gGenericAttributesDataPtr.get(), mpDeviceContext.Get());
 }
 
 
@@ -234,7 +246,6 @@ void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& 
 	XMMATRIX projectionMatrix2 = XMMatrixTranspose(projectionMatrix);
 	XMMATRIX invView = XMMatrixTranspose((XMMatrixInverse(nullptr, apCamera->GetView())));
 
-	// Get a pointer to the data in the constant buffer.
 
 	// Copy the matrices into the constant buffer.
 	gMatrixBufferDataPtr->view = viewMatrix2;
@@ -281,11 +292,9 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject)
 
 	mpMaterialCB->UpdateBuffer((void*)gMaterialBufferDataPtr.get(), mpDeviceContext.Get());
 
+	// Update buffer with world matrix
 	gPerObjectMatrixBufferDataPtr->worldMatrix = aObject->mWorldMatrix;
-	
 	mpPerObjectCB->UpdateBuffer((void*)gPerObjectMatrixBufferDataPtr.get(), mpDeviceContext.Get());
-
-	
 }
 
 
@@ -467,30 +476,34 @@ void Renderer::RenderSceneSSAOPass()
 }
 
 
-void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects)
+void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects, IObject* const aSkyboxObject)
 {
 	// Get the fullscreen shaders
-	VertexShader*const tFVS = mpShaderManager->GetVertexShader("Shaders\\VS_DeferredLighting.hlsl");
+	VertexShader*const tFVS = mpShaderManager->GetVertexShader("Shaders\\VS_DeferredLightingVolumes.hlsl");
 	PixelShader*const tFPS = mpShaderManager->GetPixelShader("Shaders\\PS_DeferredLighting.hlsl");
 
 
 	mpDeviceContext->RSSetViewports(1, &mViewport);
-	mpDeviceContext->RSSetState(mRaster_backcull);
+	mpDeviceContext->RSSetState(mRaster_cullNone);
 
-	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
+	mpDeviceContext->OMSetDepthStencilState(mDepthStencilDeferred, 0);
 
+	float color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	// Set backbuffer as RT
-	mpDeviceContext->OMSetRenderTargets(1, &this->mBackBufferTexture->rtv, mBackBufferTexture->dsv);
-	mpDeviceContext->ClearDepthStencilView(mBackBufferTexture->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	mpDeviceContext->ClearRenderTargetView(this->mBackBufferTexture->rtv, color);
+	mpDeviceContext->OMSetRenderTargets(1, &this->mBackBufferTexture->rtv, gBuffer_depthBuffer->dsv);
+	//mpDeviceContext->ClearDepthStencilView(mBackBufferTexture->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	
 	// Draw full screen quad
 	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
 	mpDeviceContext->PSSetSamplers(1, 1, &mpPointWrapSampler);
 
-	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	mpDeviceContext->VSSetShader(tFVS->shader, NULL, 0);
 	mpDeviceContext->PSSetShader(tFPS->shader, NULL, 0);
+
+	mpDeviceContext->IASetInputLayout(tFVS->inputLayout);
 
 	// Set gbuffer resources
 	mpDeviceContext->PSSetShaderResources(0, 1, &gBuffer_albedoBuffer->srv);
@@ -499,7 +512,19 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 	mpDeviceContext->PSSetShaderResources(3, 1, &mAmbientOcclusionTexture->srv);
 	mpDeviceContext->PSSetShaderResources(4, 1, &shadowMap01->resource->srv);
 
-	mpDeviceContext->Draw(4, 0);
+	Model* const model = ResourceManager::GetInstance().GetModelByID(aSkyboxObject->mpModel);
+	// Bind vertex/index buffers
+
+	UpdateObjectConstantBuffers(aSkyboxObject);
+
+	RenderBuffers(mpDeviceContext.Get(), model);
+
+	uint32_t indices = (uint32_t)model->indexBuffer->amountOfElements;
+
+	// Render the model.
+	mpDeviceContext->DrawIndexed(indices, 0, 0);
+
+	//mpDeviceContext->Draw(4, 0);
 }
 
 
@@ -530,6 +555,11 @@ void Renderer::BindStandardConstantBuffers()
 
 	tBuff = mpBlurCB->GetBuffer();
 	mpDeviceContext->PSSetConstantBuffers(5, 1, &tBuff);
+
+	tBuff = mpGenericAttributesBufferCB->GetBuffer();
+	mpDeviceContext->VSSetConstantBuffers(6, 1, &tBuff);
+	mpDeviceContext->PSSetConstantBuffers(6, 1, &tBuff);
+
 }
 
 
@@ -860,7 +890,6 @@ bool Renderer::InitializeResources()
 {	
 	D3D11_QUERY_DESC descQuery;
 
-
 	descQuery.Query = D3D11_QUERY_TIMESTAMP;
 	descQuery.MiscFlags = 0;
 
@@ -881,11 +910,12 @@ bool Renderer::InitializeResources()
 	// Create depth stencil states
 	mpDepthStencilState = CreateDepthStateDefault(mpDevice.Get());
 	mDepthStencilStateLessEqual = CreateDepthStateLessEqual(mpDevice.Get());
-	
+	mDepthStencilDeferred = CreateDepthStateDeferred(mpDevice.Get());
+
 	// Create raster states
 	this->mRaster_backcull = CreateRSDefault(mpDevice.Get());
 	this->mRaster_noCull = CreateRSNoCull(mpDevice.Get());
-
+	mRaster_cullNone = CreateRSCullNone(mpDevice.Get());
 	// Create textures
 	mBackBufferTexture = std::make_unique<Texture>();
 	mPostProcColorBuffer = std::make_unique<Texture>();
@@ -1084,7 +1114,10 @@ bool Renderer::DestroyDirectX()
 	
 	mRaster_noCull->Release();
 	mDepthStencilStateLessEqual->Release();
-	
+	mDepthStencilDeferred->Release();
+
+	mRaster_cullNone->Release();
+
 	mpAnisotropicWrapSampler->Release();
 	mpLinearClampSampler->Release();
 	mpPointClampSampler->Release();

@@ -17,7 +17,6 @@ struct PixelInputType
 {
 	float4 position : SV_POSITION;
 
-	float2 tex : TEXCOORD0;
 };
 
 // Shadow mapping with percentage close filtering 
@@ -76,10 +75,12 @@ float4 PSDeferredLighting(PixelInputType input) : SV_TARGET
 	//float3 normal = (float3)normalTexture.Load(int3(quadIn.position.xy, 0));
 	//float occlusion = occlusionTexture.Load(int3(quadIn.position.xy, 0)).r;
 
-	float4 albedo = albedoTexture.Sample(SamplePointClamp, input.tex);
-	float3 position = positionTexture.Sample(SamplePointClamp, input.tex);
-	float3 normal = normalTexture.Sample(SamplePointClamp, input.tex);
-	float occlusion = occlusionTexture.Sample(SamplePointClamp, input.tex);
+	float2 texCoord = input.position / float2(screenWidth, screenHeight);
+
+	float4 albedo = albedoTexture.Sample(SamplePointClamp, texCoord);
+	float3 position = positionTexture.Sample(SamplePointClamp, texCoord);
+	float3 normal = normalTexture.Sample(SamplePointClamp, texCoord);
+	float occlusion = occlusionTexture.Sample(SamplePointClamp, texCoord);
 
 
 
@@ -93,5 +94,4 @@ float4 PSDeferredLighting(PixelInputType input) : SV_TARGET
 	
 	float shadowImpact = ShadowMappingPCF(lightViewPosition);
 	return PerformLightingDeferred((float3)position, (float3)normal, albedo, 1.0f, occlusion) * shadowImpact;
-
 }

@@ -17,9 +17,6 @@
     <Filter Include="Libs">
       <UniqueIdentifier>{b5c942b3-b9a3-4ea9-91e2-dfe1d138626c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="D3DSetup\D3DShaderTypes">
-      <UniqueIdentifier>{e810992e-765c-44da-9774-6b792bf4a10f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Utility">
       <UniqueIdentifier>{1578abde-7f40-4936-90cb-27fbb939e80a}</UniqueIdentifier>
     </Filter>
@@ -108,9 +105,6 @@
     <ClInclude Include="d3dShaderManager.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderHelperFunctions.h">
-      <Filter>D3DSetup\D3DShaderTypes</Filter>
-    </ClInclude>
     <ClInclude Include="d3dLightClass.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
@@ -185,6 +179,9 @@
     </ClInclude>
     <ClInclude Include="Plane.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderHelperFunctions.h">
+      <Filter>D3DSetup</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

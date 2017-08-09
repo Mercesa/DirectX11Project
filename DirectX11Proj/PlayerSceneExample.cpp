@@ -60,8 +60,8 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 
 	mpCamera->UpdateViewMatrix();
 
-	mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(mpCamera->GetPosition3f().x, mpCamera->GetPosition3f().y, mpCamera->GetPosition3f().z)));
-	//mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(0.0f)));
+	//mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(mpCamera->GetPosition3f().x, mpCamera->GetPosition3f().y, mpCamera->GetPosition3f().z)));
+	mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::scale(glm::mat4(1), glm::vec3(5.0f)));
 }
 
 void PlayerSceneExample::Init()

@@ -63,22 +63,26 @@ private:
 	void UpdateObjectConstantBuffers(IObject* const aObject);
 	void UpdateShadowLightConstantBuffers(d3dLightClass* const aDirectionalLight);
 	void UpdateFrameConstantBuffers(std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
-	
+	void UpdateGenericConstantBuffer(float aScreenWidth, float aScreenHeight, float nearPlaneDistance, float farPlaneDistance);
+
+
 	void CreateConstantBuffers();
 
 	// Render functions
+
+	void CullObjects(std::vector<std::unique_ptr<IObject>>& aObjectsToCull, FrustumG* const aCullFrustum);
 	void RenderObject(IObject* const aObject);
 	void RenderMaterial(Material* const aMaterial);
 
 	void RenderFullScreenQuad();
 	
 	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera, IObject* const aSkybox);
-	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
+	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera, IObject* const aSkyboxObject);
 
 	void RenderSceneSSAOPass();
 	void RenderBlurPass();
 	void RenderSceneGBufferFill(std::vector<IObject*>& aObjects);
-	void RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects);
+	void RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects, IObject* const aSkyboxObject);
 	void RenderSceneSkybox(IObject* const aObject);
 
 	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
@@ -109,11 +113,12 @@ private:
 	ID3D11DepthStencilState* mpDepthStencilState;
 	ID3D11RasterizerState* mRaster_backcull;
 	
+	ID3D11RasterizerState* mRaster_cullNone;
 
 	ID3D11RasterizerState* mRaster_noCull;
 	ID3D11DepthStencilState* mDepthStencilStateLessEqual;
 
-	//Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRaster_frontcull; not used yet
+	ID3D11DepthStencilState* mDepthStencilDeferred;
 
 	// Samplers
 	ID3D11SamplerState* mpAnisotropicWrapSampler;
@@ -130,6 +135,8 @@ private:
 	std::unique_ptr<d3dConstantBuffer> mpLightMatrixCB;
 	std::unique_ptr<d3dConstantBuffer> mpPerObjectCB;
 	std::unique_ptr<d3dConstantBuffer> mpBlurCB;
+	std::unique_ptr<d3dConstantBuffer> mpGenericAttributesBufferCB;
+
 
 	// Shader manager
 	std::unique_ptr<d3dShaderManager> mpShaderManager;
