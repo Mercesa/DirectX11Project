@@ -79,9 +79,9 @@ void PlayerSceneExample::Init()
 
 	modelSphere = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\Sphere.obj", false);
 
-	for (int y = 0; y < 10; y++)
+	for (int y = 0; y < 1; y++)
 	{
-		for (int x = 0; x < 10; x++)
+		for (int x = 0; x < 1; x++)
 		{
 			tModels = ResourceManager::GetInstance().LoadModels("Models\\Sponza\\Sponza.obj", true);
 			for (int i = 0; i < tModels.size(); ++i)

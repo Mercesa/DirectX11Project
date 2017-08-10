@@ -324,6 +324,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	mpGPUProfiler = std::make_unique<GPUProfiler>();
 	mpGPUProfiler->Initialize(mpRenderer->mpDevice.Get());
 	mpRenderer->tProfiler = mpGPUProfiler.get();
+	mpRenderer->tProfiler->recordStatsToFile = true;
 
 	MSG msg;
 	bool done = false;

@@ -7,7 +7,8 @@ GPUProfiler::GPUProfiler() :
 	hasStartedFrame(false),
 	beginFrameQuery(nullptr),
 	endFrameQuery(nullptr),
-	disjoint(nullptr)
+	disjoint(nullptr),
+	recordStatsToFile(false)
 {
 }
 
@@ -19,6 +20,7 @@ GPUProfiler::~GPUProfiler()
 {
 	WriteStatisticsToFile();
 }
+
 
 void GPUProfiler::Shutdown()
 {
@@ -133,25 +135,25 @@ void GPUProfiler::BeginFrame(ID3D11DeviceContext* const aContext)
 	// Reset all stamps to their original state
 	for (auto &e : queryStamps)
 	{
-		e->hasStarted = false;
-		e->hasFinished = false;
+		e->currentState = QueryStamp::eNOMARKSET;
 	}
 
 	hasStartedFrame = true;
 	aContext->Begin(disjoint);
 	aContext->End(beginFrameQuery);
-	aContext->Begin(renderStatisticsQuery);
+	//aContext->Begin(renderStatisticsQuery);
 }
 
 
 void GPUProfiler::EndFrame(ID3D11DeviceContext* const aContext)
 {
 	hasStartedFrame = false;
-	aContext->End(renderStatisticsQuery);
+	//aContext->End(renderStatisticsQuery);
 	aContext->End(endFrameQuery);
 	aContext->End(disjoint);
 
-	// Reset all stamps
+	// Increment the frame
+	currentFrame++;
 }
 
 
@@ -181,11 +183,22 @@ QueryStamp* GPUProfiler::CreateQueryStamp(ID3D11DeviceContext* const aContext, I
 	aDevice->CreateQuery(&qDesc, &tStamp->beginMark);
 	aDevice->CreateQuery(&qDesc, &tStamp->endMark);
 	
+	// Give the stamps debug names
+#if defined(_DEBUG)
+	std::string firstName = "begin" + aName;
+	
+	tStamp->beginMark->SetPrivateData(WKPDID_D3DDebugObjectName, strlen(firstName.c_str()), firstName.c_str());
+
+	std::string secondName = "end" + aName;
+	tStamp->endMark->SetPrivateData(WKPDID_D3DDebugObjectName, strlen(secondName.c_str()), secondName.c_str());
+#endif
+
 	QueryStamp* retStamp = tStamp.get();
 	queryStamps.push_back(std::move(tStamp));
 	
 	return retStamp;
 }
+
 
 void GPUProfiler::SetStamp(ID3D11DeviceContext* const aContext, ID3D11Device* const aDevice, std::string aName)
 {
@@ -196,28 +209,27 @@ void GPUProfiler::SetStamp(ID3D11DeviceContext* const aContext, ID3D11Device* co
 		return;
 	}
 
-
 	else
 	{
 		// Create a stamp ( or get an existing one )
 		QueryStamp* qS = CreateQueryStamp(aContext, aDevice, aName);
 		
 		// If stamp does not have a starting mark
-		if (!qS->hasStarted)
+		if (qS->currentState == QueryStamp::eNOMARKSET)
 		{
 			// Mark it
 			aContext->End(qS->beginMark);
-			qS->hasStarted = true;
+			qS->currentState = QueryStamp::eFIRSTMARKSSET;
 			return;
 		}
 		
 		// If stamp HAS started and not been finished, mark it again
 		else
 		{
-			if (qS->hasFinished == false)
+			if (qS->currentState == QueryStamp::eFIRSTMARKSSET)
 			{
 				aContext->End(qS->endMark);
-				qS->hasFinished = true;
+				qS->currentState = QueryStamp::eBOTHMARKSSET;
 			}
 
 			// We use stamps to mark a start and end point, the user tried to use a stamp three times in one frame, which is not supported
@@ -227,6 +239,17 @@ void GPUProfiler::SetStamp(ID3D11DeviceContext* const aContext, ID3D11Device* co
 			}
 		}
 	}
+}
+
+float GPUProfiler::GetTimeBetweenQueries(ID3D11DeviceContext* const aContext, ID3D11Query* const aBeginQuery, ID3D11Query* const aEndQuery, uint64_t aDisjointFrequency)
+{
+	uint64_t tsBeginFrame, tsEndFrame;
+	aContext->GetData(aBeginQuery, &tsBeginFrame, sizeof(uint64_t), 0);
+	aContext->GetData(aEndQuery, &tsEndFrame, sizeof(uint64_t), 0);
+
+	float frameTime = float(tsEndFrame - tsBeginFrame) / float(aDisjointFrequency) * 1000.0f;
+	
+	return frameTime;
 }
 
 
@@ -251,10 +274,8 @@ void GPUProfiler::CollectData(ID3D11DeviceContext* const aContext)
 	aContext->GetData(beginFrameQuery, &tsBeginFrame, sizeof(uint64_t), 0);
 	aContext->GetData(endFrameQuery, &tsEndFrame, sizeof(uint64_t), 0);
 
-	float frameTime = float(tsEndFrame - tsBeginFrame) / float(tsDisjoint.Frequency) * 1000.0f;
+	float frameTime = GetTimeBetweenQueries(aContext, beginFrameQuery, endFrameQuery, tsDisjoint.Frequency);
 
-	D3D11_QUERY_DATA_PIPELINE_STATISTICS tsPipeStats;
-	aContext->GetData(renderStatisticsQuery, &tsPipeStats, sizeof(tsPipeStats), 0);
 
 	tempBuffer << currentFrame << ";" << frameTime << ";";
 	// Go through all the stamps and put their frame-time down
@@ -262,21 +283,13 @@ void GPUProfiler::CollectData(ID3D11DeviceContext* const aContext)
 	{
 		// Only stamps that have been finished are able to have a difference in time
 		// Since unfinished stamps means that a start point has been set but a begin point never has been set
-		if (queryStamps[i]->hasFinished == true)
+		if (queryStamps[i]->currentState == QueryStamp::eBOTHMARKSSET)
 		{
-			uint64_t beginStamp, endStamp;
-			aContext->GetData(queryStamps[i]->beginMark, &beginStamp, sizeof(uint64_t), 0);
-			aContext->GetData(queryStamps[i]->endMark, &endStamp, sizeof(uint64_t), 0);
+			float frameTimeStamps = GetTimeBetweenQueries(aContext, queryStamps[i]->beginMark, queryStamps[i]->endMark, tsDisjoint.Frequency);
 
-			float frameStamps = float(endStamp - beginStamp) / float(tsDisjoint.Frequency) * 1000.0f;
-
-			std::cout << "Frametime of " << queryStamps[i]->name << " took: " << frameStamps << "\n";
-
-			tempBuffer << frameStamps << ";";
+			tempBuffer << frameTimeStamps << ";";
 		}
 	}
 
 	tempBuffer << "\n";
-
-	currentFrame++;
 }
