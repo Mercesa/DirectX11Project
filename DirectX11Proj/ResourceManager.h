@@ -45,21 +45,17 @@ public:
 private:
 	ResourceManager();
 	
-
-	// Turn these into maps at one point
-	//std::vector<std::unique_ptr<Model>> mLoadedModels;
-
+	// Models and corresponding vector with data
 	std::unordered_map<std::string, std::vector<ModelID>> stringModelMap;
 	std::vector<Model*> modelData;
 
+	// Textures and corresponding vector with data
 	std::unordered_map<std::string, TexID> stringTextureMap;
 	std::vector<Texture*> mLoadedTextures;
 
+	std::vector<Material*> mLoadedMaterials;
 
 	Texture* LoadTexture(RawTextureData aData);
 	Texture* LoadTextureCube(RawTextureData aData);
-
-	// Load models as one
-	// Load models as a list
 };
 

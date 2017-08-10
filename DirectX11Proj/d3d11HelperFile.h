@@ -192,11 +192,6 @@ static void ReleaseModel(Model* aModel)
 		}
 		delete aModel->indexBuffer;
 	}
-
-	if (aModel->material != nullptr)
-	{
-		delete aModel->material;
-	}
 }
 
 
@@ -283,6 +278,7 @@ static ID3D11RasterizerState* CreateRSDefault(ID3D11Device* const aDevice)
 	return tRaster;
 }
 
+static ID3D11RasterizerState* CreateRSCullNone(ID3D11Device* const aDevice)
 {
 	ID3D11RasterizerState* tRaster = nullptr;
 	D3D11_RASTERIZER_DESC rasterDesc;
@@ -559,13 +555,13 @@ static ID3D11DepthStencilState* CreateDepthStateDefault(ID3D11Device* const aDev
 
 	// Stencil operations if pixel is front-facing.
 	depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
 	depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
 	// Stencil operations if pixel is back-facing.
 	depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
 	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
@@ -592,7 +588,7 @@ static ID3D11DepthStencilState* CreateDepthStateDeferred(ID3D11Device* const aDe
 	// Set up the description of the stencil state.
 	depthStencilDesc.DepthEnable = true;
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
 
 	depthStencilDesc.StencilEnable = true;
 	depthStencilDesc.StencilReadMask = 0xFF;
@@ -600,13 +596,13 @@ static ID3D11DepthStencilState* CreateDepthStateDeferred(ID3D11Device* const aDe
 
 	// Stencil operations if pixel is front-facing.
 	depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
 	depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
 	// Stencil operations if pixel is back-facing.
 	depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
 	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 

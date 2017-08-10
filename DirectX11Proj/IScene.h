@@ -31,6 +31,7 @@ public:
 
 	Camera* const GetCamera() { return mpCamera.get(); }
 	IObject* const GetSkyboxSphere() { return mpSkyboxSphere.get(); }
+	uint32_t sphereModelID;
 
 protected:
 	std::unique_ptr<Camera> mpCamera;

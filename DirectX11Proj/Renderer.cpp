@@ -206,6 +206,7 @@ void Renderer::CreateConstantBuffers()
 	LOG(INFO) << "Constant buffers created";
 }
 
+
 void Renderer::UpdateGenericConstantBuffer(float aScreenWidth, float aScreenHeight, float nearPlaneDistance, float farPlaneDistance)
 {
 	gGenericAttributesDataPtr->screenWidth = aScreenWidth;
@@ -486,13 +487,13 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 	mpDeviceContext->RSSetViewports(1, &mViewport);
 	mpDeviceContext->RSSetState(mRaster_cullNone);
 
-	mpDeviceContext->OMSetDepthStencilState(mDepthStencilDeferred, 0);
+	mpDeviceContext->OMSetDepthStencilState(mDepthStencilDeferred, 1);
 
 	float color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	// Set backbuffer as RT
 	mpDeviceContext->ClearRenderTargetView(this->mBackBufferTexture->rtv, color);
-	mpDeviceContext->OMSetRenderTargets(1, &this->mBackBufferTexture->rtv, gBuffer_depthBuffer->dsv);
-	//mpDeviceContext->ClearDepthStencilView(mBackBufferTexture->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	mpDeviceContext->OMSetRenderTargets(1, &this->mBackBufferTexture->rtv, mBackBufferTexture->dsv);
+	mpDeviceContext->ClearDepthStencilView(mBackBufferTexture->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	
 	// Draw full screen quad
@@ -646,7 +647,7 @@ void Renderer::RenderObject(IObject* const aObject)
 	uint32_t indices = (uint32_t)model->indexBuffer->amountOfElements;
 
 	// Bind textures from material
-	Material* const aMaterial = model->material;
+	Material* const aMaterial = aObject->mpMaterial;
 	
 	if (aMaterial != nullptr)
 	{

@@ -91,6 +91,9 @@
     <ClCompile Include="Plane.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
+    <ClCompile Include="GPUProfiler.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PlayerSceneExample.h">
@@ -182,6 +185,9 @@
     </ClInclude>
     <ClInclude Include="ShaderHelperFunctions.h">
       <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="GPUProfiler.h">
+      <Filter>Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

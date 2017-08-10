@@ -26,6 +26,7 @@ INITIALIZE_EASYLOGGINGPP
 #include "Renderer.h"
 #include "ImguiImplementation.h"
 #include "ResourceManager.h"
+#include "GPUProfiler.h"
 
 HWND windowHandle;
 
@@ -49,6 +50,7 @@ static WindowsProcessClass* ApplicationHandle = 0;
 std::unique_ptr<InputClass> mpInput;
 std::unique_ptr<PlayerSceneExample> mpPlayerScene;
 std::unique_ptr<Renderer> mpRenderer;
+std::unique_ptr<GPUProfiler> mpGPUProfiler;
 
 LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
@@ -320,6 +322,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 	mpPlayerScene = std::make_unique<PlayerSceneExample>();
 	mpPlayerScene->Init();
+	
+	mpGPUProfiler = std::make_unique<GPUProfiler>();
+	mpGPUProfiler->Initialize(mpRenderer->mpDevice.Get());
 
 	MSG msg;
 	bool done = false;
@@ -357,6 +362,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 	ResourceManager::GetInstance().Shutdown();
 	ImGui_ImplDX11_Shutdown();
+
+	mpGPUProfiler->Shutdown();
 	mpRenderer->DestroyDirectX();
 
 	DestroyWindow(windowHandle);
@@ -377,35 +384,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	return 0;
 }
 
-
-void CollectTimeStamps(ID3D11DeviceContext* apContext)
-{
-	while (apContext->GetData(mpRenderer->queryTestDisjoint, NULL, 0, 0) == S_FALSE)
-	{
-		Sleep(1);
-	}
-
-	D3D10_QUERY_DATA_TIMESTAMP_DISJOINT tsDisjoint;
-	apContext->GetData(mpRenderer->queryTestDisjoint, &tsDisjoint, sizeof(tsDisjoint), 0);
-
-	if (tsDisjoint.Disjoint)
-	{
-		return;
-	}
-
-	UINT64 tsBeginFrame, tsEndFrame;
-	apContext->GetData(mpRenderer->queryTestTimestampBegin, &tsBeginFrame, sizeof(UINT64), 0);
-	apContext->GetData(mpRenderer->queryTestTimestampEnd, &tsEndFrame, sizeof(UINT64), 0);
-
-	float frameTime = float(tsBeginFrame - tsEndFrame) / float(tsDisjoint.Frequency) * 1000.0f;
-
-	//std::cout << frameTime << std::endl;
-}
-
 void Render()
 {
-	mpRenderer->mpDeviceContext->Begin(mpRenderer->queryTestDisjoint);
-	mpRenderer->mpDeviceContext->End(mpRenderer->queryTestTimestampBegin);
+	mpGPUProfiler->BeginFrame(mpRenderer->mpDeviceContext.Get());
 
 	bool hasBeenSelected = false;
 	if (GraphicsSettings::gShowDebugWindow)
@@ -445,8 +426,7 @@ void Render()
 
 	mpRenderer->mpSwapchain->Present((GraphicsSettings::gIsVsyncEnabled ? 1 : 0), 0);
 
-	mpRenderer->mpDeviceContext->End(mpRenderer->queryTestTimestampEnd);
-	mpRenderer->mpDeviceContext->End(mpRenderer->queryTestDisjoint);
+	mpGPUProfiler->EndFrame(mpRenderer->mpDeviceContext.Get());
+	mpGPUProfiler->CollectData(mpRenderer->mpDeviceContext.Get());
 
-	CollectTimeStamps(mpRenderer->mpDeviceContext.Get());
 }

@@ -165,6 +165,7 @@
     <ClCompile Include="d3dShaderManager.cpp" />
     <ClCompile Include="EngineTimer.cpp" />
     <ClCompile Include="FrustumG.cpp" />
+    <ClCompile Include="GPUProfiler.cpp" />
     <ClCompile Include="GraphicsSettings.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="ImguiImplementation.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="EngineTimer.h" />
     <ClInclude Include="FrustumG.h" />
     <ClInclude Include="GenericMathValueStructs.h" />
+    <ClInclude Include="GPUProfiler.h" />
     <ClInclude Include="GraphicsSettings.h" />
     <ClInclude Include="GraphicsStructures.h" />
     <ClInclude Include="imconfig.h" />

@@ -26,9 +26,13 @@ void ResourceManager::Shutdown()
 		ReleaseTexture(mLoadedTextures[i]);
 		delete mLoadedTextures[i];
 		mLoadedTextures[i] = nullptr;
-		//delete modelData[i];
 	}
 	
+	for (int i = 0; i < mLoadedMaterials.size(); ++i)
+	{
+		delete mLoadedMaterials[i];
+		mLoadedMaterials[i] = nullptr;
+	}
 	//modelData.clear();
 	//mLoadedTextures.clear();
 	
@@ -171,7 +175,7 @@ Material* ResourceManager::LoadCubeMapTexturesFromMaterial(const RawMeshData& aM
 		mLoadedTextures.push_back(LoadTextureCube(aMeshData.normalData));
 		stringTextureMap.insert(std::pair<std::string, TexID>(aMeshData.normalData.filepath, tpMat->mpNormal));
 	}
-
+	mLoadedMaterials.push_back(tpMat);
 	return tpMat;
 }
 
@@ -216,13 +220,13 @@ Material* ResourceManager::LoadTexturesFromMaterial(const RawMeshData& aMeshData
 		stringTextureMap.insert(std::pair<std::string, TexID>(aMeshData.normalData.filepath, tpMat->mpNormal));
 	}
 
+	mLoadedMaterials.push_back(tpMat);
 	return tpMat;
 }
 
 // TODO, create a function for model loader which just asks for the next model, this removes it from the model list
-std::vector<ModelID> ResourceManager::LoadModels(std::string aFilePath, bool aGenerateAABB)
+std::vector<ModelID> ResourceManager::LoadModels(std::string aFilePath, bool aGenerateBoundingSphere)
 {
-
 	// Early out
 	if (this->stringModelMap.find(aFilePath) != stringModelMap.end())
 	{
@@ -230,7 +234,7 @@ std::vector<ModelID> ResourceManager::LoadModels(std::string aFilePath, bool aGe
 	}
 
 	std::vector<ModelID> tModels;
-	const std::vector<RawMeshData>& tMeshes = ModelLoader::LoadModel(aFilePath.c_str(), aGenerateAABB);
+	const std::vector<RawMeshData>& tMeshes = ModelLoader::LoadModel(aFilePath.c_str(), aGenerateBoundingSphere);
 
 	for (unsigned int i = 0; i < tMeshes.size(); ++i)
 	{

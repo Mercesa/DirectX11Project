@@ -60,8 +60,8 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 
 	mpCamera->UpdateViewMatrix();
 
-	//mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(mpCamera->GetPosition3f().x, mpCamera->GetPosition3f().y, mpCamera->GetPosition3f().z)));
-	mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::scale(glm::mat4(1), glm::vec3(5.0f)));
+	mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(mpCamera->GetPosition3f().x, mpCamera->GetPosition3f().y, mpCamera->GetPosition3f().z)));
+	//mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::scale(glm::mat4(1), glm::vec3(5.0f)));
 }
 
 void PlayerSceneExample::Init()
@@ -76,39 +76,6 @@ void PlayerSceneExample::Init()
 	XMMATRIX tScaleMat = tScaleMat = XMMatrixScaling(1.0f, 1.0f, 1.0f);
 	XMMATRIX tTranslateMat = XMMatrixTranslation(0.0f, 0.0f, 0.0f);
 
-	// load models and translate them as game objects
-	//for (int i = 0; i < tModels.size(); ++i)
-	//{
-	//	std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
-	//	tpObject->mpModel = tModels[i];
-	//	XMStoreFloat4x4(&tpObject->mWorldMatrix, tScaleMat);
-	//
-	//	this->mObjects.push_back(std::move(tpObject));
-	//}
-
-	// Load cube
-	//tModels = ResourceManager::GetInstance().LoadModels("Models\\Box\\cube.obj");
-	//tTranslateMat = XMMatrixTranslation(1.0f, 1.0f, 1.0f);
-	//for (int i = 0; i < tModels.size(); ++i)
-	//{
-	//	std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
-	//	tpObject->mpModel = tModels[i];
-	//	XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixScaling(10.0, 1.0, 10.0f));
-	//
-	//	this->mObjects.push_back(std::move(tpObject));
-	//}
-	// Load sphere
-	//tModels = ResourceManager::GetInstance().LoadModels("Models\\Sponza\\Sponza.obj");
-	//tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
-	//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f/2.0f);
-	//for (int i = 0; i < tModels.size(); ++i)
-	//{
-	//	std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
-	//	tpObject->mpModel = tModels[i];
-	//	XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixScaling(0.01f, 0.01f, 0.01f));
-	//
-	//	this->mObjects.push_back(std::move(tpObject));
-	//}
 
 	modelSphere = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\Sphere.obj", false);
 
@@ -117,97 +84,40 @@ void PlayerSceneExample::Init()
 		for (int x = 0; x < 1; x++)
 		{
 			tModels = ResourceManager::GetInstance().LoadModels("Models\\Sponza\\Sponza.obj", true);
-			//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
 			for (int i = 0; i < tModels.size(); ++i)
 			{
 				std::unique_ptr<IObject> tpObject = std::make_unique<IObject>();
 				tpObject->mpModel = tModels[i];
-				
+				tpObject->mpMaterial = ResourceManager::GetInstance().GetModelByID(tModels[i])->material;
 				Model* tMod = ResourceManager::GetInstance().GetModelByID(tModels[i]);
-				//XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(0.01f, 0.01f, 0.01f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
 				tpObject->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(x * 50.0f, 0.0f, y* 50.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.01f)));
 
 
 				glm::vec4 position = glm::vec4(tMod->sphereCollider.x, tMod->sphereCollider.y, tMod->sphereCollider.z, 1.0f);
 				tpObject->mSpherePosition = glm::translate(glm::mat4(), glm::vec3(x*50.0f, 0.0f, y*50.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.01f)) * position;
 				tpObject->mSpherePosition.w = tMod->sphereCollider.w * 0.01f;
-
-
-				//if (tMod->sphereCollider.w < 100.0f)
-				//{
-				//	
-				//	std::unique_ptr<IObject> tpObjectSphere = std::make_unique<IObject>();
-				//	tpObjectSphere->mpModel = modelSphere[0];
-				//	
-				//	tpObjectSphere->mWorldMatrix = glm::transpose(glm::transpose(tpObject->mWorldMatrix) * glm::translate(glm::mat4(), glm::vec3(tMod->sphereCollider.x, tMod->sphereCollider.y, tMod->sphereCollider.z)) * glm::scale(glm::mat4(), glm::vec3(tMod->sphereCollider.w)));
-				//	
-				//	glm::vec4 position = glm::vec4(tMod->sphereCollider.x, tMod->sphereCollider.y, tMod->sphereCollider.z,1.0f);
-				//	tpObjectSphere->mSpherePosition = glm::translate(glm::mat4(), glm::vec3(x*50.0f, 0.0f, y*50.0f)) * position;
-				//
-				//
-				//	//XMStoreFloat4x4(&tpObjectSphere->mWorldMatrix, sphereMatrix);
-				//	
-				//	tpObjectSphere->mCastShadow = false;
-				//	this->mObjects.push_back(std::move(tpObjectSphere));
-				//
-				//
-				//}
-				
-
+		
 				this->mObjects.push_back(std::move(tpObject));
 			}
-			//
-		//	tModels = ResourceManager::GetInstance().LoadModels("Models\\Lucy\\Lucy.obj");
-		//	tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
-		//	//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
-		//	for (int i = 0; i < tModels.size(); ++i)
-		//	{
-		//		std::unique_ptr<IObject> tpObject = std::make_unique<IObject>();
-		//		tpObject->mpModel = tModels[i];
-		//		XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(0.1f, 0.1f, 0.1f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
-		//	
-		//		this->mObjects.push_back(std::move(tpObject));
-		//	}
-
-
-			// Prepare skybox sphere
-			RawMeshData data;
-			data.diffuseData.filepath = "textures\\sunsetcube1024.dds";
-			data.diffuseData.isValid = true;
-
-			data.specularData.isValid = false;
-			data.normalData.isValid = false;
-
-			Material* tM = ResourceManager::GetInstance().LoadCubeMapTexturesFromMaterial(data);
-
-
-			tModels = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\Sphere.obj", false);
-			delete ResourceManager::GetInstance().GetModelByID(tModels[0])->material;
-			ResourceManager::GetInstance().GetModelByID(tModels[0])->material = tM;
-		
-			//XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
-			
-		
-			mpSkyboxSphere->mpModel = tModels[0];
-			//XMStoreFloat4x4(&mpSkyboxSphere->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(1.0f, 1.0f, 1.0f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
-		
-			
-
-
-			//tModels = ResourceManager::GetInstance().LoadModels("Models\\Empire\\lost_empire.obj");
-			//tTranslateMat = XMMatrixTranslation(0.0f, 5.0f, 0.0f);
-			////XMMATRIX tRotateMat = XMMatrixRotationX(-3.14f / 2.0f);
-			//for (int i = 0; i < tModels.size(); ++i)
-			//{
-			//	std::unique_ptr<ObjectExample> tpObject = std::make_unique<ObjectExample>();
-			//	tpObject->mpModel = tModels[i];
-			//	XMStoreFloat4x4(&tpObject->mWorldMatrix, XMMatrixMultiply(XMMatrixScaling(1.0f, 1.0f, 1.0f), XMMatrixTranslation(x*50.0f, 0.0f, y*50.0f)));
-			//
-			//	this->mObjects.push_back(std::move(tpObject));
-			//}
 		}
 	}
 
+	// Prepare skybox sphere
+	RawMeshData data;
+	data.diffuseData.filepath = "textures\\sunsetcube1024.dds";
+	data.diffuseData.isValid = true;
+
+	data.specularData.isValid = false;
+	data.normalData.isValid = false;
+
+	Material* tM = ResourceManager::GetInstance().LoadCubeMapTexturesFromMaterial(data);
+	tModels = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\Sphere.obj", false);
+
+	mpSkyboxSphere->mpModel = tModels[0];
+	mpSkyboxSphere->mpMaterial = tM;
+
+
+	this->sphereModelID = mpSkyboxSphere->mpModel.GetID();
 	
 
 	// Create light, set diffuse and position, add light to list

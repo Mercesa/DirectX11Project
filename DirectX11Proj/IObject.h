@@ -22,6 +22,8 @@ public:
 
 
 	ModelID mpModel;
+	Material* mpMaterial;
+
 	glm::mat4x4 mWorldMatrix;
 	glm::vec4 mSpherePosition;
 
