@@ -41,8 +41,6 @@ private:
 
 };
 
-
-
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 static WindowsProcessClass* ApplicationHandle = 0;
 
@@ -325,6 +323,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	
 	mpGPUProfiler = std::make_unique<GPUProfiler>();
 	mpGPUProfiler->Initialize(mpRenderer->mpDevice.Get());
+	mpRenderer->tProfiler = mpGPUProfiler.get();
 
 	MSG msg;
 	bool done = false;
@@ -387,6 +386,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 void Render()
 {
 	mpGPUProfiler->BeginFrame(mpRenderer->mpDeviceContext.Get());
+
 
 	bool hasBeenSelected = false;
 	if (GraphicsSettings::gShowDebugWindow)

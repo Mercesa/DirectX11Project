@@ -83,8 +83,8 @@ void Renderer::RenderScene(
 	std::vector<std::unique_ptr<Light>>& aLights,
 	d3dLightClass* const aDirectionalLight,
 	Camera* const apCamera,
-	IObject* const aSkybox
-)
+	IObject* const aSkybox)
+
 {
 	ImGui::MenuItem("Enabled", NULL, &renderForward);
 	ImGui::MenuItem("UpdateCullFrustum", NULL, &UpdateCullFrustum);
@@ -111,9 +111,14 @@ void Renderer::RenderScene(
 
 	CullObjects(aObjects, mMainCamCullFrustum.get());
 
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "ConstantBuffersTime");
+
 	BindStandardConstantBuffers();
 	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
 	UpdateGenericConstantBuffer(GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, apCamera->GetNearZ(), apCamera->GetFarZ());
+
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "ConstantBuffersTime");
+
 
 	if (renderForward)
 	{
@@ -151,13 +156,20 @@ void Renderer::RenderSceneForward(
 	Camera* const apCamera,
 	IObject* const aSkybox)
 {
+	// 
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "SceneDepthPrePass");
 	auto renderSceneDepthPrePassTimerStart = std::chrono::high_resolution_clock::now();
 	RenderSceneDepthPrePass(aObjects);
 	auto renderSceneDepthPrePassTimerEnd = std::chrono::high_resolution_clock::now();
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "SceneDepthPrePass");
 
+
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "SceneShadows");
 	auto renderSceneWithShadowsTimerStart = std::chrono::high_resolution_clock::now();
 	RenderSceneWithShadows(aCulledObjects, aLights, aDirectionalLight, apCamera);
 	auto renderSceneWithShadowsTimerEnd = std::chrono::high_resolution_clock::now();
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "SceneShadows");
+
 
 	RenderSceneSkybox(aSkybox);
 

@@ -16,7 +16,7 @@
 #include "IScene.h"
 #include "d3d11HelperFile.h"
 #include "GenericMathValueStructs.h"
-
+#include "GPUProfiler.h"
 
 class FrustumG;
 
@@ -47,9 +47,9 @@ public:
 
 	ID3D11Query* queryTestDisjoint;
 
-
 	bool DestroyDirectX();
 
+	GPUProfiler* tProfiler = nullptr;
 private:
 	bool InitializeDirectX();
 	bool InitializeDXGI();
@@ -157,6 +157,7 @@ private:
 	std::unique_ptr<Texture> randomValueTexture;
 
 	std::unique_ptr<ShadowMap> shadowMap01;
+
 
 	uint32_t sphereID;
 };

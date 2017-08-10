@@ -79,9 +79,9 @@ void PlayerSceneExample::Init()
 
 	modelSphere = ResourceManager::GetInstance().LoadModels("Models\\Sphere\\Sphere.obj", false);
 
-	for (int y = 0; y < 1; y++)
+	for (int y = 0; y < 10; y++)
 	{
-		for (int x = 0; x < 1; x++)
+		for (int x = 0; x < 10; x++)
 		{
 			tModels = ResourceManager::GetInstance().LoadModels("Models\\Sponza\\Sponza.obj", true);
 			for (int i = 0; i < tModels.size(); ++i)
@@ -119,7 +119,7 @@ void PlayerSceneExample::Init()
 
 	this->sphereModelID = mpSkyboxSphere->mpModel.GetID();
 	
-
+		
 	// Create light, set diffuse and position, add light to list
 	//std::unique_ptr<Light> tpLight = std::make_unique<Light>();
 	//tpLight->diffuseColor = XMFLOAT3(1.0f, 0.0f, 1.0f);
