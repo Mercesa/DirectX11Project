@@ -70,7 +70,7 @@ private:
 
 	// Render functions
 
-	void CullObjects(std::vector<std::unique_ptr<IObject>>& aObjectsToCull, FrustumG* const aCullFrustum);
+	void CullObjects(std::vector<std::unique_ptr<IObject>>& aObjectsToCull, const FrustumG* const aCullFrustum);
 	void RenderObject(IObject* const aObject);
 	void RenderMaterial(Material* const aMaterial);
 

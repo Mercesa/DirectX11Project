@@ -63,7 +63,7 @@ void Renderer::Initialize(HWND aHwnd)
 	mMainCamCullFrustum->SetCamInternals(MathHelper::Pi * 0.5f, 1.333f, 1.0f, 1000.0f);
 }
 
-void Renderer::CullObjects(std::vector<std::unique_ptr<IObject>>& aObjectsToCull, FrustumG* const aCullFrustum)
+void Renderer::CullObjects(std::vector<std::unique_ptr<IObject>>& aObjectsToCull, const FrustumG* const aCullFrustum)
 {
 	size_t aLoopSize = aObjectsToCull.size();
 
@@ -91,14 +91,12 @@ void Renderer::RenderScene(
 
 
 	// Convert DirectX math objects to glm
-	glm::vec3 camPos = glm::vec3(apCamera->GetPosition3f().x, apCamera->GetPosition3f().y, apCamera->GetPosition3f().z);
-	glm::vec3 lookPos = glm::vec3(apCamera->GetLook3f().x, apCamera->GetLook3f().y, apCamera->GetLook3f().z);
-	glm::vec3 upVec = glm::vec3(0.0f, 1.0f, 0.0f);
+
 
 	// Update cull frustum with current position
 	if (UpdateCullFrustum)
 	{
-		mMainCamCullFrustum->SetCamDef(camPos, lookPos, upVec);
+		apCamera->UpdateFrustumPlanes();
 	}
 
 	if (firstFrame)
@@ -109,7 +107,7 @@ void Renderer::RenderScene(
 
 	mCulledObjects.clear();
 
-	CullObjects(aObjects, mMainCamCullFrustum.get());
+	CullObjects(aObjects, apCamera->GetFrustum());
 
 	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "ConstantBuffersTime");
 

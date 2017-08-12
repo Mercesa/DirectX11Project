@@ -33,7 +33,7 @@ void Plane::Set3Points(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
 	d = -(glm::dot(normal, point));
 }
 
-float Plane::Distance(glm::vec3& p)
+float Plane::Distance(glm::vec3& p) const
 {
 	return (d + dot(normal, p));
 }

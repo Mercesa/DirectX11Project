@@ -10,6 +10,8 @@ using namespace DirectX;
 
 Camera::Camera()
 {
+	mFrustum = std::make_unique<FrustumG>();
+
 	SetLens(0.5f*MathHelper::Pi, GraphicsSettings::gCurrentScreenWidth / GraphicsSettings::gCurrentScreenHeight, 1.0f, 1000.0f);
 }
 
@@ -115,8 +117,24 @@ float Camera::GetFarWindowHeight()const
 	return mFarWindowHeight;
 }
 
+const FrustumG* const Camera::GetFrustum()
+{
+	return mFrustum.get();
+}
+
+void Camera::UpdateFrustumPlanes()
+{
+	glm::vec3 camPos = glm::vec3(this->GetPosition3f().x, this->GetPosition3f().y, this->GetPosition3f().z);
+	glm::vec3 lookPos = glm::vec3(this->GetLook3f().x, this->GetLook3f().y, this->GetLook3f().z);
+	glm::vec3 upVec = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	mFrustum->SetCamDef(camPos, lookPos, upVec);
+}
+
 void Camera::SetLens(float fovY, float aspect, float zn, float zf)
 {
+	mFrustum->SetCamInternals(fovY, aspect, zn, zf);
+
 	// cache properties
 	mFovY = fovY;
 	mAspect = aspect;

@@ -183,6 +183,7 @@ float4 DoDirectionalLightDeferred(Light light, float3 V, float3 P, float3 N, flo
 	// Calculate light vector
 	float3 L = normalize(-light.position.xyz);
 
+	// Put our light direction vector to viewspace
 	L = (float3)mul(float4(L.rgb, 0.0), viewMatrix);
 
 	// texture * normal dot product * light colour * attenuation
@@ -211,16 +212,3 @@ float4 PerformLightingDeferred(float3 aFragPosition, float3 aNormal, float4 aDif
 
 	return tResultCol;
 }
-//float4 PerformDirectionalLight(float3 aFragPosition, float3 aNormal, float4 aDiffMapSample, float aSpecMapSample)
-//{
-//	float4 tResultCol = float4(0.0f, 0.0f, 0.0f, 0.0f);
-//
-//	// Loop through all the lights(point lights in this case)
-//
-//	// From frag position to eye 
-//	float3 eyeDir = normalize(gEyePos - aFragPosition);
-//	
-//	
-//
-//	return tResultCol;
-//}

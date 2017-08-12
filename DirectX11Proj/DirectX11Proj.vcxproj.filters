@@ -257,5 +257,8 @@
     <None Include="Shaders\VS_DeferredLightingVolumes.hlsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="FullScreenEffects.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

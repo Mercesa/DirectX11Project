@@ -22,7 +22,7 @@ public:
 
 	void SetCamDef(glm::vec3 p, glm::vec3 l, glm::vec3 u);
 
-	int FrustumG::pointInFrustum(glm::vec3 &p) {
+	int FrustumG::pointInFrustum(glm::vec3 &p) const {
 
 		int result = 1;
 
@@ -36,7 +36,7 @@ public:
 		return 1;
 	}
 
-	int FrustumG::sphereInFrustum(glm::vec4 &p) {
+	int FrustumG::sphereInFrustum(glm::vec4 &p) const {
 
 		float distance;
 		int result = 1;
