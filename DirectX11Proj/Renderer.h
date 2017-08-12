@@ -6,9 +6,8 @@
 #pragma comment(lib, "d3dx10.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
+
 #include "WindowsAndDXIncludes.h"
-
-
 #include "d3dShaderManager.h"
 #include "d3dConstantBuffer.h"
 #include "d3dLightClass.h"
@@ -17,8 +16,6 @@
 #include "d3d11HelperFile.h"
 #include "GenericMathValueStructs.h"
 #include "GPUProfiler.h"
-
-class FrustumG;
 
 class Renderer
 {
@@ -40,12 +37,6 @@ public:
 
 	Microsoft::WRL::ComPtr<ID3D11Device1> mpDevice1;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext1> mpDeviceContext1;
-
-
-	ID3D11Query* queryTestTimestampBegin;
-	ID3D11Query* queryTestTimestampEnd;
-
-	ID3D11Query* queryTestDisjoint;
 
 	bool DestroyDirectX();
 
@@ -103,8 +94,6 @@ private:
 
 	D3D11_VIEWPORT mViewport;
 
-	std::unique_ptr<FrustumG> mMainCamCullFrustum;
-
 	// IDXGI stuff
 	Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;
 	Microsoft::WRL::ComPtr<IDXGIAdapter> mAdapter;
@@ -137,7 +126,6 @@ private:
 	std::unique_ptr<d3dConstantBuffer> mpBlurCB;
 	std::unique_ptr<d3dConstantBuffer> mpGenericAttributesBufferCB;
 
-
 	// Shader manager
 	std::unique_ptr<d3dShaderManager> mpShaderManager;
 
@@ -157,6 +145,9 @@ private:
 	std::unique_ptr<Texture> randomValueTexture;
 
 	std::unique_ptr<ShadowMap> shadowMap01;
+
+	ShadowMap* shadowMapsForPointLight[6];
+
 
 
 	uint32_t sphereID;

@@ -59,8 +59,8 @@ void Renderer::Initialize(HWND aHwnd)
 	mpShaderManager = std::make_unique<d3dShaderManager>();
 	mpShaderManager->InitializeShaders(mpDevice.Get());
 
-	mMainCamCullFrustum = std::make_unique<FrustumG>();
-	mMainCamCullFrustum->SetCamInternals(MathHelper::Pi * 0.5f, 1.333f, 1.0f, 1000.0f);
+	// Initialize shadow map point light array
+	memset(shadowMapsForPointLight, 0, sizeof(ShadowMap) * 6);
 }
 
 void Renderer::CullObjects(std::vector<std::unique_ptr<IObject>>& aObjectsToCull, const FrustumG* const aCullFrustum)
@@ -904,13 +904,6 @@ bool Renderer::InitializeResources()
 	descQuery.Query = D3D11_QUERY_TIMESTAMP;
 	descQuery.MiscFlags = 0;
 
-	mpDevice->CreateQuery(&descQuery, &this->queryTestTimestampBegin);
-	mpDevice->CreateQuery(&descQuery, &this->queryTestTimestampEnd);
-
-	descQuery.Query = D3D11_QUERY_TIMESTAMP_DISJOINT;
-	mpDevice->CreateQuery(&descQuery, &this->queryTestDisjoint);
-
-
 	// Create sampler states
 	mpAnisotropicWrapSampler = CreateSamplerAnisotropicWrap(mpDevice.Get());
 	mpPointClampSampler = CreateSamplerPointClamp(mpDevice.Get());
@@ -972,11 +965,39 @@ bool Renderer::InitializeResources()
 	shadowMap01->width = shadowMap01->viewport.Width;
 	shadowMap01->height = shadowMap01->viewport.Height;
 
-
 	// Buffer for shadow mapping
 	shadowMap01->resource->texture = CreateSimpleTexture2D(mpDevice.Get(), shadowMap01->width, shadowMap01->height, GetDepthResourceFormat(DXGI_FORMAT_D24_UNORM_S8_UINT), D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
 	shadowMap01->resource->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), shadowMap01->resource->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	shadowMap01->resource->srv = CreateSimpleShaderResourceView(mpDevice.Get(), shadowMap01->resource->texture, GetDepthSRVFormat(DXGI_FORMAT_D24_UNORM_S8_UINT));
+
+
+	// For point lights
+
+	for (int i = 0; i < 6; ++i)
+	{
+		shadowMapsForPointLight[i] = new ShadowMap();
+		shadowMapsForPointLight[i]->resource = new Texture();
+
+		shadowMapsForPointLight[i]->viewport.Width = 8096.0f;
+		shadowMapsForPointLight[i]->viewport.Height = 8096.0f;
+		shadowMapsForPointLight[i]->viewport.MinDepth = 0.0f;
+		shadowMapsForPointLight[i]->viewport.MaxDepth = 1.0f;
+		shadowMapsForPointLight[i]->viewport.TopLeftX = 0.0f;
+		shadowMapsForPointLight[i]->viewport.TopLeftY = 0.0f;
+
+		shadowMapsForPointLight[i]->width = shadowMap01->viewport.Width;
+		shadowMapsForPointLight[i]->height = shadowMap01->viewport.Height;
+
+		// Buffer for shadow mapping
+		shadowMapsForPointLight[i]->resource->texture = CreateSimpleTexture2D(mpDevice.Get(), shadowMapsForPointLight[i]->width, shadowMapsForPointLight[i]->height, GetDepthResourceFormat(DXGI_FORMAT_D24_UNORM_S8_UINT), D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE);
+		shadowMapsForPointLight[i]->resource->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), shadowMapsForPointLight[i]->resource->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
+		shadowMapsForPointLight[i]->resource->srv = CreateSimpleShaderResourceView(mpDevice.Get(), shadowMapsForPointLight[i]->resource->texture, GetDepthSRVFormat(DXGI_FORMAT_D24_UNORM_S8_UINT));
+	}
+
+
+
+
+
 
 	// Every buffer in the gbuffer needs a shader resource view and render target view, SRV for texture access, RTV to render 
 	gBuffer_albedoBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
@@ -1134,6 +1155,14 @@ bool Renderer::DestroyDirectX()
 	mpPointClampSampler->Release();
 	mpLinearWrapSampler->Release();
 	mpPointWrapSampler->Release();
+
+
+	for (int i = 0; i < 6; ++i)
+	{
+		ReleaseTexture(shadowMapsForPointLight[i]->resource);
+		delete shadowMapsForPointLight[i]->resource;
+		delete shadowMapsForPointLight[i];
+	}
 	return true;
 }
 

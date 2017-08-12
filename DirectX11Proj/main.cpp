@@ -429,5 +429,4 @@ void Render()
 
 	mpGPUProfiler->EndFrame(mpRenderer->mpDeviceContext.Get());
 	mpGPUProfiler->CollectData(mpRenderer->mpDeviceContext.Get());
-
 }

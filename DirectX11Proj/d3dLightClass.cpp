@@ -94,13 +94,13 @@ void d3dLightClass::GenerateProjectionMatrix(float screenDepth, float screenNear
 {
 	float fieldOfView, screenAspect;
 
-
 	// Setup field of view and screen aspect for a square light source.
 	fieldOfView = (float)D3DX_PI / 2.0f;
 	screenAspect = 1.0f;
 
 	//XMStoreFloat4x4(&mProjectionmatrix, XMMatrixPerspectiveFovLH(fieldOfView, screenAspect, screenNear, screenDepth));
 	XMStoreFloat4x4(&mProjectionmatrix, XMMatrixOrthographicLH(50.0f, 50.0f, -50.0f, 50.0f));
+	
 
 	return;
 }
