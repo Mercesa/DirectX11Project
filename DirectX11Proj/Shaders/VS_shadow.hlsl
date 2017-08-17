@@ -31,13 +31,12 @@ PixelInputType ShadowVertexShader(VertexInputType input)
 	output.position = mul(input.position, worldMatrix);
 	output.fragPos = output.position;
 
-	output.position = mul(output.position, viewMatrix);
-	output.position = mul(output.position, projectionMatrix);
 
 	// Calculate the position of the vertice as viewed by the light source.
-	output.lightViewPosition = mul(input.position, worldMatrix);
-	output.lightViewPosition = mul(output.lightViewPosition, lightViewMatrix);
-	output.lightViewPosition = mul(output.lightViewPosition, lightProjectionMatrix);
+	output.lightViewPosition = output.position;
+	output.lightViewPosition = mul(output.lightViewPosition, lightProjectionViewMatrix);
+
+	output.position = mul(output.position, projViewMatrix);
 
 
 	output.normal = mul(input.normal, (float3x3)worldMatrix);

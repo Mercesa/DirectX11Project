@@ -82,16 +82,42 @@ float4 PSDeferredLighting(PixelInputType input) : SV_TARGET
 	float3 normal = normalTexture.Sample(SamplePointClamp, texCoord);
 	float occlusion = occlusionTexture.Sample(SamplePointClamp, texCoord);
 
-
-
 	// Calculate the world space position by multiplying by the inverse view matrix
 	// position is in view space
 	// Multiplied by the inverse view space will take it to world space
 	float4 worldSpacePosition = mul(float4(position.xyz, 1.0f), viewMatrixInversed);
 
+
+
+	// Next code is for motion blur
+	// Calculate the difference between screen space positions
+	
+	// Transform world poisition with previous camera projection/view matrix
+	// Project to screen, and calculate difference between 
+	float4 previous = mul(worldSpacePosition, prevProjViewMatrix);
+	previous.x /= previous.w;
+	previous.y /= -previous.w;
+
+	previous.xy = previous.xy * 0.5f + 0.5f;
+
+	float2 blurVec = (previous.xy - texCoord) *2.0f;
+
+	float4 result = albedoTexture.Sample(SamplePointClamp, texCoord);
+
+	int amountOfSamples = 6;
+	for (int i = 1; i < amountOfSamples; ++i)
+	{
+		float2 offset = blurVec * (float(i) / float(amountOfSamples - 1) - 0.5);
+		result += albedoTexture.Sample(SamplePointClamp, texCoord + offset);
+	}
+
+	result /= float(amountOfSamples);
 	// Transform the world space position to light projection space
 	float4 lightViewPosition = mul(mul(float4(worldSpacePosition.xyz, 1.0f), lightViewMatrix), lightProjectionMatrix);
+
+
 	
 	float shadowImpact = ShadowMappingPCF(lightViewPosition);
-	return PerformLightingDeferred((float3)position, (float3)normal, albedo, 1.0f, occlusion) * shadowImpact;
+	return PerformLightingDeferred((float3)position, (float3)normal, albedo, 1.0f, occlusion) * shadowImpact;// +result;
+
 }

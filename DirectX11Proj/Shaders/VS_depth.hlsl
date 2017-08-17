@@ -19,9 +19,7 @@ PixelInputType DepthVertexShader(VertexInputType input)
 
 	// transform with light matrices, can precalculate view and projection matrix as one
 	output.position = mul(input.position, worldMatrix);
-	output.position = mul(output.position, lightViewMatrix);
-	output.position = mul(output.position, lightProjectionMatrix);
-
+	output.position = mul(output.position, lightProjectionViewMatrix);
 
 	return output;
 }

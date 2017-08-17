@@ -25,6 +25,8 @@ public:
 	Material* mpMaterial;
 
 	glm::mat4x4 mWorldMatrix;
+	glm::mat4x4 mPrevWorldMatrix;
+
 	glm::vec4 mSpherePosition;
 
 	bool mCastShadow = true;

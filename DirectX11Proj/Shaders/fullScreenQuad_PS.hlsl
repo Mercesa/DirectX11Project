@@ -67,9 +67,8 @@ float Sobel(float2 texCoord)
 
 float4 PixShader(VSQuadOut quadIn) : SV_TARGET
 {
-	float sobelValue = Sobel(quadIn.texcoord);
-	float3 boxBlurValue = BoxBlur(quadIn.texcoord);
+	//float sobelValue = Sobel(quadIn.texcoord);
+	//float3 boxBlurValue = BoxBlur(quadIn.texcoord);
 	// Loads a texture with the x and y screen position
-	return float4(sobelValue, sobelValue, sobelValue, 1.0f);//renderedSceneTexture.Load(int3(quadIn.position.xy + int2(2.0, 0.0), 0));
-
+	return renderedSceneTexture.Load(int3(quadIn.position.xy, 0));
 }

@@ -305,7 +305,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FullScreenEffects.hlsl">
+    <None Include="Shaders\PS_VelocityBuffer.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shaders\VS_VelocityBuffer.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

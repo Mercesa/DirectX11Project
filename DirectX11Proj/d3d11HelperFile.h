@@ -921,6 +921,8 @@ static Model* CreateSimpleModelFromRawData(ID3D11Device* aDevice, const RawMeshD
 	return model;
 }
 
+
+
 //static ID3D11RenderTargetView* CreateTexture2DRTVDefault(ID3D11Device* const aDevice, uint32_t aWidth, uint32_t aHeight)
 //{
 //	HRESULT result;

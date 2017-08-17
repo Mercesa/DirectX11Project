@@ -15,6 +15,9 @@ PlayerSceneExample::~PlayerSceneExample()
 {
 }
 
+
+IObject* sphereMove = nullptr;
+
 void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 {
 	//throw std::logic_error("The method or operation is not implemented.");
@@ -59,6 +62,13 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 	}
 
 	mpCamera->UpdateViewMatrix();
+	
+	
+	static float tempT = 0.0f;
+	tempT += 0.1f * aDT;
+
+	sphereMove->mPrevWorldMatrix = sphereMove->mWorldMatrix;
+	sphereMove->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(sin(tempT) * 4.0f, 3.0f, 1.0f)));
 
 	mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(mpCamera->GetPosition3f().x, mpCamera->GetPosition3f().y, mpCamera->GetPosition3f().z)));
 	//mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::scale(glm::mat4(1), glm::vec3(5.0f)));
@@ -91,6 +101,7 @@ void PlayerSceneExample::Init()
 				tpObject->mpMaterial = ResourceManager::GetInstance().GetModelByID(tModels[i])->material;
 				Model* tMod = ResourceManager::GetInstance().GetModelByID(tModels[i]);
 				tpObject->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(x * 50.0f, 0.0f, y* 50.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(0.01f)));
+				tpObject->mPrevWorldMatrix = tpObject->mWorldMatrix;
 
 
 				glm::vec4 position = glm::vec4(tMod->sphereCollider.x, tMod->sphereCollider.y, tMod->sphereCollider.z, 1.0f);
@@ -118,7 +129,12 @@ void PlayerSceneExample::Init()
 
 
 	this->sphereModelID = mpSkyboxSphere->mpModel.GetID();
-	
+
+
+	std::unique_ptr<IObject> sphereObject = std::make_unique<IObject>();
+	sphereObject->mpModel = tModels[0];
+	sphereMove = sphereObject.get();
+	this->mObjects.push_back(std::move(sphereObject));
 		
 	// Create light, set diffuse and position, add light to list
 	//std::unique_ptr<Light> tpLight = std::make_unique<Light>();

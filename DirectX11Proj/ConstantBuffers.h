@@ -6,9 +6,12 @@
 
 struct cbMatrixBuffer
 {
-	XMMATRIX view;
-	XMMATRIX projection;
-	XMMATRIX viewMatrixInversed;
+	glm::mat4 view;
+	glm::mat4 projection;
+	glm::mat4 viewMatrixInversed;
+	glm::mat4 projectionMatrixInverse;
+	glm::mat4 projViewMatrix;
+	glm::mat4 prevProjViewMatrix;
 
 	float gEyePosX;
 	float gEyePosY;
@@ -23,8 +26,9 @@ struct cbLightMatrix
 	float shadowMapheight;
 	float pad0;
 	float pad1;
-	XMMATRIX lightViewMatrix;
-	XMMATRIX lightProjectionMatrix;
+	glm::mat4 lightViewMatrix;
+	glm::mat4 lightProjectionMatrix;
+	glm::mat4 lightProjectionViewMatrix;
 
 	VEC3f kernelSamples[64];
 	VEC4f pad[16];
@@ -53,6 +57,7 @@ struct cbLights
 struct cbPerObject
 {
 	glm::mat4 worldMatrix;
+	glm::mat4 prevWorldMatrix;
 };
 
 struct cbBlurParameters

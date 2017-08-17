@@ -16,6 +16,9 @@ cbuffer MatrixBuffer : register(b0)
 	matrix viewMatrix;
 	matrix projectionMatrix;
 	matrix viewMatrixInversed;
+	matrix projectionMatrixInverse;
+	matrix projViewMatrix;
+	matrix prevProjViewMatrix;
 
 	float3 gEyePos;
 	float1 pad0;
@@ -51,6 +54,7 @@ cbuffer LightMatrixBuffer : register (b3)
 
 	matrix lightViewMatrix;
 	matrix lightProjectionMatrix;
+	matrix lightProjectionViewMatrix;
 
 	float3 kernelSamples[64];
 }
@@ -58,6 +62,7 @@ cbuffer LightMatrixBuffer : register (b3)
 cbuffer PerObjectBuffer : register(b4)
 {
 	matrix worldMatrix;
+	matrix prevWorldMatrix;
 }
 
 cbuffer BlurBuffer : register(b5)

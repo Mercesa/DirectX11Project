@@ -41,6 +41,7 @@ public:
 	bool DestroyDirectX();
 
 	GPUProfiler* tProfiler = nullptr;
+
 private:
 	bool InitializeDirectX();
 	bool InitializeDXGI();
@@ -70,6 +71,8 @@ private:
 	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera, IObject* const aSkybox);
 	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera, IObject* const aSkyboxObject);
 
+
+	void RenderSceneVelocityPass(std::vector<IObject*>& aObjects);;
 	void RenderSceneSSAOPass();
 	void RenderBlurPass();
 	void RenderSceneGBufferFill(std::vector<IObject*>& aObjects);
@@ -144,11 +147,10 @@ private:
 	std::unique_ptr<Texture> gBuffer_depthBuffer;
 	std::unique_ptr<Texture> randomValueTexture;
 
+	std::unique_ptr<Texture> velocityTexture;
+
+
 	std::unique_ptr<ShadowMap> shadowMap01;
-
-	ShadowMap* shadowMapsForPointLight[6];
-
-
 
 	uint32_t sphereID;
 };
