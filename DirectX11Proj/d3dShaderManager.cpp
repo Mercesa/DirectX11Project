@@ -64,6 +64,8 @@ bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_Skybox.hlsl", "SkyboxVertexShader", "vs_5_0", EVERTEX));
 	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_Skybox.hlsl", "SkyboxPixelShader", "ps_5_0", EPIXEL));
 
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_VelocityBuffer.hlsl", "VelocityVertexShader", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_VelocityBuffer.hlsl", "VelocityPixelShader", "ps_5_0", EPIXEL));
 
 	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_DeferredLightingVolumes.hlsl", "VSDeferredLightVolumes", "vs_5_0", EVERTEX));
 

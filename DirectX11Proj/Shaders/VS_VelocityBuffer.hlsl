@@ -14,20 +14,19 @@ struct PixelInputType
 	float4 position : SV_POSITION;
 	float4 positionNow : POSITIONNOW;
 	float4 positionPrev : POSITIONPREV;
-
 };
 
-PixelInputType VelocityBuffer(VertexInputType input)
+PixelInputType VelocityVertexShader(VertexInputType input)
 {
 	PixelInputType output;
 
 	output.position = mul(input.position, worldMatrix);
-	output.position = mul(input.position, projViewMatrix);
+	output.position = mul(output.position, projViewMatrix);
 
-	output.positionNow = output.pposition;
+	output.positionNow = output.position;
 
-	output.prev = mul(input.position, worldMatrix);
-	output.prev = mul(input.position, prevProjViewMatrix);
+	output.positionPrev = mul(input.position, prevWorldMatrix);
+	output.positionPrev = mul(output.positionPrev, prevProjViewMatrix);
 
 
 	return output;

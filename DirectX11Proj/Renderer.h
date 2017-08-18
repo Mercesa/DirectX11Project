@@ -72,7 +72,7 @@ private:
 	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera, IObject* const aSkyboxObject);
 
 
-	void RenderSceneVelocityPass(std::vector<IObject*>& aObjects);;
+	void RenderSceneVelocityPass(std::vector<IObject*>& aObjects);
 	void RenderSceneSSAOPass();
 	void RenderBlurPass();
 	void RenderSceneGBufferFill(std::vector<IObject*>& aObjects);

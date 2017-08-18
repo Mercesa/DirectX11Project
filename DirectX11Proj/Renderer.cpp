@@ -139,6 +139,7 @@ void Renderer::RenderSceneDeferred(
 	RenderSceneGBufferFill(aCulledObjects);
 	RenderSceneSSAOPass();
 	RenderBlurPass();
+	RenderSceneVelocityPass(aCulledObjects);
 	RenderSceneLightingPass(aObjects, aSkyboxObject);
 }
 
@@ -558,6 +559,7 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 	mpDeviceContext->PSSetShaderResources(2, 1, &gBuffer_normalBuffer->srv);
 	mpDeviceContext->PSSetShaderResources(3, 1, &mAmbientOcclusionTexture->srv);
 	mpDeviceContext->PSSetShaderResources(4, 1, &shadowMap01->resource->srv);
+	mpDeviceContext->PSSetShaderResources(5, 1, &velocityTexture->srv);
 
 	//Model* const model = ResourceManager::GetInstance().GetModelByID(aSkyboxObject->mpModel);
 	// Bind vertex/index buffers
@@ -642,6 +644,35 @@ void Renderer::RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aO
 	}
 }
 
+void Renderer::RenderSceneVelocityPass(std::vector<IObject*>& aObjects)
+{
+	VertexShader*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_VelocityBuffer.hlsl");
+	PixelShader* const tPS = mpShaderManager->GetPixelShader("Shaders\\PS_VelocityBuffer.hlsl");
+
+	mpDeviceContext->RSSetViewports(1, &mViewport);
+	mpDeviceContext->RSSetState(mRaster_backcull);
+
+	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
+	mpDeviceContext->OMSetRenderTargets(1, &this->velocityTexture->rtv, mBackBufferTexture->dsv);
+
+	mpDeviceContext->ClearDepthStencilView(mBackBufferTexture->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
+
+	float color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	mpDeviceContext->ClearRenderTargetView(this->velocityTexture->rtv, color);
+	// Set the vertex and pixel shaders that will be used to render this triangle.
+	mpDeviceContext->VSSetShader(tVS->shader, NULL, 0);
+	mpDeviceContext->PSSetShader(tPS->shader, NULL, 0);
+
+	// Set the sampler state in the pixel shader.
+	mpDeviceContext->IASetInputLayout(tVS->inputLayout);
+
+	for (int i = 0; i < aObjects.size(); ++i)
+	{
+		UpdateObjectConstantBuffers(aObjects[i]);
+		RenderObject(aObjects[i]);
+	}
+
+}
 
 // Render scene to full screen quad
 void Renderer::RenderFullScreenQuad()

@@ -1,96 +1,27 @@
 #include "Lighting.hlsl"
 
-Texture2D diffuseTexture : register(t0);
-Texture2D specularTexture : register(t1);
-Texture2D normalTexture : register(t2);
-
-Texture2D depthMapTexture : register(t3);
-
-SamplerState SampleTypeClamp : register(s0);
-SamplerState SampleTypeWrap : register(s1);
-SamplerState SampleTypeAnisotropicWrap : register(s2);
-SamplerState SampleTypeLinearWrap : register(s3);
 
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
-	float4 lightViewPosition : TEXCOORD1;
-	float3 normal : NORMAL;
-	float3 fragPos : FRAGPOSITION;
-	float3 tang : TANGENT;
-	float2 tex : TEXCOORD0;
+	float4 positionNow : POSITIONNOW;
+	float4 positionPrev : POSITIONPREV;
+	
 };
 
 
-float ShadowMappingPCF(float4 aLightviewPosition)
+float2 VelocityPixelShader(PixelInputType input) : SV_TARGET
 {
-	float bias;
-	float2 projectTexCoord;
-	float depthValue;
-	float lightDepthValue;
-	float lightIntensity;
-	float shadowValue = 0.0f;
+	float4 positionNow = input.positionNow;
+	float4 positionPrev = input.positionPrev;
+	positionNow.xy /= float2(positionNow.w, -positionNow.w);
+	positionPrev.xy /= float2(positionPrev.w, -positionPrev.w);
 
-	bias = 0.001f;
-	// Project the coordinates and put them from -1 to 1   to   0 to 1
-	projectTexCoord.x = aLightviewPosition.x / aLightviewPosition.w * 0.5f + 0.5f;
-	projectTexCoord.y = aLightviewPosition.y / -aLightviewPosition.w * 0.5f + 0.5f;
+	positionNow.xy *= float2(0.5f, 0.5f);
+	positionNow.xy += float2(0.5f, 0.5f);
 
-	// Percentage close filtering
-	for (int y = -2; y < 2; ++y)
-	{
-		for (int x = -2; x < 2; ++x)
-		{
-			// Hardcode the resolution for now
-			float2 texelSize = float2(1.0f/shadowMapWidth, 1.0f/shadowMapHeight);
-			float2 offsetProjTexCoord = projectTexCoord + float2(x,y) * texelSize;
-			
-			// Clamp the coordinates
-			if ((saturate(offsetProjTexCoord.x) == offsetProjTexCoord.x) && saturate(offsetProjTexCoord.y) == offsetProjTexCoord.y)
-			{
-				depthValue = depthMapTexture.Sample(SampleTypeClamp, offsetProjTexCoord).r;
+	positionPrev.xy *= float2(0.5f, 0.5f);
+	positionPrev.xy += float2(0.5f, 0.5f);
 
-				lightDepthValue = aLightviewPosition.z / aLightviewPosition.w;
-
-				lightDepthValue -= bias;
-
-				// If light value is less far away than the depth value
-				shadowValue += depthValue > lightDepthValue ? 1.0f : 0.1f;
-				continue;
-			}
-			shadowValue += 1.0f;
-		}
-	}
-	shadowValue /= 16.0f;
-
-	return shadowValue;
-}
-
-float4 ShadowPixelShader(PixelInputType input) : SV_TARGET
-{
-	float shadowImpact = ShadowMappingPCF(input.lightViewPosition);
-
-	float3 tNorm = input.normal;
-	if (hasNormal)
-	{
-		tNorm = NormalSampleToWorldSpace(normalTexture.Sample(SampleTypeLinearWrap, input.tex), input.normal , input.tang);
-	}
-
-	float4 diffuseColor = float4(1.0f, 1.0f, 1.0f, 1.0f);
-	if (hasDiffuse)
-	{
-		diffuseColor = diffuseTexture.Sample(SampleTypeAnisotropicWrap, input.tex);
-	}
-
-	float specularIntensity = 0.0f;
-	if (hasSpecular)
-	{
-		specularIntensity = specularTexture.Sample(SampleTypeAnisotropicWrap, input.tex);
-	}
-	
-	//diffuseColor = float4(specularIntensity, specularIntensity, specularIntensity, 1.0f);
-
-	float4 color = PerformLighting(input.fragPos, tNorm, diffuseColor, specularIntensity, 1.0f) * shadowImpact;
-
-	return color;
+	return positionNow.xy - positionPrev.xy;
 }

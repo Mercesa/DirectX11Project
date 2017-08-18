@@ -5,6 +5,7 @@ Texture2D positionTexture : register(t1);
 Texture2D normalTexture : register(t2);
 Texture2D occlusionTexture : register(t3);
 Texture2D depthMapTexture : register(t4);
+Texture2D velocityTexture : register(t5);
 
 SamplerState SamplePointClamp : register(s0);
 SamplerState SamplePointWrap : register(s1);
@@ -94,14 +95,15 @@ float4 PSDeferredLighting(PixelInputType input) : SV_TARGET
 	
 	// Transform world poisition with previous camera projection/view matrix
 	// Project to screen, and calculate difference between 
-	float4 previous = mul(worldSpacePosition, prevProjViewMatrix);
-	previous.x /= previous.w;
-	previous.y /= -previous.w;
+	//float4 previous = mul(worldSpacePosition, prevProjViewMatrix);
+	//previous.x /= previous.w;
+	//previous.y /= -previous.w;
+	//
+	//previous.xy = previous.xy * 0.5f + 0.5f;
+	//
+	//float2 blurVec = (previous.xy - texCoord) *2.0f;
 
-	previous.xy = previous.xy * 0.5f + 0.5f;
-
-	float2 blurVec = (previous.xy - texCoord) *2.0f;
-
+	float2 blurVec = float2(velocityTexture.Sample(SamplePointClamp, texCoord).rg) * 2.0f;
 	float4 result = albedoTexture.Sample(SamplePointClamp, texCoord);
 
 	int amountOfSamples = 6;
@@ -118,6 +120,7 @@ float4 PSDeferredLighting(PixelInputType input) : SV_TARGET
 
 	
 	float shadowImpact = ShadowMappingPCF(lightViewPosition);
-	return PerformLightingDeferred((float3)position, (float3)normal, albedo, 1.0f, occlusion) * shadowImpact;// +result;
+	//return float4(blurVec.xy * 1., 0.0f, 1.0f);
+	return PerformLightingDeferred((float3)position, (float3)normal, albedo, 1.0f, occlusion) * shadowImpact +result/2.0f;
 
 }
