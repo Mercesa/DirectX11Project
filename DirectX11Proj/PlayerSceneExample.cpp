@@ -17,7 +17,6 @@ PlayerSceneExample::~PlayerSceneExample()
 
 
 IObject* sphereMove = nullptr;
-static float tempT = 0.0f;
 
 void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 {
@@ -31,17 +30,18 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 
 	if (apInput->rMouseDownC)
 	{
-	
-	apInput->GetMouseRelativeLocation(mouseRelX, mouseRelY);
-	//std::cout << mouseRelX << std::endl;
 
-	x = mouseRelX;
-	y = mouseRelY;
+		apInput->GetMouseRelativeLocation(mouseRelX, mouseRelY);
+		//std::cout << mouseRelX << std::endl;
+
+		x = mouseRelX;
+		y = mouseRelY;
 
 
-	mpCamera->Pitch(y/360.0f);
-	mpCamera->RotateY(x / 360.0f);
+		mpCamera->Pitch(y / 360.0f);
+		mpCamera->RotateY(x / 360.0f);
 	}
+
 	if (apInput->IsKeyHeld(0x53))
 	{
 		mpCamera->Walk(-1.0f * aDT);
@@ -65,8 +65,8 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 	mpCamera->UpdateViewMatrix();
 	
 	
-	tempT += 10.0f * aDT;
-	std::cout << tempT << std::endl;
+	tempT += 1.0f * aDT;
+	//std::cout << tempT << std::endl;
 	sphereMove->mPrevWorldMatrix = sphereMove->mWorldMatrix;
 	sphereMove->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(sin(tempT) * 2.0f, 3.0f, 1.0f)));
 

@@ -43,7 +43,6 @@ Renderer::Renderer()
 }
 
 
-
 Renderer::~Renderer()
 {
 }
@@ -74,6 +73,7 @@ void Renderer::CullObjects(std::vector<std::unique_ptr<IObject>>& aObjectsToCull
 		}
 	}
 }
+
 
 void Renderer::RenderScene(
 	std::vector<std::unique_ptr<IObject>>& aObjects,
@@ -673,6 +673,7 @@ void Renderer::RenderSceneVelocityPass(std::vector<IObject*>& aObjects)
 
 }
 
+
 // Render scene to full screen quad
 void Renderer::RenderFullScreenQuad()
 {
@@ -958,10 +959,12 @@ bool Renderer::InitializeDXGI()
 	return true;
 }
 
+
 float lerp(float v0, float v1, float t)
 {
 	return (1 - t) * v0 + t * v1;
 }
+
 
 bool Renderer::InitializeResources()
 {	

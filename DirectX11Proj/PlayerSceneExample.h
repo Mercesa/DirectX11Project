@@ -12,6 +12,7 @@ public:
 	virtual void Init() override;
 
 	virtual void Destroy() override;
+	float tempT = 0.0f;
 
 };
 

@@ -1,6 +1,7 @@
 #pragma once
 
-
+#include <glm/common.hpp>
+#include <glm/gtx/common.hpp>
 
 #include <windowsx.h>
 #include <wrl.h>
@@ -107,6 +108,17 @@ struct ShadowMap
 
 	uint32_t width = 0; 
 	uint32_t height = 0;
+};
+
+struct CameraData
+{
+	glm::mat4 proj;
+	glm::mat4 view;
+	FrustumG* frustumPtr;
+	glm::vec3 position;
+	float nearZ, farZ;
+	float fovY;
+	float aspect;
 };
 
 static void ReleaseVertexShader(VertexShader* aVShader)

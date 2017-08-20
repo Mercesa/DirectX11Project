@@ -33,6 +33,7 @@ cbuffer MaterialBuffer : register(b1)
 	int padding0;
 };
 
+
 cbuffer LightBuffer : register(b2)
 {
 	int amountOfLights;
@@ -44,6 +45,7 @@ cbuffer LightBuffer : register(b2)
 
 	Light arr[16];
 };
+
 
 cbuffer LightMatrixBuffer : register (b3)
 {
@@ -59,11 +61,13 @@ cbuffer LightMatrixBuffer : register (b3)
 	float3 kernelSamples[64];
 }
 
+
 cbuffer PerObjectBuffer : register(b4)
 {
 	matrix worldMatrix;
 	matrix prevWorldMatrix;
 }
+
 
 cbuffer BlurBuffer : register(b5)
 {
@@ -73,14 +77,13 @@ cbuffer BlurBuffer : register(b5)
 	int pad2B;
 }
 
+
 cbuffer GenericAttributesBuffer : register(b6)
 {
 	float screenWidth;			// 4 bytes
 	float screenHeight;			// 8 bytes
 	float nearPlaneDistance;	// 12 bytes
-	float farPlaneDistance;		// 16 bytes
-
-	
+	float farPlaneDistance;		// 16 bytes	
 }
 
 float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangentW)

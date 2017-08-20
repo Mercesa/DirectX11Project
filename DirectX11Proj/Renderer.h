@@ -17,6 +17,7 @@
 #include "GenericMathValueStructs.h"
 #include "GPUProfiler.h"
 
+
 class Renderer
 {
 public:
