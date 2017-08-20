@@ -51,18 +51,25 @@ void FrustumG::SetCamDef(glm::vec3 p, glm::vec3 l, glm::vec3 u)
 	fc = p - Z * farD;
 
 	// near plane points
-	ntl = nc + Y * nh - X * nw;
-	ntr = nc + Y * nh + X * nw;
 
-	nbl = nc - Y * nh - X * nw;
-	nbr = nc - Y * nh + X * nw;
+	// precalculate some values
+	glm::vec3 yNH = Y*nh;
+	glm::vec3 xNW = X*nw;
+	glm::vec3 yFH = Y*fh;
+	glm::vec3 xFW = X*fw;
+
+	ntl = nc + yNH - xNW;
+	ntr = nc + yNH + xNW;
+
+	nbl = nc - yNH - xNW;
+	nbr = nc - yNH + xNW;
 
 	// Far plane points
-	ftl = fc + Y * fh - X * fw;
-	ftr = fc + Y * fh + X * fw;
-
-	fbl = fc - Y * fh - X * fw;
-	fbr = fc - Y * fh + X * fw;
+	ftl = fc + yFH - xFW;
+	ftr = fc + yFH + xFW;
+			   		 
+	fbl = fc - yFH - xFW;
+	fbr = fc - yFH + xFW;
 
 
 	planes[TOP].Set3Points(ntr, ntl, ftl);

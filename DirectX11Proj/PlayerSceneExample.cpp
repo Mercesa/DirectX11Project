@@ -17,6 +17,7 @@ PlayerSceneExample::~PlayerSceneExample()
 
 
 IObject* sphereMove = nullptr;
+static float tempT = 0.0f;
 
 void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 {
@@ -43,30 +44,29 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 	}
 	if (apInput->IsKeyHeld(0x53))
 	{
-		mpCamera->Walk(-0.1f * aDT);
+		mpCamera->Walk(-1.0f * aDT);
 	}
 	
 	if (apInput->IsKeyHeld(0x57))
 	{
-		mpCamera->Walk(0.1f * aDT);
+		mpCamera->Walk(1.0f * aDT);
 	}
 	
 	if (apInput->IsKeyHeld(0x41))
 	{
-		mpCamera->Strafe(-0.1f * aDT);
+		mpCamera->Strafe(-1.0f* aDT);
 	}
 	
 	if (apInput->IsKeyHeld(0x44))
 	{
-		mpCamera->Strafe(0.1f * aDT);
+		mpCamera->Strafe(1.0f * aDT);
 	}
 
 	mpCamera->UpdateViewMatrix();
 	
 	
-	static float tempT = 0.0f;
-	tempT += 0.1f * aDT;
-
+	tempT += 10.0f * aDT;
+	std::cout << tempT << std::endl;
 	sphereMove->mPrevWorldMatrix = sphereMove->mWorldMatrix;
 	sphereMove->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(sin(tempT) * 2.0f, 3.0f, 1.0f)));
 

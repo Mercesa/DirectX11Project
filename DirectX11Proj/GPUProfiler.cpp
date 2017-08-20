@@ -205,7 +205,7 @@ void GPUProfiler::SetStamp(ID3D11DeviceContext* const aContext, ID3D11Device* co
 	// Frame needs to have started before time stamps can be marked
 	if (!hasStartedFrame)
 	{
-		LOG(WARNING) << "GPUProfiler: Can not set stamp if the frame has not started yet!";
+		//LOG(WARNING) << "GPUProfiler: Can not set stamp if the frame has not started yet!";
 		return;
 	}
 

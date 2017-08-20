@@ -83,12 +83,8 @@ void Renderer::RenderScene(
 	IObject* const aSkybox)
 
 {
-	ImGui::MenuItem("Enabled", NULL, &renderForward);
+	ImGui::MenuItem("RenderForward", NULL, &renderForward);
 	ImGui::MenuItem("UpdateCullFrustum", NULL, &UpdateCullFrustum);
-
-
-	// Convert DirectX math objects to glm
-
 
 	// Update cull frustum with current position
 	if (UpdateCullFrustum)
@@ -135,12 +131,29 @@ void Renderer::RenderSceneDeferred(
 	Camera* const apCamera,
 	IObject* const aSkyboxObject)
 {
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "DepthPre-pass");
 	RenderSceneDepthPrePass(aObjects);
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "DepthPre-pass");
+
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "GbufferFill");
 	RenderSceneGBufferFill(aCulledObjects);
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "GbufferFill");
+
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "SSAOPass");
 	RenderSceneSSAOPass();
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "SSAOPass");
+
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "SSAOBlur");
 	RenderBlurPass();
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "SSAOBlur");
+
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "MotionBlurVelocityPass");
 	RenderSceneVelocityPass(aCulledObjects);
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "MotionBlurVelocityPass");
+
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "LightingPass");
 	RenderSceneLightingPass(aObjects, aSkyboxObject);
+	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "LightingPass");
 }
 
 
@@ -248,8 +261,6 @@ void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& 
 	
 	mpLightCB->UpdateBuffer((void*)gLightBufferDataPtr.get(), mpDeviceContext.Get());
 	
-
-
 
 	// Transpose the matrices to prepare them for the shader.
 	XMMATRIX viewMatrix = XMMatrixTranspose(apCamera->GetView());
@@ -499,15 +510,15 @@ void Renderer::RenderSceneSSAOPass()
 	mpDeviceContext->RSSetViewports(1, &mViewport);
 	mpDeviceContext->RSSetState(mRaster_backcull);
 
-	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
+	//mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
 
 	// Set backbuffer as RT
-	mpDeviceContext->OMSetRenderTargets(1, &this->mAmbientOcclusionTexture->rtv, nullptr);
+	mpDeviceContext->OMSetRenderTargets(1, &this->mAmbientOcclusionTexture->rtv, this->gBuffer_depthBuffer->dsv);
 	//mpDeviceContext->ClearDepthStencilView(mBackBufferTexture->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 
 	// Draw full screen quad
-	//mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
+	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
 	mpDeviceContext->PSSetSamplers(1, 1, &mpPointWrapSampler);
 
 	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
@@ -515,7 +526,6 @@ void Renderer::RenderSceneSSAOPass()
 	mpDeviceContext->PSSetShader(tFPS->shader, NULL, 0);
 
 	// Set gbuffer resources
-	mpDeviceContext->PSSetShaderResources(0, 1, &gBuffer_albedoBuffer->srv);
 	mpDeviceContext->PSSetShaderResources(1, 1, &gBuffer_positionBuffer->srv);
 	mpDeviceContext->PSSetShaderResources(2, 1, &gBuffer_normalBuffer->srv);
 	mpDeviceContext->PSSetShaderResources(3, 1, &randomValueTexture->srv);
@@ -561,17 +571,6 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 	mpDeviceContext->PSSetShaderResources(4, 1, &shadowMap01->resource->srv);
 	mpDeviceContext->PSSetShaderResources(5, 1, &velocityTexture->srv);
 
-	//Model* const model = ResourceManager::GetInstance().GetModelByID(aSkyboxObject->mpModel);
-	// Bind vertex/index buffers
-
-	//UpdateObjectConstantBuffers(aSkyboxObject);
-
-	//RenderBuffers(mpDeviceContext.Get(), model);
-
-	//uint32_t indices = (uint32_t)model->indexBuffer->amountOfElements;
-
-	// Render the model.
-	//mpDeviceContext->DrawIndexed(indices, 0, 0);
 
 	mpDeviceContext->Draw(4, 0);
 }
@@ -1129,7 +1128,7 @@ bool Renderer::InitializeResources()
 
 	memset(&gLightMatrixBufferDataPtr->kernelSamples, 0, sizeof(VEC3f) * (size_t)64);
 
-	for (int i = 0; i < 64; ++i)
+	for (int i = 0; i < 32; ++i)
 	{
 		VEC3f value;
 		// Create random rotation vectors
@@ -1150,7 +1149,7 @@ bool Renderer::InitializeResources()
 		value.z *= randValue;
 
 		// Samples close to center should be scaled more
-		float scale = (float)i / 64.0f;
+		float scale = (float)i / 32.0f;
 		scale = lerp(0.1f, 1.0f, scale * scale);
 		value.x *= scale;
 		value.y *= scale;
@@ -1161,8 +1160,6 @@ bool Renderer::InitializeResources()
 
 	return true;
 }
-
-
 
 bool Renderer::DestroyDirectX()
 {

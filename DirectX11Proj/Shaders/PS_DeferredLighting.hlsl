@@ -21,7 +21,7 @@ struct PixelInputType
 };
 
 // Shadow mapping with percentage close filtering 
-float ShadowMappingPCF(float4 aLightviewPosition)
+inline float ShadowMappingPCF(float4 aLightviewPosition)
 {
 	float bias;
 	float2 projectTexCoord;
@@ -121,6 +121,6 @@ float4 PSDeferredLighting(PixelInputType input) : SV_TARGET
 	
 	float shadowImpact = ShadowMappingPCF(lightViewPosition);
 	//return float4(blurVec.xy * 1., 0.0f, 1.0f);
-	return PerformLightingDeferred((float3)position, (float3)normal, albedo, 1.0f, occlusion) * shadowImpact +result/2.0f;
+	return PerformLightingDeferred((float3)position, (float3)normal, albedo, 1.0f, occlusion) * shadowImpact;
 
 }

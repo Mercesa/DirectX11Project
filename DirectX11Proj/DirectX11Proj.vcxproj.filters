@@ -257,13 +257,11 @@
     <None Include="Shaders\VS_DeferredLightingVolumes.hlsl">
       <Filter>Shaders</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="Shaders\VS_VelocityBuffer.hlsl">
+    <None Include="Shaders\PS_VelocityBuffer.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\PS_VelocityBuffer.hlsl">
+    </None>
+    <None Include="Shaders\VS_VelocityBuffer.hlsl">
       <Filter>Shaders</Filter>
-    </FxCompile>
+    </None>
   </ItemGroup>
 </Project>

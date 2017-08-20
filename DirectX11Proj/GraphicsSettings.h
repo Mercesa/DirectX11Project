@@ -9,7 +9,7 @@ struct GraphicsSettings
 	static bool gIsVsyncEnabled;
 
 	static bool gShowDebugWindow;
-
+	static bool gCollectProfileData;
 private:
 	GraphicsSettings();
 	~GraphicsSettings();

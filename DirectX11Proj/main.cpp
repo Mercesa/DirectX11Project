@@ -27,7 +27,7 @@ INITIALIZE_EASYLOGGINGPP
 #include "ImguiImplementation.h"
 #include "ResourceManager.h"
 #include "GPUProfiler.h"
-
+#include "EngineTimer.h"
 HWND windowHandle;
 
 class WindowsProcessClass
@@ -61,8 +61,8 @@ LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARA
 		int yPos = GET_Y_LPARAM(lparam);
 
 		mpInput->MouseMove(xPos, yPos);
-
 		return 0;
+		break;
 	}
 
 	case WM_RBUTTONDOWN:
@@ -75,14 +75,13 @@ LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARA
 		return 0;
 		break;
 
-
-
 	// Check if a key has been pressed on the keyboard.
 	case WM_KEYDOWN:
 	{
 		// If a key is pressed send it to the input object so it can record that state.
 		mpInput->KeyDown((unsigned int)wparam);
 		return 0;
+		break;
 	}
 
 	// Check if a key has been released on the keyboard.
@@ -90,6 +89,7 @@ LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARA
 	{
 		// If a key is released then send it to the input object so it can unset the state for that key.
 		mpInput->KeyUp((unsigned int)wparam);
+		break;
 		return 0;
 	}
 
@@ -212,6 +212,7 @@ void ShowTitleMenu()
 	}
 }
 
+
 void Render();
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
@@ -328,13 +329,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 	MSG msg;
 	bool done = false;
+
+	std::unique_ptr<EngineTimer> mTimer = std::make_unique<EngineTimer>();
 	while (!done)
 	{
+		mTimer->Update();
 		ImGui_ImplDX11_NewFrame();
 		mpInput->Frame();
 
 		// Handle the windows messages.
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		while(PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -355,7 +359,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 		{
 			GraphicsSettings::gShowDebugWindow = !GraphicsSettings::gShowDebugWindow;
 		}
-		mpPlayerScene->Tick(mpInput.get(), 1.0f);
+		mpPlayerScene->Tick(mpInput.get(), mTimer->GetDeltaTime());
 		Render();
 
 	}
@@ -386,7 +390,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 void Render()
 {
-	mpGPUProfiler->BeginFrame(mpRenderer->mpDeviceContext.Get());
+	if (GraphicsSettings::gCollectProfileData)
+	{
+		mpGPUProfiler->BeginFrame(mpRenderer->mpDeviceContext.Get());
+	}
 
 
 	bool hasBeenSelected = false;
@@ -420,6 +427,8 @@ void Render()
 
 	mpRenderer->RenderScene(mpPlayerScene->mObjects, mpPlayerScene->mLights, mpPlayerScene->mDirectionalLight.get(), mpPlayerScene->GetCamera(), mpPlayerScene->GetSkyboxSphere());
 
+	ImGui::MenuItem("CollcetGPUProfileData", NULL, &GraphicsSettings::gCollectProfileData);
+
 
 	ImGui::Render();
 
@@ -427,6 +436,10 @@ void Render()
 
 	mpRenderer->mpSwapchain->Present((GraphicsSettings::gIsVsyncEnabled ? 1 : 0), 0);
 
-	mpGPUProfiler->EndFrame(mpRenderer->mpDeviceContext.Get());
-	mpGPUProfiler->CollectData(mpRenderer->mpDeviceContext.Get());
+	if (GraphicsSettings::gCollectProfileData)
+	{
+		mpGPUProfiler->EndFrame(mpRenderer->mpDeviceContext.Get());
+		mpGPUProfiler->CollectData(mpRenderer->mpDeviceContext.Get());
+
+	}
 }

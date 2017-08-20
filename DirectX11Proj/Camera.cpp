@@ -12,7 +12,7 @@ Camera::Camera()
 {
 	mFrustum = std::make_unique<FrustumG>();
 
-	SetLens(0.5f*MathHelper::Pi, GraphicsSettings::gCurrentScreenWidth / GraphicsSettings::gCurrentScreenHeight, 1.0f, 1000.0f);
+	SetLens(0.6f*MathHelper::Pi, GraphicsSettings::gCurrentScreenWidth / GraphicsSettings::gCurrentScreenHeight, 0.1f, 1000.0f);
 }
 
 Camera::~Camera()
