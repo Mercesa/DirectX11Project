@@ -19,7 +19,6 @@ struct cbMatrixBuffer
 	float pad0;
 };
 
-
 struct cbLightMatrix
 {
 	float shadowMapWidth;
@@ -34,6 +33,7 @@ struct cbLightMatrix
 	VEC4f pad[16];
 };
 
+__declspec(align(16))
 struct cbMaterial
 {
 	int hasDiffuse; // 4 bytes
@@ -54,12 +54,14 @@ struct cbLights
 	Light arr[16];
 };
 
+__declspec(align(16))
 struct cbPerObject
 {
 	glm::mat4 worldMatrix;
 	glm::mat4 prevWorldMatrix;
 };
 
+__declspec(align(16))
 struct cbBlurParameters
 {
 	int blurHorizontal;
@@ -68,10 +70,15 @@ struct cbBlurParameters
 	int pad2;
 };
 
+//__declspec(align(16))
 struct cbGenericAttributesBuffer
 {
 	float screenWidth;
 	float screenHeight;
 	float nearPlaneDistance;
 	float farPlaneDistance;
+
+	float totalApplicationTime;
+	float deltaTime;
+	float framerate;
 };

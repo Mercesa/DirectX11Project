@@ -110,16 +110,37 @@ struct ShadowMap
 	uint32_t height = 0;
 };
 
+#include "FrustumG.h"
 struct CameraData
 {
 	glm::mat4 proj;
 	glm::mat4 view;
-	FrustumG* frustumPtr;
 	glm::vec3 position;
+	const FrustumG* frustumPtr;
 	float nearZ, farZ;
 	float fovY;
 	float aspect;
 };
+
+struct LightData
+{
+	glm::mat4 proj;
+	glm::mat4 view;
+	glm::vec3 dirVector;
+
+	glm::vec3 ambientCol;
+	glm::vec3 diffuseCol;
+	glm::vec3 specularCol;
+	glm::vec3 position;
+};
+
+struct FrameData
+{
+	float totalTime;
+	float deltaTime;
+	float framerate;
+};
+
 
 static void ReleaseVertexShader(VertexShader* aVShader)
 {

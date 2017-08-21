@@ -7,7 +7,6 @@
 #include "inputclass.h"
 #include "IObject.h"
 #include "Camera.h"
-#include "d3dLightClass.h"
 #include "GraphicsStructures.h"
 
 
@@ -25,7 +24,7 @@ public:
 	std::vector <std::unique_ptr<IObject>> mObjects;
 	std::vector <std::unique_ptr<Light>> mLights;
 	
-	std::unique_ptr<d3dLightClass> mDirectionalLight;
+	std::unique_ptr<LightData> mDirectionalLight;
 
 	bool HasBeenInitialized() { return mInitialized; }
 

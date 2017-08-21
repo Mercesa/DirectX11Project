@@ -174,7 +174,6 @@
     <ClCompile Include="inputclass.cpp" />
     <ClCompile Include="IObject.cpp" />
     <ClCompile Include="IScene.cpp" />
-    <ClCompile Include="d3dLightClass.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
@@ -203,7 +202,6 @@
     <ClInclude Include="inputclass.h" />
     <ClInclude Include="IObject.h" />
     <ClInclude Include="IScene.h" />
-    <ClInclude Include="d3dLightClass.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="Plane.h" />

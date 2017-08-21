@@ -49,7 +49,8 @@ std::unique_ptr<InputClass> mpInput;
 std::unique_ptr<PlayerSceneExample> mpPlayerScene;
 std::unique_ptr<Renderer> mpRenderer;
 std::unique_ptr<GPUProfiler> mpGPUProfiler;
-
+std::unique_ptr<FrameData> gFrameData;
+std::unique_ptr<EngineTimer> gTimer;
 WNDCLASSEX wc;
 DEVMODE dmScreenSettings;
 int posX, posY;
@@ -241,6 +242,7 @@ void CreateWindowWindows(WindowsProcessClass* aWindowProcessClass)
 }
 
 void Render();
+
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
 	std::unique_ptr<WindowsProcessClass> mWProc = std::make_unique<WindowsProcessClass>();
@@ -271,18 +273,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	mpPlayerScene->Init();
 	
 	mpGPUProfiler = std::make_unique<GPUProfiler>();
+	gTimer = std::make_unique<EngineTimer>();
+
 	mpGPUProfiler->Initialize(mpRenderer->mpDevice.Get());
 	mpRenderer->tProfiler = mpGPUProfiler.get();
 	mpRenderer->tProfiler->recordStatsToFile = true;
 
+
+	gFrameData = std::make_unique<FrameData>();
+
+
 	MSG msg;
 	bool done = false;
 
-	std::unique_ptr<EngineTimer> mTimer = std::make_unique<EngineTimer>();
-	mTimer->Start();
+	gTimer->Start();
 	while (!done)
 	{
-		mTimer->Update();
+		gTimer->Update();
 		ImGui_ImplDX11_NewFrame();
 		mpInput->Frame();
 
@@ -308,7 +315,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 		{
 			GraphicsSettings::gShowDebugMenuBar = true;
 		}
-		mpPlayerScene->Tick(mpInput.get(), mTimer->GetDeltaTime());
+		mpPlayerScene->Tick(mpInput.get(), gTimer->GetDeltaTime());
 		Render();
 
 	}
@@ -337,6 +344,8 @@ static void DrawStatisticsMenu()
 		ImGui::End();
 		return;
 	}
+	
+	ImGui::MenuItem("Profile GPU", NULL, &GraphicsSettings::gCollectProfileData);
 
 
 	ImGui::End();
@@ -357,16 +366,23 @@ static void DrawLightMenu()
 		ImGui::ColorEditMode(ImGuiColorEditMode_UserSelect);
 		static float pos[3] = { 0.0, 0.0, 0.0 };
 		ImGui::ColorEdit3("position point light", (float*)&pos);
-		mpPlayerScene->mLights[i]->position = XMFLOAT3(pos);
+		mpPlayerScene->mLights[i]->position = glm::vec3(pos[0], pos[1], pos[2]);
 	}
 	float arr[3] = { 0.01f, 0.01f, 0.01f };
 	ImGui::ColorEditMode(ImGuiColorEditMode_RGB);
-	ImGui::ColorEdit3("color directional light", (float*)&mpPlayerScene->mDirectionalLight->mDiffuseColor);
+	ImGui::ColorEdit3("color directional light", (float*)&mpPlayerScene->mDirectionalLight->diffuseCol);
 	//ImGui::ColorEdit3("position directional light", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
 	//ImGui::InputFloat3("PITCH   YAW    ROLL", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
-	ImGui::DragFloat3("Pitch Yaw Roll", (float*)&mpPlayerScene->mDirectionalLight->mPosition, 0.1f, 0.0f, 0.0f, "%.3f", 1.0f);
-
-	mpPlayerScene->mDirectionalLight->GenerateViewMatrix();
+	
+	glm::vec3 prevPos = mpPlayerScene->mDirectionalLight->position;
+	ImGui::DragFloat3("Pitch Yaw Roll", (float*)&mpPlayerScene->mDirectionalLight->position, 0.1f, 0.0f, 0.0f, "%.3f", 1.0f);
+	
+	if (prevPos != mpPlayerScene->mDirectionalLight->position)
+	{
+		MathHelper::GenerateViewMatrixBasedOnDir(mpPlayerScene->mDirectionalLight->position, mpPlayerScene->mDirectionalLight->view, mpPlayerScene->mDirectionalLight->dirVector);
+	}
+	
+	//mpPlayerScene->mDirectionalLight->GenerateViewMatrix();
 
 	ImGui::End();
 }
@@ -375,7 +391,6 @@ static void ShowExampleMenuFile()
 {
 	if (ImGui::MenuItem("Statistics"))
 	{
-		ImGui::MenuItem("CollectGPUProfileData", NULL, &GraphicsSettings::gCollectProfileData);
 		drawStatisticsMenuVar = !drawStatisticsMenuVar;
 	}
 	
@@ -423,6 +438,7 @@ void DrawMenu()
 	}
 }
 
+
 void Render()
 {
 	if (GraphicsSettings::gCollectProfileData)
@@ -435,9 +451,26 @@ void Render()
 
 	bool hasBeenSelected = false;
 
+	CameraData camDat;
+	camDat.aspect = mpPlayerScene->GetCamera()->GetAspect();
+	camDat.farZ = mpPlayerScene->GetCamera()->GetFarZ();
+	camDat.nearZ = mpPlayerScene->GetCamera()->GetNearZ();
+	camDat.frustumPtr = mpPlayerScene->GetCamera()->GetFrustum();
+	camDat.position.x = mpPlayerScene->GetCamera()->GetPosition3f().x;
+	camDat.position.y = mpPlayerScene->GetCamera()->GetPosition3f().y;
+	camDat.position.z = mpPlayerScene->GetCamera()->GetPosition3f().z;
+	
+	camDat.farZ = mpPlayerScene->GetCamera()->GetFarZ();
 
-	mpRenderer->RenderScene(mpPlayerScene->mObjects, mpPlayerScene->mLights, mpPlayerScene->mDirectionalLight.get(), mpPlayerScene->GetCamera(), mpPlayerScene->GetSkyboxSphere());
+	memcpy(&camDat.view[0], &mpPlayerScene->GetCamera()->GetView().r[0], sizeof(glm::mat4));
+	memcpy(&camDat.proj[0], &mpPlayerScene->GetCamera()->GetProj().r[0], sizeof(glm::mat4));
 
+	mpRenderer->RenderScene(
+		mpPlayerScene->mObjects, 
+		mpPlayerScene->mLights, 
+		mpPlayerScene->mDirectionalLight.get(), 
+		camDat, mpPlayerScene->GetSkyboxSphere(), 
+		gFrameData.get());
 
 
 	ImGui::Render();

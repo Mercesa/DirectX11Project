@@ -37,9 +37,6 @@
     <ClCompile Include="d3dShaderManager.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
-    <ClCompile Include="d3dLightClass.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
     <ClCompile Include="inputclass.cpp">
       <Filter>Utility</Filter>
     </ClCompile>
@@ -106,9 +103,6 @@
       <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="d3dShaderManager.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dLightClass.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="inputclass.h">

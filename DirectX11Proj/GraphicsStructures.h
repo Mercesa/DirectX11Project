@@ -6,6 +6,7 @@
 
 #include "GenericMathValueStructs.h"
 
+#include <glm/common.hpp>
 using namespace DirectX;
 
 enum eLightTypes
@@ -15,13 +16,13 @@ enum eLightTypes
 
 struct Light
 {
-	XMFLOAT3 position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
 	float pad0;
 
-	XMFLOAT3 diffuseColor = XMFLOAT3(0.5f, 0.5f, 0.5f);
+	glm::vec3 diffuseColor = glm::vec3(0.5f, 0.5f, 0.5f);
 	float pad1;
 
-	XMFLOAT3 specularColor = XMFLOAT3(1.0f, 0.0f, 1.0f);
+	glm::vec3 specularColor = glm::vec3(1.0f, 0.0f, 1.0f);
 	int typeOfLight;
 };
 

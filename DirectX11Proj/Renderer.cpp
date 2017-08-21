@@ -78,19 +78,17 @@ void Renderer::CullObjects(std::vector<std::unique_ptr<IObject>>& aObjectsToCull
 void Renderer::RenderScene(
 	std::vector<std::unique_ptr<IObject>>& aObjects,
 	std::vector<std::unique_ptr<Light>>& aLights,
-	d3dLightClass* const aDirectionalLight,
-	Camera* const apCamera,
-	IObject* const aSkybox)
+	LightData* const aDirectionalLight,
+	CameraData apCamera,
+	IObject* const aSkybox,
+	const FrameData* const aFrameData)
 
 {
 	ImGui::MenuItem("RenderForward", NULL, &renderForward);
 	ImGui::MenuItem("UpdateCullFrustum", NULL, &UpdateCullFrustum);
 
 	// Update cull frustum with current position
-	if (UpdateCullFrustum)
-	{
-		apCamera->UpdateFrustumPlanes();
-	}
+
 
 	if (firstFrame)
 	{
@@ -100,13 +98,13 @@ void Renderer::RenderScene(
 
 	mCulledObjects.clear();
 
-	CullObjects(aObjects, apCamera->GetFrustum());
+	CullObjects(aObjects, apCamera.frustumPtr);
 
 	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "ConstantBuffersTime");
 
 	BindStandardConstantBuffers();
 	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
-	UpdateGenericConstantBuffer(GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, apCamera->GetNearZ(), apCamera->GetFarZ());
+	UpdateGenericConstantBuffer(GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, apCamera.nearZ, apCamera.farZ);
 
 	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "ConstantBuffersTime");
 
@@ -127,8 +125,8 @@ void Renderer::RenderSceneDeferred(
 	std::vector<std::unique_ptr<IObject>>& aObjects, 
 	std::vector<IObject*>& aCulledObjects, 
 	std::vector<std::unique_ptr<Light>>& aLights, 
-	d3dLightClass* const aDirectionalLight, 
-	Camera* const apCamera,
+	LightData* const aDirectionalLight, 
+	CameraData const apCamera,
 	IObject* const aSkyboxObject)
 {
 	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "DepthPre-pass");
@@ -161,8 +159,8 @@ void Renderer::RenderSceneForward(
 	std::vector<std::unique_ptr<IObject>>& aObjects,
 	std::vector<IObject*>& aCulledObjects,
 	std::vector<std::unique_ptr<Light>>& aLights,
-	d3dLightClass* const aDirectionalLight,
-	Camera* const apCamera,
+	LightData* const aDirectionalLight,
+	CameraData apCamera,
 	IObject* const aSkybox)
 {
 	// 
@@ -238,12 +236,13 @@ void Renderer::UpdateGenericConstantBuffer(float aScreenWidth, float aScreenHeig
 	gGenericAttributesDataPtr->screenHeight = aScreenHeight;
 	gGenericAttributesDataPtr->nearPlaneDistance = nearPlaneDistance;
 	gGenericAttributesDataPtr->farPlaneDistance = farPlaneDistance;
+	
 
 	mpGenericAttributesBufferCB->UpdateBuffer((void*)gGenericAttributesDataPtr.get(), mpDeviceContext.Get());
 }
 
 
-void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& apLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera)
+void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& apLights, LightData* const aDirectionalLight, CameraData apCamera)
 {
 	// Update light constant buffers
 	gLightBufferDataPtr->amountOfLights = static_cast<int>(apLights.size());
@@ -254,49 +253,27 @@ void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& 
 		gLightBufferDataPtr->arr[i].diffuseColor = apLights[i]->diffuseColor;
 	}
 
-	gLightBufferDataPtr->directionalLight.diffuseColor = aDirectionalLight->mDiffuseColor;
-	gLightBufferDataPtr->directionalLight.specularColor = aDirectionalLight->mSpecularColor;
-	gLightBufferDataPtr->directionalLight.position = aDirectionalLight->mDirectionVector;
+	gLightBufferDataPtr->directionalLight.diffuseColor = aDirectionalLight->diffuseCol;
+	gLightBufferDataPtr->directionalLight.specularColor = aDirectionalLight->specularCol;
+	gLightBufferDataPtr->directionalLight.position = aDirectionalLight->dirVector;
 
 	
 	mpLightCB->UpdateBuffer((void*)gLightBufferDataPtr.get(), mpDeviceContext.Get());
 	
-
-	// Transpose the matrices to prepare them for the shader.
-	XMMATRIX viewMatrix = XMMatrixTranspose(apCamera->GetView());
-	XMMATRIX projectionMatrix = XMMatrixTranspose(apCamera->GetProj());
-	XMMATRIX invView = XMMatrixTranspose((XMMatrixInverse(nullptr, apCamera->GetView())));
-	XMMATRIX invProj = XMMatrixTranspose((XMMatrixInverse(nullptr, apCamera->GetProj())));
-
-
-	// Memcpy over our data, we will convert XMMatrices to glm's matrices in the future
-	glm::mat4 viewNew = glm::mat4(1);
-	memcpy(&viewNew[0], &viewMatrix.r[0], sizeof(glm::mat4));
-
-	glm::mat4 projNew = glm::mat4(1);
-	memcpy(&projNew[0], &projectionMatrix.r[0], sizeof(glm::mat4));
-
-	glm::mat4 invViewNew = glm::mat4(1);
-	memcpy(&invViewNew[0], &invView.r[0], sizeof(glm::mat4));
-
-	glm::mat4 invProjNew = glm::mat4(1);
-	memcpy(&invProjNew[0], &invProj.r[0], sizeof(glm::mat4));
-
-
 	// Copy the matrices into the constant buffer
 	// Initialize with proj view matrix from last frame to set the previous matrix 
 	gMatrixBufferDataPtr->prevProjViewMatrix = gMatrixBufferDataPtr->projViewMatrix;
 	
 	
-	gMatrixBufferDataPtr->view = viewNew;
-	gMatrixBufferDataPtr->projection = projNew;
-	gMatrixBufferDataPtr->viewMatrixInversed = invViewNew;
-	gMatrixBufferDataPtr->projectionMatrixInverse = invProjNew;
-	gMatrixBufferDataPtr->projViewMatrix = viewNew*projNew;
+	gMatrixBufferDataPtr->view = glm::transpose(apCamera.view);
+	gMatrixBufferDataPtr->projection = glm::transpose(apCamera.proj);
+	gMatrixBufferDataPtr->viewMatrixInversed = glm::transpose(glm::inverse(apCamera.view));
+	gMatrixBufferDataPtr->projectionMatrixInverse = glm::transpose(glm::inverse(apCamera.proj));
+	gMatrixBufferDataPtr->projViewMatrix = gMatrixBufferDataPtr->view*gMatrixBufferDataPtr->projection;
 
-	gMatrixBufferDataPtr->gEyePosX = apCamera->GetPosition3f().x;
-	gMatrixBufferDataPtr->gEyePosY = apCamera->GetPosition3f().y;
-	gMatrixBufferDataPtr->gEyePosZ = apCamera->GetPosition3f().z;
+	gMatrixBufferDataPtr->gEyePosX = apCamera.position.x;
+	gMatrixBufferDataPtr->gEyePosY = apCamera.position.y;
+	gMatrixBufferDataPtr->gEyePosZ = apCamera.position.z;
 
 
 	mpMatrixCB->UpdateBuffer((void*)gMatrixBufferDataPtr.get(), mpDeviceContext.Get());
@@ -306,25 +283,11 @@ void Renderer::UpdateFrameConstantBuffers(std::vector <std::unique_ptr<Light>>& 
 }
 
 
-void Renderer::UpdateShadowLightConstantBuffers(d3dLightClass* const aDirectionalLight)
+void Renderer::UpdateShadowLightConstantBuffers(LightData* const aDirectionalLight)
 {
-	XMMATRIX viewMatrix, projectionMatrix;
-	aDirectionalLight->GetViewMatrix(viewMatrix);
-	aDirectionalLight->GetProjectionMatrix(projectionMatrix);
-
-	viewMatrix = XMMatrixTranspose(viewMatrix);
-	projectionMatrix = XMMatrixTranspose(projectionMatrix);
-
-	glm::mat4 viewNew = glm::mat4(1);
-	memcpy(&viewNew[0], &viewMatrix.r[0], sizeof(glm::mat4));
-
-	glm::mat4 projNew = glm::mat4(1);
-	memcpy(&projNew[0], &projectionMatrix.r[0], sizeof(glm::mat4));
-
-
-	gLightMatrixBufferDataPtr->lightProjectionMatrix = projNew;
-	gLightMatrixBufferDataPtr->lightViewMatrix = viewNew;
-	gLightMatrixBufferDataPtr->lightProjectionViewMatrix = viewNew * projNew;
+	gLightMatrixBufferDataPtr->lightProjectionMatrix = glm::transpose(aDirectionalLight->proj);
+	gLightMatrixBufferDataPtr->lightViewMatrix = glm::transpose(aDirectionalLight->view);;
+	gLightMatrixBufferDataPtr->lightProjectionViewMatrix = gLightMatrixBufferDataPtr->lightViewMatrix * gLightMatrixBufferDataPtr->lightProjectionMatrix;
 
 
 	gLightMatrixBufferDataPtr->shadowMapWidth = shadowMap01->width;
@@ -358,8 +321,8 @@ void Renderer::UpdateObjectConstantBuffers(IObject* const aObject)
 
 void Renderer::RenderSceneWithShadows(std::vector<IObject*>& aObjects,
 	std::vector<std::unique_ptr<Light>>& aLights,
-	d3dLightClass* const aDirectionalLight,
-	Camera* const apCamera)
+	LightData* const aDirectionalLight,
+	CameraData apCamera)
 {
 	mpDeviceContext->RSSetViewports(1, &mViewport);
 	mpDeviceContext->RSSetState(mRaster_backcull);
@@ -968,10 +931,14 @@ float lerp(float v0, float v1, float t)
 
 bool Renderer::InitializeResources()
 {	
-	D3D11_QUERY_DESC descQuery;
+	// Generic viewport initialization
+	mViewport.Width = (float)GraphicsSettings::gCurrentScreenWidth;
+	mViewport.Height = (float)GraphicsSettings::gCurrentScreenHeight;
+	mViewport.MinDepth = 0.0f;
+	mViewport.MaxDepth = 1.0f;
+	mViewport.TopLeftX = 0.0f;
+	mViewport.TopLeftY = 0.0f;
 
-	descQuery.Query = D3D11_QUERY_TIMESTAMP;
-	descQuery.MiscFlags = 0;
 
 	// Create sampler states
 	mpAnisotropicWrapSampler = CreateSamplerAnisotropicWrap(mpDevice.Get());
@@ -1005,8 +972,10 @@ bool Renderer::InitializeResources()
 	mAmbientOcclusionBufferTexture = std::make_unique<Texture>();
 
 	velocityTexture = std::make_unique<Texture>();
-	// Initialize all textures and its resources
 	
+	// Resources for motion blur deconstructing technique
+	reconstruction_VelocityBuffer = std::make_unique<Texture>();
+
 	// Post proc color and depth buffer 
 	mPostProcColorBuffer->texture =  CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
 	mPostProcColorBuffer->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), mPostProcColorBuffer->texture, DXGI_FORMAT_R32G32B32A32_FLOAT);
@@ -1071,6 +1040,15 @@ bool Renderer::InitializeResources()
 	velocityTexture->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
 	velocityTexture->srv = CreateSimpleShaderResourceView(mpDevice.Get(), velocityTexture->texture, DXGI_FORMAT_R32G32_FLOAT);
 	velocityTexture->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), velocityTexture->texture, DXGI_FORMAT_R32G32_FLOAT);
+
+
+	// BUFFERS FOR RECONSTRUCTION TECHNIQUE
+	// Texture used to record velocity values into buffer
+	velocityTexture->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R8G8_UINT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
+	velocityTexture->srv = CreateSimpleShaderResourceView(mpDevice.Get(), velocityTexture->texture, DXGI_FORMAT_R8G8_UINT);
+	velocityTexture->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), velocityTexture->texture, DXGI_FORMAT_R8G8_UINT);
+
+
 
 	std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);
 	std::default_random_engine generator;
@@ -1207,17 +1185,6 @@ bool Renderer::DestroyDirectX()
 }
 
 
-bool Renderer::InitializeViewportAndMatrices()
-{
-	mViewport.Width = (float)GraphicsSettings::gCurrentScreenWidth;
-	mViewport.Height = (float)GraphicsSettings::gCurrentScreenHeight;
-	mViewport.MinDepth = 0.0f;
-	mViewport.MaxDepth = 1.0f;
-	mViewport.TopLeftX = 0.0f;
-	mViewport.TopLeftY = 0.0f;
-
-	return true;
-}
 
 
 bool Renderer::InitializeDirectX()
@@ -1250,12 +1217,6 @@ bool Renderer::InitializeDirectX()
 	}
 	LOG(INFO) << "Successfully initialized resources";
 
-	
-	if (!InitializeViewportAndMatrices())
-	{
-		LOG(INFO) << "Failed to create viewport";
-		return false;
-	}
 
 	LOG(INFO) << "Successfully initialized DirectX!";
 

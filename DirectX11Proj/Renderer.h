@@ -10,12 +10,13 @@
 #include "WindowsAndDXIncludes.h"
 #include "d3dShaderManager.h"
 #include "d3dConstantBuffer.h"
-#include "d3dLightClass.h"
 
 #include "IScene.h"
 #include "d3d11HelperFile.h"
 #include "GenericMathValueStructs.h"
 #include "GPUProfiler.h"
+
+#include "d3d11HelperFile.h"
 
 
 class Renderer
@@ -27,7 +28,7 @@ public:
 	void Initialize(HWND aHwnd);
 
 	 
-	void RenderScene(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera, IObject* const aSkybox);
+	void RenderScene(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, LightData* const aDirectionalLight, CameraData apCamera, IObject* const aSkybox, const FrameData* const data);
 	//void Destroy();
 
 	//void OnResize();
@@ -49,13 +50,12 @@ private:
 	bool InitializeDeviceAndContext();
 	bool InitializeSwapchain();
 	bool InitializeResources();
-	bool InitializeViewportAndMatrices();
 
 	void BindStandardConstantBuffers();
 
 	void UpdateObjectConstantBuffers(IObject* const aObject);
-	void UpdateShadowLightConstantBuffers(d3dLightClass* const aDirectionalLight);
-	void UpdateFrameConstantBuffers(std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
+	void UpdateShadowLightConstantBuffers(LightData* const aDirectionalLight);
+	void UpdateFrameConstantBuffers(std::vector<std::unique_ptr<Light>>& aLights, LightData* const aDirectionalLight, CameraData apCamera);
 	void UpdateGenericConstantBuffer(float aScreenWidth, float aScreenHeight, float nearPlaneDistance, float farPlaneDistance);
 
 
@@ -69,11 +69,13 @@ private:
 
 	void RenderFullScreenQuad();
 	
-	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera, IObject* const aSkybox);
-	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera, IObject* const aSkyboxObject);
+	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, LightData* const aDirectionalLight, CameraData const apCamera, IObject* const aSkybox);
+	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, LightData* const aDirectionalLight, CameraData const apCamera, IObject* const aSkyboxObject);
 
 
 	void RenderSceneVelocityPass(std::vector<IObject*>& aObjects);
+	void RenderSceneVelocityPassReconstruction(std::vector<IObject*>& aObjects);
+
 	void RenderSceneSSAOPass();
 	void RenderBlurPass();
 	void RenderSceneGBufferFill(std::vector<IObject*>& aObjects);
@@ -83,8 +85,8 @@ private:
 	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
 	void RenderSceneWithShadows(std::vector<IObject*>& aObjects,
 		std::vector<std::unique_ptr<Light>>& aLights,
-		d3dLightClass* const aDirectionalLight,
-		Camera* const apCamera);
+		LightData* const aDirectionalLight,
+		CameraData apCamera);
 	
 	
 	void RenderBuffers(ID3D11DeviceContext* const apDeviceContext, Model* const aModel);
@@ -149,6 +151,12 @@ private:
 	std::unique_ptr<Texture> randomValueTexture;
 
 	std::unique_ptr<Texture> velocityTexture;
+
+	
+	std::unique_ptr<Texture> reconstruction_VelocityBuffer;
+	std::unique_ptr<Texture> reconstruction_TileMaxBuffer;
+	std::unique_ptr<Texture> reconstruction_neighborMax;
+
 
 
 	std::unique_ptr<ShadowMap> shadowMap01;

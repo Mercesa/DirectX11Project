@@ -84,6 +84,10 @@ cbuffer GenericAttributesBuffer : register(b6)
 	float screenHeight;			// 8 bytes
 	float nearPlaneDistance;	// 12 bytes
 	float farPlaneDistance;		// 16 bytes	
+	
+	float totalApplicationTime; // 20 bytes
+	float deltaTime;			// 24 bytes
+	float framerate;			// 28 bytes
 }
 
 float3 NormalSampleToWorldSpace(float3 normalMapSample, float3 unitNormalW, float3 tangentW)

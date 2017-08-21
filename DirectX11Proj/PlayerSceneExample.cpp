@@ -72,8 +72,13 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 
 	mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(mpCamera->GetPosition3f().x, mpCamera->GetPosition3f().y, mpCamera->GetPosition3f().z)));
 	//mpSkyboxSphere->mWorldMatrix = glm::transpose(glm::scale(glm::mat4(1), glm::vec3(5.0f)));
+
+	// Update camera frustum planes
+	mpCamera->UpdateFrustumPlanes();
+
 }
 
+#include "MathHelper.h"
 void PlayerSceneExample::Init()
 {
 	mpCamera->SetPosition(0.0f, 2.0f, -1.0f);
@@ -143,12 +148,25 @@ void PlayerSceneExample::Init()
 	////
 	//this->mLights.push_back(std::move(tpLight));
 
-	mDirectionalLight = std::make_unique<d3dLightClass>();
-	mDirectionalLight->SetPosition(1.6f, 2.6f, 0.00f);
-	mDirectionalLight->GenerateProjectionMatrix(-32.0f, -32.0f);
 
-	mDirectionalLight->mDiffuseColor = XMFLOAT3(1.0f, 1.0f, 1.0f);
-	mDirectionalLight->GenerateViewMatrix();
+	mDirectionalLight = std::make_unique<LightData>();
+	mDirectionalLight->diffuseCol = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	mDirectionalLight->position = glm::vec3(1.6, 2.6f, 0.0f);
+	
+	mDirectionalLight->dirVector.x = 0.0f;
+	mDirectionalLight->dirVector.y = 0.0f;
+	mDirectionalLight->dirVector.z = 0.0f;
+
+	XMMATRIX ProjMatrix = XMMatrixOrthographicLH(50.0f, 50.0f, -50.0f, 50.0f);
+
+	
+	MathHelper::GenerateViewMatrixBasedOnDir(mDirectionalLight->position, mDirectionalLight->view, mDirectionalLight->dirVector);
+	memcpy(&mDirectionalLight->proj[0], &ProjMatrix.r[0], sizeof(glm::mat4));
+
+
+
+
 	//throw std::logic_error("The method or operation is not implemented.");
 }
 

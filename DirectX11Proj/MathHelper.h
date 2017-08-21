@@ -10,6 +10,11 @@
 #include <DirectXMath.h>
 #include <cstdint>
 
+
+#include "glm/common.hpp"
+#include "glm/gtx/common.hpp"
+
+using namespace DirectX;
 class MathHelper
 {
 public:
@@ -88,6 +93,27 @@ public:
 
         return I;
     }
+
+
+
+	static void GenerateViewMatrixBasedOnDir(glm::vec3 aDirection, glm::mat4& aOutViewVec, glm::vec3& outDirVec)
+	{
+		// direction matrix
+		XMMATRIX directionMatrix = XMMatrixRotationRollPitchYaw(aDirection.x, aDirection.y, aDirection.z);
+
+		// Direction vector
+		XMFLOAT3 dir = XMFLOAT3(0.0f, 0.0f, 1.0f);
+		XMVECTOR dirVec = XMLoadFloat3(&dir);
+		dirVec = XMVector3Transform(dirVec, directionMatrix);
+		
+		XMStoreFloat3(&dir, dirVec);
+		outDirVec = glm::vec3(dir.x, dir.y, dir.z);
+
+		memcpy(&aOutViewVec, &directionMatrix, sizeof(glm::mat4));
+
+		return;
+	}
+
 
     static DirectX::XMVECTOR RandUnitVec3();
     static DirectX::XMVECTOR RandHemisphereUnitVec3(DirectX::XMVECTOR n);
