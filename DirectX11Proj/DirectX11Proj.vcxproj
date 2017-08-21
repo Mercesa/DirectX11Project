@@ -76,7 +76,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\Assimp;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\Assimp;E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\glm;$(IncludePath)</IncludePath>
     <LibraryPath>E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\Assimp\x64-Debug;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -86,7 +86,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\Assimp;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\Assimp;E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\glm;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;E:\Github Projects\DirectX11Project\DirectX11Proj\Libs\Assimp\x64-Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -164,6 +164,8 @@
     <ClCompile Include="d3dConstantBuffer.cpp" />
     <ClCompile Include="d3dShaderManager.cpp" />
     <ClCompile Include="EngineTimer.cpp" />
+    <ClCompile Include="FrustumG.cpp" />
+    <ClCompile Include="GPUProfiler.cpp" />
     <ClCompile Include="GraphicsSettings.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="ImguiImplementation.cpp" />
@@ -172,10 +174,10 @@
     <ClCompile Include="inputclass.cpp" />
     <ClCompile Include="IObject.cpp" />
     <ClCompile Include="IScene.cpp" />
-    <ClCompile Include="d3dLightClass.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MathHelper.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
+    <ClCompile Include="Plane.cpp" />
     <ClCompile Include="PlayerSceneExample.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -188,7 +190,9 @@
     <ClInclude Include="d3dShaderManager.h" />
     <ClInclude Include="easylogging++.h" />
     <ClInclude Include="EngineTimer.h" />
+    <ClInclude Include="FrustumG.h" />
     <ClInclude Include="GenericMathValueStructs.h" />
+    <ClInclude Include="GPUProfiler.h" />
     <ClInclude Include="GraphicsSettings.h" />
     <ClInclude Include="GraphicsStructures.h" />
     <ClInclude Include="imconfig.h" />
@@ -198,9 +202,9 @@
     <ClInclude Include="inputclass.h" />
     <ClInclude Include="IObject.h" />
     <ClInclude Include="IScene.h" />
-    <ClInclude Include="d3dLightClass.h" />
     <ClInclude Include="MathHelper.h" />
     <ClInclude Include="ModelLoader.h" />
+    <ClInclude Include="Plane.h" />
     <ClInclude Include="PlayerSceneExample.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ResourceManager.h" />
@@ -236,9 +240,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Shaders\PS_depth.hlsl">
-      <FileType>Document</FileType>
-    </None>
     <None Include="Shaders\VS_depth.hlsl">
       <FileType>Document</FileType>
     </None>
@@ -285,6 +286,27 @@
       <FileType>Document</FileType>
     </None>
     <None Include="Shaders\VS_Blur.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\PS_Skybox.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shaders\VS_Skybox.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\VS_DeferredLightingVolumes.hlsl">
+      <FileType>Document</FileType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\PS_VelocityBuffer.hlsl">
+      <FileType>Document</FileType>
+    </None>
+    <None Include="Shaders\VS_VelocityBuffer.hlsl">
       <FileType>Document</FileType>
     </None>
   </ItemGroup>

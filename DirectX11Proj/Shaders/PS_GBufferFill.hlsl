@@ -39,7 +39,7 @@ PS_OUT GbufferFillPixelShader(PixelInputType input) : SV_Target
 	
 	else
 	{
-		o.albedo = float4(1.0f, 0.0f, 1.0f, 1.0f);
+		o.albedo = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 	if (hasNormal)

@@ -26,7 +26,8 @@ INITIALIZE_EASYLOGGINGPP
 #include "Renderer.h"
 #include "ImguiImplementation.h"
 #include "ResourceManager.h"
-
+#include "GPUProfiler.h"
+#include "EngineTimer.h"
 HWND windowHandle;
 
 class WindowsProcessClass
@@ -40,8 +41,6 @@ private:
 
 };
 
-
-
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 static WindowsProcessClass* ApplicationHandle = 0;
 
@@ -49,6 +48,14 @@ static WindowsProcessClass* ApplicationHandle = 0;
 std::unique_ptr<InputClass> mpInput;
 std::unique_ptr<PlayerSceneExample> mpPlayerScene;
 std::unique_ptr<Renderer> mpRenderer;
+std::unique_ptr<GPUProfiler> mpGPUProfiler;
+std::unique_ptr<FrameData> gFrameData;
+std::unique_ptr<EngineTimer> gTimer;
+WNDCLASSEX wc;
+DEVMODE dmScreenSettings;
+int posX, posY;
+LPCWSTR applicationName;
+HINSTANCE m_hinstance;
 
 LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
@@ -61,8 +68,8 @@ LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARA
 		int yPos = GET_Y_LPARAM(lparam);
 
 		mpInput->MouseMove(xPos, yPos);
-
 		return 0;
+		break;
 	}
 
 	case WM_RBUTTONDOWN:
@@ -75,14 +82,13 @@ LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARA
 		return 0;
 		break;
 
-
-
 	// Check if a key has been pressed on the keyboard.
 	case WM_KEYDOWN:
 	{
 		// If a key is pressed send it to the input object so it can record that state.
 		mpInput->KeyDown((unsigned int)wparam);
 		return 0;
+		break;
 	}
 
 	// Check if a key has been released on the keyboard.
@@ -90,6 +96,7 @@ LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARA
 	{
 		// If a key is released then send it to the input object so it can unset the state for that key.
 		mpInput->KeyUp((unsigned int)wparam);
+		break;
 		return 0;
 	}
 
@@ -107,7 +114,7 @@ LRESULT CALLBACK WindowsProcessClass::MessageHandler(HWND hwnd, UINT umsg, WPARA
 extern LRESULT ImGui_ImplDX11_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 {
-	if (GraphicsSettings::gShowDebugWindow)
+	if (GraphicsSettings::gShowDebugMenuBar)
 	{
 		ImGui_ImplDX11_WndProcHandler(hwnd, umessage, wparam, lparam);
 		return true;
@@ -130,7 +137,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 			return 0;
 		}
 
-
 		// All other messages pass to the message handler in the system class.
 		default:
 		{
@@ -139,109 +145,29 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 	}
 }
 
-bool showTWindow = true;
-#include <chrono>
-static void ShowExampleMenuFile()
+
+void DestroyWindowWindows(HINSTANCE aHinstance, LPCWSTR aApplicationName)
 {
-	ImGui::MenuItem("(dummy menu)", NULL, false, false);
-	if (ImGui::MenuItem("New")) {}
-	if (ImGui::MenuItem("Open", "Ctrl+O")) {}
-	if (ImGui::BeginMenu("Open Recent"))
+	DestroyWindow(windowHandle);
+	windowHandle = NULL;
+
+	if (GraphicsSettings::gIsApplicationFullScreen)
 	{
-		ImGui::MenuItem("fish_hat.c");
-		ImGui::MenuItem("fish_hat.inl");
-		ImGui::MenuItem("fish_hat.h");
-		if (ImGui::BeginMenu("More.."))
-		{
-			ImGui::MenuItem("Hello");
-			ImGui::MenuItem("Sailor");
-			if (ImGui::BeginMenu("Recurse.."))
-			{
-				ShowExampleMenuFile();
-				ImGui::EndMenu();
-			}
-			ImGui::EndMenu();
-		}
-		ImGui::EndMenu();
+		ChangeDisplaySettings(NULL, 0);
 	}
-	if (ImGui::MenuItem("Save", "Ctrl+S")) {}
-	if (ImGui::MenuItem("Save As..")) {}
-	ImGui::Separator();
-	if (ImGui::BeginMenu("Options"))
-	{
-		static bool enabled = true;
-		ImGui::MenuItem("Enabled", "", &enabled);
-		ImGui::BeginChild("child", ImVec2(0, 60), true);
-		for (int i = 0; i < 10; i++)
-			ImGui::Text("Scrolling Text %d", i);
-		ImGui::EndChild();
-		static float f = 0.5f;
-		static int n = 0;
-		ImGui::SliderFloat("Value", &f, 0.0f, 1.0f);
-		ImGui::InputFloat("Input", &f, 0.1f);
-		ImGui::Combo("Combo", &n, "Yes\0No\0Maybe\0\0");
-		ImGui::EndMenu();
-	}
-	if (ImGui::BeginMenu("Colors"))
-	{
-		for (int i = 0; i < ImGuiCol_COUNT; i++)
-			ImGui::MenuItem(ImGui::GetStyleColName((ImGuiCol)i));
-		ImGui::EndMenu();
-	}
-	if (ImGui::BeginMenu("Disabled", false)) // Disabled
-	{
-		IM_ASSERT(0);
-	}
-	if (ImGui::MenuItem("Checked", NULL, true)) {}
-	if (ImGui::MenuItem("Quit", "Alt+F4")) {
-		GraphicsSettings::gShowDebugWindow = false;
-	}
+
+	// Remove the application instance.
+	UnregisterClass(aApplicationName, aHinstance);
+	m_hinstance = NULL;
+
+	// Release the pointer to this class.
+	ApplicationHandle = NULL;
 }
 
-void ShowTitleMenu()
+void CreateWindowWindows(WindowsProcessClass* aWindowProcessClass)
 {
-	if (ImGui::BeginMainMenuBar())
-	{
-		if (ImGui::BeginMenu("Menu"))
-		{
-			ShowExampleMenuFile();
-			ImGui::EndMenu();
-		}
-
-		ImGui::EndMainMenuBar();
-	}
-}
-
-void Render();
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
-{
-	std::unique_ptr<WindowsProcessClass> mWProc = std::make_unique<WindowsProcessClass>();
-	mpInput = std::make_unique<InputClass>();
-	mpInput->Initialize();
-
-
-	mpRenderer = std::make_unique<Renderer>();
-	
-	// This is for the console window
-	AllocConsole();
-	freopen("conin$", "r", stdin);
-	freopen("conout$", "w", stdout);
-	freopen("conout$", "w", stderr);
-
-	// Also define a debug flag here, just for now. Its all right, dont worry about it. shhhhh
-#if defined(DEBUG) | defined(_DEBUG)
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-#endif
-
-
-	WNDCLASSEX wc;
-	DEVMODE dmScreenSettings;
-	int posX, posY;
-	LPCWSTR applicationName;
-	HINSTANCE m_hinstance;
-
 	// Get an external pointer to this object.	
-	ApplicationHandle = mWProc.get();
+	ApplicationHandle = aWindowProcessClass;
 
 	// Get the instance of this application.
 	m_hinstance = GetModuleHandle(NULL);
@@ -295,14 +221,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	}
 	else
 	{
-	
+
 		// Place the window in the middle of the screen.
 		posX = (GetSystemMetrics(SM_CXSCREEN) - GraphicsSettings::gCurrentScreenWidth) / 2;
 		posY = (GetSystemMetrics(SM_CYSCREEN) - GraphicsSettings::gCurrentScreenHeight) / 2;
 		// Create the window with the screen settings and get the handle to it.
 		windowHandle = CreateWindowEx(WS_EX_APPWINDOW, applicationName, applicationName,
-		WS_OVERLAPPEDWINDOW,
-		posX, posY, GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, NULL, NULL, m_hinstance, NULL);
+			WS_OVERLAPPEDWINDOW,
+			posX, posY, GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, NULL, NULL, m_hinstance, NULL);
 	}
 
 	// Bring the window up on the screen and set it as main focus.
@@ -310,29 +236,65 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	SetForegroundWindow(windowHandle);
 	SetFocus(windowHandle);
 	SetCapture(windowHandle);
-	
+
 	// Hide the mouse cursor.
 	ShowCursor(true);
+}
 
+void Render();
+
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
+{
+	std::unique_ptr<WindowsProcessClass> mWProc = std::make_unique<WindowsProcessClass>();
+	mpInput = std::make_unique<InputClass>();
+	mpInput->Initialize();
+
+
+	mpRenderer = std::make_unique<Renderer>();
+	
+	// This is for the console window
+	AllocConsole();
+	freopen("conin$", "r", stdin);
+	freopen("conout$", "w", stdout);
+	freopen("conout$", "w", stderr);
+
+	// Also define a debug flag here, just for now. Its all right, dont worry about it. shhhhh
+#if defined(DEBUG) | defined(_DEBUG)
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
+
+	CreateWindowWindows(mWProc.get());
 
 	mpRenderer->Initialize(windowHandle);
 	ImGui_ImplDX11_Init(windowHandle, mpRenderer->mpDevice.Get(), mpRenderer->mpDeviceContext.Get());
 
-	//unsigned char* pixels;
-	//int width, height;
-	//ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&pixels, &width, &height);
 	mpPlayerScene = std::make_unique<PlayerSceneExample>();
 	mpPlayerScene->Init();
+	
+	mpGPUProfiler = std::make_unique<GPUProfiler>();
+	gTimer = std::make_unique<EngineTimer>();
+
+	mpGPUProfiler->Initialize(mpRenderer->mpDevice.Get());
+	mpRenderer->tProfiler = mpGPUProfiler.get();
+	mpRenderer->tProfiler->recordStatsToFile = true;
+
+
+	gFrameData = std::make_unique<FrameData>();
+
 
 	MSG msg;
 	bool done = false;
+
+	gTimer->Start();
 	while (!done)
 	{
+		gTimer->Update();
 		ImGui_ImplDX11_NewFrame();
 		mpInput->Frame();
 
 		// Handle the windows messages.
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		while(PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -351,81 +313,165 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 
 		if (mpInput->IsKeyDown(VK_F5))
 		{
-			GraphicsSettings::gShowDebugWindow = !GraphicsSettings::gShowDebugWindow;
+			GraphicsSettings::gShowDebugMenuBar = true;
 		}
-		mpPlayerScene->Tick(mpInput.get(), 1.0f);
+		mpPlayerScene->Tick(mpInput.get(), gTimer->GetDeltaTime());
 		Render();
 
 	}
 
 	ResourceManager::GetInstance().Shutdown();
 	ImGui_ImplDX11_Shutdown();
+
+
+	DestroyWindowWindows(hInstance, applicationName);
+
+	mpGPUProfiler->Shutdown();
 	mpRenderer->DestroyDirectX();
 
-	DestroyWindow(windowHandle);
-	windowHandle = NULL;
-	
-	if (GraphicsSettings::gIsApplicationFullScreen)
-	{
-		ChangeDisplaySettings(NULL, 0);
-	}
-
-	// Remove the application instance.
-	UnregisterClass(applicationName, m_hinstance);
-	m_hinstance = NULL;
-	
-	// Release the pointer to this class.
-	ApplicationHandle = NULL;
 
 	return 0;
+}
+#include "imgui_internal.h"
+ 
+static bool drawStatisticsMenuVar = false;
+static bool drawLightMenuVar = false;
+
+static void DrawStatisticsMenu()
+{
+	if (!ImGui::Begin("Statistics", &drawStatisticsMenuVar))
+	{
+		ImGui::End();
+		return;
+	}
+	
+	ImGui::MenuItem("Profile GPU", NULL, &GraphicsSettings::gCollectProfileData);
+
+
+	ImGui::End();
+}
+
+static void DrawLightMenu()
+{
+	if (!ImGui::Begin("Lights", &drawLightMenuVar))
+	{
+		ImGui::End();
+		return;
+	}
+
+	for (int i = 0; i < mpPlayerScene->mLights.size(); ++i)
+	{
+		ImGui::ColorEdit3("color point light", (float*)&mpPlayerScene->mLights[i]->diffuseColor);
+
+		ImGui::ColorEditMode(ImGuiColorEditMode_UserSelect);
+		static float pos[3] = { 0.0, 0.0, 0.0 };
+		ImGui::ColorEdit3("position point light", (float*)&pos);
+		mpPlayerScene->mLights[i]->position = glm::vec3(pos[0], pos[1], pos[2]);
+	}
+	float arr[3] = { 0.01f, 0.01f, 0.01f };
+	ImGui::ColorEditMode(ImGuiColorEditMode_RGB);
+	ImGui::ColorEdit3("color directional light", (float*)&mpPlayerScene->mDirectionalLight->diffuseCol);
+	//ImGui::ColorEdit3("position directional light", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
+	//ImGui::InputFloat3("PITCH   YAW    ROLL", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
+	
+	glm::vec3 prevPos = mpPlayerScene->mDirectionalLight->position;
+	ImGui::DragFloat3("Pitch Yaw Roll", (float*)&mpPlayerScene->mDirectionalLight->position, 0.1f, 0.0f, 0.0f, "%.3f", 1.0f);
+	
+	if (prevPos != mpPlayerScene->mDirectionalLight->position)
+	{
+		MathHelper::GenerateViewMatrixBasedOnDir(mpPlayerScene->mDirectionalLight->position, mpPlayerScene->mDirectionalLight->view, mpPlayerScene->mDirectionalLight->dirVector);
+	}
+	
+	//mpPlayerScene->mDirectionalLight->GenerateViewMatrix();
+
+	ImGui::End();
+}
+
+static void ShowExampleMenuFile()
+{
+	if (ImGui::MenuItem("Statistics"))
+	{
+		drawStatisticsMenuVar = !drawStatisticsMenuVar;
+	}
+	
+	if (ImGui::MenuItem("Lights"))
+	{
+		drawLightMenuVar = !drawLightMenuVar;
+	}
+
+	if (ImGui::MenuItem("Quit", "Alt+F4")) {
+		GraphicsSettings::gShowDebugMenuBar = false;
+	}
+}
+
+void ShowTitleMenu()
+{
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("Menu"))
+		{
+			ShowExampleMenuFile();
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMainMenuBar();
+	}
+}
+
+// Function to manage the menu drawing
+void DrawMenu()
+{
+
+	if (GraphicsSettings::gShowDebugMenuBar)
+	{
+		ShowTitleMenu();
+	}
+
+	if (drawStatisticsMenuVar)
+	{
+		DrawStatisticsMenu();
+	}
+
+	if (drawLightMenuVar)
+	{
+		DrawLightMenu();
+	}
 }
 
 
 void Render()
 {
-	auto frameConstantBufferTimerStart = std::chrono::high_resolution_clock::now();
-
-	bool hasBeenSelected = false;
-	if (GraphicsSettings::gShowDebugWindow)
+	if (GraphicsSettings::gCollectProfileData)
 	{
-		ShowTitleMenu();
-		
-		
-		static float f = 0.0f;
-		
-		ImGui::Text("Hello, world!");
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-		
-		for (int i = 0; i < mpPlayerScene->mLights.size(); ++i)
-		{
-			ImGui::ColorEdit3("color point light", (float*)&mpPlayerScene->mLights[i]->diffuseColor);
-		
-			ImGui::ColorEditMode(ImGuiColorEditMode_UserSelect);
-			static float pos[3] = { 0.0, 0.0, 0.0 };
-			ImGui::ColorEdit3("position point light", (float*)&pos);
-			mpPlayerScene->mLights[i]->position = XMFLOAT3(pos);
-		}
-		float arr[3] = { 0.01f, 0.01f, 0.01f };
-		ImGui::ColorEditMode(ImGuiColorEditMode_RGB);
-		ImGui::ColorEdit3("color directional light", (float*)&mpPlayerScene->mDirectionalLight->mDiffuseColor);
-		//ImGui::ColorEdit3("position directional light", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
-		//ImGui::InputFloat3("PITCH   YAW    ROLL", (float*)&mpPlayerScene->mDirectionalLight->mPosition);
-		ImGui::DragFloat3("Pitch Yaw Roll", (float*)&mpPlayerScene->mDirectionalLight->mPosition, 0.1f, 0.0f, 0.0f, "%.3f", 1.0f);
-
-		mpPlayerScene->mDirectionalLight->GenerateViewMatrix();
-
-
-		//ImGui::SetNextWindowPos(ImVec2(0, 0), ImGuiSetCond_FirstUseEver);     // Normally user code doesn't need/want to call it because positions are saved in .ini file anyway. Here we just want to make the demo initial state a bit more friendly!
-		//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		mpGPUProfiler->BeginFrame(mpRenderer->mpDeviceContext.Get());
 	}
 
-	mpRenderer->RenderScene(mpPlayerScene->mObjects, mpPlayerScene->mLights, mpPlayerScene->mDirectionalLight.get(), mpPlayerScene->GetCamera());
-	auto frameConstantBufferTimerEnd = std::chrono::high_resolution_clock::now();
+	// Draw menu
+	DrawMenu();
 
-	float performance = std::chrono::duration_cast<std::chrono::microseconds>(frameConstantBufferTimerEnd - frameConstantBufferTimerStart).count() / 1000.0f;
+	bool hasBeenSelected = false;
 
+	CameraData camDat;
+	camDat.aspect = mpPlayerScene->GetCamera()->GetAspect();
+	camDat.farZ = mpPlayerScene->GetCamera()->GetFarZ();
+	camDat.nearZ = mpPlayerScene->GetCamera()->GetNearZ();
+	camDat.frustumPtr = mpPlayerScene->GetCamera()->GetFrustum();
+	camDat.position.x = mpPlayerScene->GetCamera()->GetPosition3f().x;
+	camDat.position.y = mpPlayerScene->GetCamera()->GetPosition3f().y;
+	camDat.position.z = mpPlayerScene->GetCamera()->GetPosition3f().z;
+	
+	camDat.farZ = mpPlayerScene->GetCamera()->GetFarZ();
 
-	ImGui::Text("Rendering total: %.3f ms/frame", performance);
+	memcpy(&camDat.view[0], &mpPlayerScene->GetCamera()->GetView().r[0], sizeof(glm::mat4));
+	memcpy(&camDat.proj[0], &mpPlayerScene->GetCamera()->GetProj().r[0], sizeof(glm::mat4));
+
+	mpRenderer->RenderScene(
+		mpPlayerScene->mObjects, 
+		mpPlayerScene->mLights, 
+		mpPlayerScene->mDirectionalLight.get(), 
+		camDat, mpPlayerScene->GetSkyboxSphere(), 
+		gFrameData.get());
+
 
 	ImGui::Render();
 
@@ -433,4 +479,10 @@ void Render()
 
 	mpRenderer->mpSwapchain->Present((GraphicsSettings::gIsVsyncEnabled ? 1 : 0), 0);
 
+	if (GraphicsSettings::gCollectProfileData)
+	{
+		mpGPUProfiler->EndFrame(mpRenderer->mpDeviceContext.Get());
+		mpGPUProfiler->CollectData(mpRenderer->mpDeviceContext.Get());
+
+	}
 }

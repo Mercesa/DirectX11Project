@@ -1,6 +1,11 @@
 #pragma once
 
 #include "d3d11HelperFile.h"
+
+#include <glm\gtx\common.hpp>
+#include <glm\gtc\matrix_transform.hpp>
+#include <glm\common.hpp>
+
 class IObject
 {
 public:
@@ -16,13 +21,20 @@ public:
 	bool GetHasBeenInitialized() { return mHasBeenInitialized; }
 
 
+	glm::mat4x4 mWorldMatrix;
+	glm::mat4x4 mPrevWorldMatrix;
+	glm::vec4 mSpherePosition;
+
 	ModelID mpModel;
-	XMFLOAT4X4 mWorldMatrix;
+	Material* mpMaterial;
+
+	
+
+	bool mCastShadow = true;
 
 protected:
 	// premature initialization just so I dont forget in general
 	bool mIsActive = false;
-	bool mCastShadow = false;
 	bool mHasBeenInitialized = false;
 		
 };

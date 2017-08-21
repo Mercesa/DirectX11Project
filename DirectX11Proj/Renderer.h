@@ -5,20 +5,19 @@
 #pragma comment(lib, "d3dx11.lib")
 #pragma comment(lib, "d3dx10.lib")
 #pragma comment(lib, "d3dcompiler.lib")
+#pragma comment(lib, "dxguid.lib")
 
 #include "WindowsAndDXIncludes.h"
-
-
 #include "d3dShaderManager.h"
 #include "d3dConstantBuffer.h"
-#include "d3dLightClass.h"
 
 #include "IScene.h"
 #include "d3d11HelperFile.h"
 #include "GenericMathValueStructs.h"
+#include "GPUProfiler.h"
 
-class d3dRenderTexture;
-class d3dRenderDepthTexture;
+#include "d3d11HelperFile.h"
+
 
 class Renderer
 {
@@ -29,7 +28,7 @@ public:
 	void Initialize(HWND aHwnd);
 
 	 
-	void RenderScene(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
+	void RenderScene(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, LightData* const aDirectionalLight, CameraData apCamera, IObject* const aSkybox, const FrameData* const data);
 	//void Destroy();
 
 	//void OnResize();
@@ -41,9 +40,9 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11Device1> mpDevice1;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext1> mpDeviceContext1;
 
-	float clearColor[3] = { 0.0f, 0.0f, 0.0f };
+	bool DestroyDirectX();
 
-		bool DestroyDirectX();
+	GPUProfiler* tProfiler = nullptr;
 
 private:
 	bool InitializeDirectX();
@@ -51,45 +50,46 @@ private:
 	bool InitializeDeviceAndContext();
 	bool InitializeSwapchain();
 	bool InitializeResources();
-	bool InitializeDepthStencilView();
-	bool InitializeRasterstate();
-	bool InitializeSamplerState();
-	bool InitializeViewportAndMatrices();
 
 	void BindStandardConstantBuffers();
 
 	void UpdateObjectConstantBuffers(IObject* const aObject);
-	void UpdateShadowLightConstantBuffers(d3dLightClass* const aDirectionalLight);
-	void UpdateFrameConstantBuffers(std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
-	
+	void UpdateShadowLightConstantBuffers(LightData* const aDirectionalLight);
+	void UpdateFrameConstantBuffers(std::vector<std::unique_ptr<Light>>& aLights, LightData* const aDirectionalLight, CameraData apCamera);
+	void UpdateGenericConstantBuffer(float aScreenWidth, float aScreenHeight, float nearPlaneDistance, float farPlaneDistance);
+
+
 	void CreateConstantBuffers();
 
 	// Render functions
+
+	void CullObjects(std::vector<std::unique_ptr<IObject>>& aObjectsToCull, const FrustumG* const aCullFrustum);
 	void RenderObject(IObject* const aObject);
 	void RenderMaterial(Material* const aMaterial);
 
 	void RenderFullScreenQuad();
 	
-	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
-	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<std::unique_ptr<Light>>& aLights, d3dLightClass* const aDirectionalLight, Camera* const apCamera);
+	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, LightData* const aDirectionalLight, CameraData const apCamera, IObject* const aSkybox);
+	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, LightData* const aDirectionalLight, CameraData const apCamera, IObject* const aSkyboxObject);
+
+
+	void RenderSceneVelocityPass(std::vector<IObject*>& aObjects);
+	void RenderSceneVelocityPassReconstruction(std::vector<IObject*>& aObjects);
 
 	void RenderSceneSSAOPass();
 	void RenderBlurPass();
-	void RenderSceneGBufferFill(std::vector<std::unique_ptr<IObject>>& aObjects);
-	void RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects);
-
+	void RenderSceneGBufferFill(std::vector<IObject*>& aObjects);
+	void RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aObjects, IObject* const aSkyboxObject);
+	void RenderSceneSkybox(IObject* const aObject);
 
 	void RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aObjects);
-	void RenderSceneWithShadows(std::vector<std::unique_ptr<IObject>>& aObjects,
+	void RenderSceneWithShadows(std::vector<IObject*>& aObjects,
 		std::vector<std::unique_ptr<Light>>& aLights,
-		d3dLightClass* const aDirectionalLight,
-		Camera* const apCamera);
+		LightData* const aDirectionalLight,
+		CameraData apCamera);
 	
 	
 	void RenderBuffers(ID3D11DeviceContext* const apDeviceContext, Model* const aModel);
-
-	const float SCREEN_FAR = 1000.0f;
-	const float SCREEN_NEAR = 2.0f;
 
 	int gVideoCardMemoryAmount;
 	char gVideoCardDescription[128];
@@ -99,9 +99,7 @@ private:
 	HWND windowHandle;
 
 	D3D11_VIEWPORT mViewport;
-	D3D11_VIEWPORT mShadowLightViewport;
 
-	
 	// IDXGI stuff
 	Microsoft::WRL::ComPtr<IDXGIFactory> mFactory;
 	Microsoft::WRL::ComPtr<IDXGIAdapter> mAdapter;
@@ -110,7 +108,12 @@ private:
 	ID3D11DepthStencilState* mpDepthStencilState;
 	ID3D11RasterizerState* mRaster_backcull;
 	
-	//Microsoft::WRL::ComPtr<ID3D11RasterizerState> mRaster_frontcull; not used yet
+	ID3D11RasterizerState* mRaster_cullNone;
+
+	ID3D11RasterizerState* mRaster_noCull;
+	ID3D11DepthStencilState* mDepthStencilStateLessEqual;
+
+	ID3D11DepthStencilState* mDepthStencilDeferred;
 
 	// Samplers
 	ID3D11SamplerState* mpAnisotropicWrapSampler;
@@ -127,13 +130,12 @@ private:
 	std::unique_ptr<d3dConstantBuffer> mpLightMatrixCB;
 	std::unique_ptr<d3dConstantBuffer> mpPerObjectCB;
 	std::unique_ptr<d3dConstantBuffer> mpBlurCB;
+	std::unique_ptr<d3dConstantBuffer> mpGenericAttributesBufferCB;
 
 	// Shader manager
 	std::unique_ptr<d3dShaderManager> mpShaderManager;
 
 	std::unique_ptr<Texture> mBackBufferTexture;
-	std::unique_ptr<Texture> mBackBufferDepthTexture;
-	std::unique_ptr<Texture> mShadowDepthBuffer;
 
 	std::unique_ptr<Texture> mAmbientOcclusionTexture;
 	std::unique_ptr<Texture> mAmbientOcclusionBufferTexture;
@@ -147,5 +149,18 @@ private:
 	std::unique_ptr<Texture> gBuffer_specularBuffer;
 	std::unique_ptr<Texture> gBuffer_depthBuffer;
 	std::unique_ptr<Texture> randomValueTexture;
+
+	std::unique_ptr<Texture> velocityTexture;
+
+	
+	std::unique_ptr<Texture> reconstruction_VelocityBuffer;
+	std::unique_ptr<Texture> reconstruction_TileMaxBuffer;
+	std::unique_ptr<Texture> reconstruction_neighborMax;
+
+
+
+	std::unique_ptr<ShadowMap> shadowMap01;
+
+	uint32_t sphereID;
 };
 

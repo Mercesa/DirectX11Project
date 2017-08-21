@@ -17,9 +17,6 @@
     <Filter Include="Libs">
       <UniqueIdentifier>{b5c942b3-b9a3-4ea9-91e2-dfe1d138626c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="D3DSetup\D3DShaderTypes">
-      <UniqueIdentifier>{e810992e-765c-44da-9774-6b792bf4a10f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Utility">
       <UniqueIdentifier>{1578abde-7f40-4936-90cb-27fbb939e80a}</UniqueIdentifier>
     </Filter>
@@ -38,9 +35,6 @@
       <Filter>NonFramework</Filter>
     </ClCompile>
     <ClCompile Include="d3dShaderManager.cpp">
-      <Filter>D3DSetup</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dLightClass.cpp">
       <Filter>D3DSetup</Filter>
     </ClCompile>
     <ClCompile Include="inputclass.cpp">
@@ -88,6 +82,15 @@
     <ClCompile Include="Camera.cpp">
       <Filter>NonFramework</Filter>
     </ClCompile>
+    <ClCompile Include="FrustumG.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Plane.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="GPUProfiler.cpp">
+      <Filter>Utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PlayerSceneExample.h">
@@ -100,12 +103,6 @@
       <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="d3dShaderManager.h">
-      <Filter>D3DSetup</Filter>
-    </ClInclude>
-    <ClInclude Include="ShaderHelperFunctions.h">
-      <Filter>D3DSetup\D3DShaderTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="d3dLightClass.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
     <ClInclude Include="inputclass.h">
@@ -174,6 +171,18 @@
     <ClInclude Include="GenericMathValueStructs.h">
       <Filter>D3DSetup</Filter>
     </ClInclude>
+    <ClInclude Include="FrustumG.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Plane.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderHelperFunctions.h">
+      <Filter>D3DSetup</Filter>
+    </ClInclude>
+    <ClInclude Include="GPUProfiler.h">
+      <Filter>Utility</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\VS_texture.hlsl">
@@ -195,9 +204,6 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\PS_shadow.hlsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="Shaders\PS_depth.hlsl">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\VS_depth.hlsl">
@@ -234,6 +240,21 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\VS_SSAO.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PS_Skybox.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\VS_Skybox.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\VS_DeferredLightingVolumes.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PS_VelocityBuffer.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\VS_VelocityBuffer.hlsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

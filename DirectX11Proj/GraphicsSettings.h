@@ -8,8 +8,8 @@ struct GraphicsSettings
 	static bool gIsApplicationFullScreen;
 	static bool gIsVsyncEnabled;
 
-	static bool gShowDebugWindow;
-
+	static bool gShowDebugMenuBar;
+	static bool gCollectProfileData;
 private:
 	GraphicsSettings();
 	~GraphicsSettings();

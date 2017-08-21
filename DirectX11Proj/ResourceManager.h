@@ -32,31 +32,30 @@ public:
 		return instance;
 	}
 
-	std::vector<ModelID> LoadModels(std::string aFilePath);
+	std::vector<ModelID> LoadModels(std::string aFilePath, bool aGenerateAABB);
 
 	ID3D11Device* mpDevice;
 
 	Model* const GetModelByID(const ModelID& aID) const;
 	Texture* const GetTextureByID(const TexID& aID) const;
 
+	Material* LoadTexturesFromMaterial(const RawMeshData& aMeshData);
+	Material* LoadCubeMapTexturesFromMaterial(const RawMeshData& aMeshData);
+
 private:
 	ResourceManager();
 	
-
-	// Turn these into maps at one point
-	//std::vector<std::unique_ptr<Model>> mLoadedModels;
-
+	// Models and corresponding vector with data
 	std::unordered_map<std::string, std::vector<ModelID>> stringModelMap;
 	std::vector<Model*> modelData;
 
+	// Textures and corresponding vector with data
 	std::unordered_map<std::string, TexID> stringTextureMap;
 	std::vector<Texture*> mLoadedTextures;
 
+	std::vector<Material*> mLoadedMaterials;
 
-	Material* LoadTexturesFromMaterial(const RawMeshData& aMeshData);
 	Texture* LoadTexture(RawTextureData aData);
-
-	// Load models as one
-	// Load models as a list
+	Texture* LoadTextureCube(RawTextureData aData);
 };
 

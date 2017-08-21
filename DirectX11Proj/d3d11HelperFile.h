@@ -1,6 +1,7 @@
 #pragma once
 
-
+#include <glm/common.hpp>
+#include <glm/gtx/common.hpp>
 
 #include <windowsx.h>
 #include <wrl.h>
@@ -11,7 +12,7 @@
 
 #include <cassert>
 #include "GraphicsStructures.h"
-
+#include "GenericMathValueStructs.h"
 
 // These ID structs are special due to their explicit constructors
 // This prevents issues such as using a texture ID for loading a model ID
@@ -80,8 +81,6 @@ struct ComputeShader
 	ID3D11ComputeShader* shader;
 };
 
-
-
 struct Material
 {
 	Material() : mpDiffuse(0), mpNormal(0), mpSpecular(0) {}
@@ -90,14 +89,58 @@ struct Material
 	TexID mpNormal = TexID();
 };
 
-
 // A model is nothing more than something with a vertexbuffer and index buffer
 struct Model
 {
 	Buffer* vertexBuffer;
 	Buffer* indexBuffer;
 	Material* material;
+
+	// x y z are for the center of the sphere, the w is for the radius
+	VEC4f sphereCollider;
 };
+
+struct ShadowMap 
+{
+	D3D11_VIEWPORT viewport;
+
+	Texture* resource;
+
+	uint32_t width = 0; 
+	uint32_t height = 0;
+};
+
+#include "FrustumG.h"
+struct CameraData
+{
+	glm::mat4 proj;
+	glm::mat4 view;
+	glm::vec3 position;
+	const FrustumG* frustumPtr;
+	float nearZ, farZ;
+	float fovY;
+	float aspect;
+};
+
+struct LightData
+{
+	glm::mat4 proj;
+	glm::mat4 view;
+	glm::vec3 dirVector;
+
+	glm::vec3 ambientCol;
+	glm::vec3 diffuseCol;
+	glm::vec3 specularCol;
+	glm::vec3 position;
+};
+
+struct FrameData
+{
+	float totalTime;
+	float deltaTime;
+	float framerate;
+};
+
 
 static void ReleaseVertexShader(VertexShader* aVShader)
 {
@@ -113,12 +156,21 @@ static void ReleaseVertexShader(VertexShader* aVShader)
 	}
 }
 
-static void ReleasePixelShader(PixelShader* aVShader)
+static void ReleasePixelShader(PixelShader* aPShader)
 {
-	assert(aVShader != nullptr);
-	if (aVShader->shader != nullptr)
+	assert(aPShader != nullptr);
+	if (aPShader->shader != nullptr)
 	{
-		aVShader->shader->Release();
+		aPShader->shader->Release();
+	}
+}
+
+static void ReleaseComputeShader(ComputeShader* aCShader)
+{
+	assert(aCShader != nullptr);
+	if (aCShader->shader != nullptr)
+	{
+		aCShader->shader->Release();
 	}
 }
 
@@ -172,11 +224,6 @@ static void ReleaseModel(Model* aModel)
 			aModel->indexBuffer->buffer->Release();
 		}
 		delete aModel->indexBuffer;
-	}
-
-	if (aModel->material != nullptr)
-	{
-		delete aModel->material;
 	}
 }
 
@@ -252,7 +299,6 @@ static ID3D11RasterizerState* CreateRSDefault(ID3D11Device* const aDevice)
 	rasterDesc.MultisampleEnable = false;
 	rasterDesc.ScissorEnable = false;
 	rasterDesc.SlopeScaledDepthBias = 0.0f;
-	
 
 	result = aDevice->CreateRasterizerState(&rasterDesc, &tRaster);
 	
@@ -264,6 +310,64 @@ static ID3D11RasterizerState* CreateRSDefault(ID3D11Device* const aDevice)
 
 	return tRaster;
 }
+
+static ID3D11RasterizerState* CreateRSCullNone(ID3D11Device* const aDevice)
+{
+	ID3D11RasterizerState* tRaster = nullptr;
+	D3D11_RASTERIZER_DESC rasterDesc;
+	HRESULT result;
+
+	rasterDesc.AntialiasedLineEnable = false;
+	rasterDesc.CullMode = D3D11_CULL_NONE;
+	rasterDesc.DepthBias = 0;
+	rasterDesc.DepthBiasClamp = 0.0f;
+	rasterDesc.DepthClipEnable = true;
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
+	rasterDesc.FrontCounterClockwise = false;
+	rasterDesc.MultisampleEnable = false;
+	rasterDesc.ScissorEnable = false;
+	rasterDesc.SlopeScaledDepthBias = 0.0f;
+
+	result = aDevice->CreateRasterizerState(&rasterDesc, &tRaster);
+
+	if (FAILED(result))
+	{
+		LOG(INFO) << "CreateDefaultRasterizerState failed";
+		return nullptr;
+	}
+
+	return tRaster;
+}
+
+static ID3D11RasterizerState* CreateRSNoCull(ID3D11Device* const aDevice)
+{
+	ID3D11RasterizerState* tRaster = nullptr;
+	D3D11_RASTERIZER_DESC rasterDesc;
+	HRESULT result;
+
+	rasterDesc.AntialiasedLineEnable = false;
+	rasterDesc.CullMode = D3D11_CULL_NONE;
+	rasterDesc.DepthBias = 0;
+	rasterDesc.DepthBiasClamp = 0.0f;
+	rasterDesc.DepthClipEnable = true;
+	rasterDesc.FillMode = D3D11_FILL_SOLID;
+	rasterDesc.FrontCounterClockwise = false;
+	rasterDesc.MultisampleEnable = false;
+	rasterDesc.ScissorEnable = false;
+	rasterDesc.SlopeScaledDepthBias = 0.0f;
+
+
+	result = aDevice->CreateRasterizerState(&rasterDesc, &tRaster);
+
+	if (FAILED(result))
+	{
+		LOG(INFO) << "CreateRSNoCull failed";
+		return nullptr;
+	}
+
+	return tRaster;
+}
+
 
 
 static ID3D11RasterizerState* CreateRSWireFrame(ID3D11Device* const aDevice)
@@ -477,6 +581,88 @@ static ID3D11DepthStencilState* CreateDepthStateDefault(ID3D11Device* const aDev
 	depthStencilDesc.DepthEnable = true;
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	depthStencilDesc.StencilEnable = true;
+	depthStencilDesc.StencilReadMask = 0xFF;
+	depthStencilDesc.StencilWriteMask = 0xFF;
+
+	// Stencil operations if pixel is front-facing.
+	depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	// Stencil operations if pixel is back-facing.
+	depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	result = aDevice->CreateDepthStencilState(&depthStencilDesc, &tDepthStencilState);
+
+	if (FAILED(result))
+	{
+		LOG(ERROR) << "Failed to create depth-stencil state";
+		return nullptr;
+	}
+
+	return tDepthStencilState;
+}
+
+static ID3D11DepthStencilState* CreateDepthStateDeferred(ID3D11Device* const aDevice)
+{
+	ID3D11DepthStencilState* tDepthStencilState;
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+	HRESULT result;
+
+	// Initialize the description of the stencil state.
+	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+
+	// Set up the description of the stencil state.
+	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_ALWAYS;
+
+	depthStencilDesc.StencilEnable = true;
+	depthStencilDesc.StencilReadMask = 0xFF;
+	depthStencilDesc.StencilWriteMask = 0xFF;
+
+	// Stencil operations if pixel is front-facing.
+	depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	// Stencil operations if pixel is back-facing.
+	depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+
+	result = aDevice->CreateDepthStencilState(&depthStencilDesc, &tDepthStencilState);
+
+	if (FAILED(result))
+	{
+		LOG(ERROR) << "Failed to create depth-stencil state";
+		return nullptr;
+	}
+
+	return tDepthStencilState;
+}
+
+static ID3D11DepthStencilState* CreateDepthStateLessEqual(ID3D11Device* const aDevice)
+{
+	ID3D11DepthStencilState* tDepthStencilState;
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
+	HRESULT result;
+
+	// Initialize the description of the stencil state.
+	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
+
+	// Set up the description of the stencil state.
+	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 
 	depthStencilDesc.StencilEnable = true;
 	depthStencilDesc.StencilReadMask = 0xFF;
@@ -765,9 +951,10 @@ static Model* CreateSimpleModelFromRawData(ID3D11Device* aDevice, const RawMeshD
 	model->indexBuffer->buffer = CreateSimpleBuffer(aDevice, (void*)(aData.indices.data()), sizeof(unsigned long) * indicesSize, (uint32_t)indicesSize, D3D11_BIND_INDEX_BUFFER, D3D11_USAGE_DEFAULT);
 	model->indexBuffer->amountOfElements = indicesSize;
 
-
 	return model;
 }
+
+
 
 //static ID3D11RenderTargetView* CreateTexture2DRTVDefault(ID3D11Device* const aDevice, uint32_t aWidth, uint32_t aHeight)
 //{

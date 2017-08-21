@@ -13,8 +13,11 @@
 
 #include <Windows.h>
 #include <DirectXMath.h>
+#include <memory>
 
 #include "MathHelper.h"
+#include "FrustumG.h"
+
 class Camera
 {
 public:
@@ -35,6 +38,8 @@ public:
 	DirectX::XMFLOAT3 GetUp3f()const;
 	DirectX::XMVECTOR GetLook()const;
 	DirectX::XMFLOAT3 GetLook3f()const;
+	
+	void UpdateFrustumPlanes();
 
 	// Get frustum properties.
 	float GetNearZ()const;
@@ -74,6 +79,8 @@ public:
 	// After modifying camera position/orientation, call to rebuild the view matrix.
 	void UpdateViewMatrix();
 
+	const FrustumG* const GetFrustum();
+
 private:
 
 	// Camera coordinate system with coordinates relative to world space.
@@ -95,6 +102,9 @@ private:
 	// Cache View/Proj matrices.
 	DirectX::XMFLOAT4X4 mView = MathHelper::Identity4x4();
 	DirectX::XMFLOAT4X4 mProj = MathHelper::Identity4x4();
+
+	// Every camera has a frustum for occlussion culling
+	std::unique_ptr<FrustumG> mFrustum;
 };
 
 #endif // CAMERA_H
