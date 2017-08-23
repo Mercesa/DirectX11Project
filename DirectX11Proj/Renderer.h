@@ -56,7 +56,7 @@ private:
 	void UpdateObjectConstantBuffers(IObject* const aObject);
 	void UpdateShadowLightConstantBuffers(LightData* const aDirectionalLight);
 	void UpdateFrameConstantBuffers(std::vector<std::unique_ptr<Light>>& aLights, LightData* const aDirectionalLight, CameraData apCamera);
-	void UpdateGenericConstantBuffer(float aScreenWidth, float aScreenHeight, float nearPlaneDistance, float farPlaneDistance);
+	void UpdateGenericConstantBuffer(float aScreenWidth, float aScreenHeight, float nearPlaneDistance, float farPlaneDistance, const FrameData* const aFrameData);
 
 
 	void CreateConstantBuffers();
@@ -72,9 +72,11 @@ private:
 	void RenderSceneForward(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, LightData* const aDirectionalLight, CameraData const apCamera, IObject* const aSkybox);
 	void RenderSceneDeferred(std::vector<std::unique_ptr<IObject>>& aObjects, std::vector<IObject*>& aCulledObjects, std::vector<std::unique_ptr<Light>>& aLights, LightData* const aDirectionalLight, CameraData const apCamera, IObject* const aSkyboxObject);
 
-
+	// Motion blur functions
 	void RenderSceneVelocityPass(std::vector<IObject*>& aObjects);
-	void RenderSceneVelocityPassReconstruction(std::vector<IObject*>& aObjects);
+
+	// Debug function to show textures on screen
+	void RenderTexturesToScreen(Texture* const aTextures);
 
 	void RenderSceneSSAOPass();
 	void RenderBlurPass();
@@ -155,6 +157,8 @@ private:
 	
 	std::unique_ptr<Texture> reconstruction_VelocityBuffer;
 	std::unique_ptr<Texture> reconstruction_TileMaxBuffer;
+	std::unique_ptr<Texture> reconstruction_DepthBuffer;
+
 	std::unique_ptr<Texture> reconstruction_neighborMax;
 
 

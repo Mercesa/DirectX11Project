@@ -64,7 +64,6 @@ float Sobel(float2 texCoord)
 }
 
 
-
 float4 PixShader(VSQuadOut quadIn) : SV_TARGET
 {
 	//float sobelValue = Sobel(quadIn.texcoord);

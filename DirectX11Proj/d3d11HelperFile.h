@@ -134,6 +134,7 @@ struct LightData
 	glm::vec3 position;
 };
 
+
 struct FrameData
 {
 	float totalTime;
@@ -795,6 +796,27 @@ static ID3D11ShaderResourceView* CreateSimpleShaderResourceView(ID3D11Device* co
 	}
 
 	return srv;
+}
+
+static ID3D11UnorderedAccessView* CreateSimpleUnorderedAccessView(ID3D11Device* const aDevice, ID3D11Texture2D* const aTexture, DXGI_FORMAT aFormat)
+{
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+	ID3D11UnorderedAccessView* uav;
+	HRESULT result;
+	// Setup the description of the shader resource view.
+	uavDesc.Format = aFormat;
+	uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+	uavDesc.Texture2D.MipSlice = 0;
+
+	// Create the shader resource view.
+	result = aDevice->CreateUnorderedAccessView(aTexture, &uavDesc, &uav);
+	if (FAILED(result))
+	{
+		LOG(ERROR) << "CreateSimpleShaderResourceView failed";
+		return nullptr;
+	}
+
+	return uav;
 }
 
 

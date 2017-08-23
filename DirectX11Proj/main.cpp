@@ -290,6 +290,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	while (!done)
 	{
 		gTimer->Update();
+
+		gFrameData->deltaTime = gTimer->GetDeltaTime();
+		gFrameData->totalTime = gTimer->GetTotalTime();
+		gFrameData->framerate = 1.0f / gFrameData->deltaTime;
+
 		ImGui_ImplDX11_NewFrame();
 		mpInput->Frame();
 
