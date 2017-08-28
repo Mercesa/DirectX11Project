@@ -28,11 +28,11 @@ int2 VelocityBufferReconstructionPixelShader(PixelInputType input) : SV_TARGET
 	positionPrev.xy += float2(0.5f, 0.5f);
 
 	// 1/2 * distance * exposure time * framerate
-	float2 distance = 0.5f * (positionNow.xy - positionPrev.xy) * 16.66 * framerate;
+	float2 distance = 0.5f * (positionNow.xy - positionPrev.xy) * 100.0f * framerate;
 
 	//  (qx * max(0.5px, min( ||qx||, k)))  / length(qx) + epsilon
 	
-	int2 distanceCompressed = (distance*max(0.5, min(length(distance), 20))) / length(distance);
+	int2 distanceCompressed = (distance*max(0.5, min(length(distance), 20))) / length(distance) + 0.01f;
 
 	return distanceCompressed;
 }

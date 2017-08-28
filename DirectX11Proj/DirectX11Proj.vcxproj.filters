@@ -266,13 +266,16 @@
     <None Include="Shaders\VS_TextureToScreen.hlsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="Shaders\PS_DeferredLightingReconstruction.hlsl">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Shaders\PS_VelocityBufferTileMax.hlsl">
       <Filter>Shaders</Filter>
     </None>
     <None Include="Shaders\CS_ReconstructionVelocityTileMax.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\CS_ReconstructionVelocityNeighbourMax.hlsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="Shaders\PS_DeferredLightingReconstruction.hlsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

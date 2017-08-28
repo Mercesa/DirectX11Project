@@ -5,7 +5,8 @@ Texture2D positionTexture : register(t1);
 Texture2D normalTexture : register(t2);
 Texture2D occlusionTexture : register(t3);
 Texture2D depthMapTexture : register(t4);
-Texture2D<int> velocityTexture : register(t5);
+Texture2D<int2> velocityTexture : register(t5);
+Texture2D<int2> velocityNeighbourMaxTexture : register(t6);
 
 SamplerState SamplePointClamp : register(s0);
 SamplerState SamplePointWrap : register(s1);
@@ -21,7 +22,7 @@ struct PixelInputType
 };
 
 // Shadow mapping with percentage close filtering 
-inline float ShadowMappingPCF(float4 aLightviewPosition)
+float ShadowMappingPCF(float4 aLightviewPosition)
 {
 	float bias;
 	float2 projectTexCoord;
@@ -68,6 +69,78 @@ inline float ShadowMappingPCF(float4 aLightviewPosition)
 	return shadowValue;
 }
 
+float softDepthCompare(float firstZ, float secZ)
+{
+	return clamp(1.0f - (firstZ - secZ) / 1.0f, 0.0f, 1.0f);
+}
+
+float cone(float2 X, float2 Y, float2 v)
+{
+	return clamp(1 - length(X - Y) / length(v), 0, 1);
+}
+
+float cylinder(float2 X, float2 Y, float2 V)
+{
+	return 1.0 - smoothstep(0.95f*length(V), 1.05*length(V), length(X - Y));
+}
+
+float4 Reconstruct(float2 texCoord, float2 velocityVec, float2 position)
+{
+
+	float2 newTexCoords = texCoord * float2(screenWidth/20, screenHeight/20);
+	
+	int2 v = velocityTexture[texCoord];
+
+	//return float4(abs(v.x), abs(v.y), 0.0f, 1.0f);
+	if (length(v) <= (0.01f + 0.5f))
+	{
+		return albedoTexture.Sample(SamplePointClamp, texCoord);
+	}	
+
+	//float2 tVelocity = float2(velocityTexture[position].rg);
+	//return float4(tVelocity.x, tVelocity.y, 0.0f, 1.0f);
+
+	float weight = 1.0f / length(velocityTexture[position.rg]);
+	float4 sum = albedoTexture.Sample(SamplePointClamp, texCoord) * weight;
+
+	float t	 = 0.0f;
+	float2 y = 0.0f;
+	float zX = 0.0f;
+	float zY = 0.0f;
+	float f	 = 0.0f;
+	float b	 = 0.0f;
+	float a  = 0.0f;
+
+	float sampleAmount = 6.0f;
+	float j = 0.0f;
+
+	int loopTimes = int(ceil((sampleAmount - 1) / 2.0f));
+	[unroll(6)]
+	for (int i = 0; i < loopTimes; ++i)
+	{
+		t = lerp(-1.0f, 1.0f, (i + j + 1.0) / (sampleAmount + 1.0f));
+		
+		y = round(position + v*t + 0.5f);
+		
+		zX = positionTexture[position].z;
+		zY = positionTexture[y.rg].z;
+		
+		f = softDepthCompare(zX, zY);
+		b = softDepthCompare(zY, zX);
+		
+		float2 velY = velocityTexture[y.rg];
+		float2 velX = velocityTexture[position.rg];
+		
+		a = f * cone(y, position, velY) 
+			+ b*cone(position, y, velX) +
+			cylinder(y, position, velY) * cylinder(position, y, velX) * 2.0f;
+		
+		weight += a; sum += a *albedoTexture[y];
+	}
+
+	return sum / weight;
+}
+
 float4 DeferredLightingReconstructPixelShader(PixelInputType input) : SV_TARGET
 { 
 	float2 texCoord = input.position / float2(screenWidth, screenHeight);
@@ -77,6 +150,8 @@ float4 DeferredLightingReconstructPixelShader(PixelInputType input) : SV_TARGET
 	float3 normal = normalTexture.Sample(SamplePointClamp, texCoord);
 	float occlusion = occlusionTexture.Sample(SamplePointClamp, texCoord);
 
+
+	float4 rec = Reconstruct(texCoord, position.z, input.position.xy);
 	// Calculate the world space position by multiplying by the inverse view matrix
 	// position is in view space
 	// Multiplied by the inverse view space will take it to world space
@@ -100,9 +175,9 @@ float4 DeferredLightingReconstructPixelShader(PixelInputType input) : SV_TARGET
 	
 	// Transform the world space position to light projection space
 	float4 lightViewPosition = mul(mul(float4(worldSpacePosition.xyz, 1.0f), lightViewMatrix), lightProjectionMatrix);
-	
+	return rec;
 	float shadowImpact = ShadowMappingPCF(lightViewPosition);
 	//return float4(blurVec.xy * 1., 0.0f, 1.0f);
-	return PerformLightingDeferred((float3)position, (float3)normal, albedo, 1.0f, occlusion) * shadowImpact;
+	return PerformLightingDeferred((float3)position, (float3)normal, rec, 1.0f, occlusion) * shadowImpact;
 
 }

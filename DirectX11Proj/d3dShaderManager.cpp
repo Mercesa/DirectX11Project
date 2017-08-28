@@ -79,6 +79,7 @@ bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 
 	mShadersInfo.push_back(ShaderInfo("Shaders\\CS_GuassianBlur.hlsl", "CSMain", "cs_5_0", ECOMPUTE));
 	mShadersInfo.push_back(ShaderInfo("Shaders\\CS_ReconstructionVelocityTileMax.hlsl", "CSMain", "cs_5_0", ECOMPUTE));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\CS_ReconstructionVelocityNeighbourMax.hlsl", "CSMain", "cs_5_0", ECOMPUTE));
 
 
 	LOG(INFO) << "ShaderManager: Finished initializing all shaders";

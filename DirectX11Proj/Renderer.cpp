@@ -566,7 +566,7 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
 	mpDeviceContext->PSSetSamplers(1, 1, &mpPointWrapSampler);
 
-	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	mpDeviceContext->VSSetShader(tFVS->shader, NULL, 0);
 	mpDeviceContext->PSSetShader(tFPS->shader, NULL, 0);
 
@@ -584,12 +584,10 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 #ifdef USE_MOTIONBLURRECONSTRUCTION
 	velocityTextureToUse = reconstruction_VelocityBuffer.get();
 #else
-	velocityTextureToUse = velocityTexture.get;
+	velocityTextureToUse = velocityTexture.get();
 #endif
 	mpDeviceContext->PSSetShaderResources(5, 1, &velocityTextureToUse->srv);
-
-
-
+	mpDeviceContext->PSSetShaderResources(6, 1, &reconstruction_NeighbourMaxBuffer->srv);
 
 	mpDeviceContext->Draw(4, 0);
 }
@@ -708,43 +706,33 @@ void Renderer::RenderSceneVelocityPass(std::vector<IObject*>& aObjects)
 	// Tilemax and neighbour max for our reconstruction algorithm
 #ifdef USE_MOTIONBLURRECONSTRUCTION
 
-	ComputeShader* const tCS = mpShaderManager->GetComputeShader("Shaders\\CS_ReconstructionVelocityTileMax.hlsl");
+	ComputeShader* const tCS1 = mpShaderManager->GetComputeShader("Shaders\\CS_ReconstructionVelocityTileMax.hlsl");
 
+	// The reconstruction tilemax pass 
 	mpDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
 
-	mpDeviceContext->CSSetShader(tCS->shader, NULL, 0);
+	mpDeviceContext->CSSetShader(tCS1->shader, NULL, 0);
 	mpDeviceContext->CSSetShaderResources(0, 1, &reconstruction_VelocityBuffer->srv);
 	mpDeviceContext->CSSetUnorderedAccessViews(0, 1, &reconstruction_TileMaxBuffer->uav, 0);
 
+	// Dispatch a workgroup with the x*y amount of tiles, every dispatch group runs on one pixel
 	mpDeviceContext->Dispatch(GraphicsSettings::gCurrentScreenWidth / 20, GraphicsSettings::gCurrentScreenHeight / 20, 1);
 
-	//// Create viewport for reconstruction textures
-	//D3D11_VIEWPORT reconstructionViewport;
-	//
-	//reconstructionViewport.MinDepth = 0.0f;
-	//reconstructionViewport.MaxDepth = 1.0f;
-	//reconstructionViewport.TopLeftX = 0.0f;
-	//reconstructionViewport.TopLeftY = 0.0f;
-	//reconstructionViewport.Width = GraphicsSettings::gCurrentScreenWidth;
-	//reconstructionViewport.Height = GraphicsSettings::gCurrentScreenHeight;
-	//mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
-	//
-	//mpDeviceContext->RSSetViewports(1, &reconstructionViewport);
-	//// To ensure the velocity buffer texture we have set 
-	////mpDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
-	//
-	//tVS = mpShaderManager->GetVertexShader("Shaders\\fullScreenQuad_VS.hlsl");
-	//tPS = mpShaderManager->GetPixelShader("Shaders\\PS_VelocityBufferTileMax.hlsl");
-	//mpDeviceContext->OMSetRenderTargets(1, &this->reconstruction_TileMaxBuffer->rtv, reconstruction_DepthBuffer->dsv);
-	//mpDeviceContext->ClearDepthStencilView(reconstruction_DepthBuffer->dsv, D3D11_CLEAR_DEPTH, 0, 0);
-	//
-	//mpDeviceContext->VSSetShader(tVS->shader, NULL, 0);
-	//mpDeviceContext->PSSetShader(tPS->shader, NULL, 0);
-	//
-	//mpDeviceContext->PSSetShaderResources(0, 1, &reconstruction_VelocityBuffer->srv);
-	//
-	//mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-	//mpDeviceContext->Draw(4, 0);
+
+	// The reconstruction neighbour max pass
+	ComputeShader* const tCS2 = mpShaderManager->GetComputeShader("Shaders\\CS_ReconstructionVelocityNeighbourMax.hlsl");
+	mpDeviceContext->CSSetShader(tCS2->shader, NULL, 0);
+
+	mpDeviceContext->CSSetUnorderedAccessViews(0, 1, &reconstruction_NeighbourMaxBuffer->uav, 0);
+	mpDeviceContext->CSSetShaderResources(0, 1, &reconstruction_TileMaxBuffer->srv);
+
+	mpDeviceContext->Dispatch(GraphicsSettings::gCurrentScreenWidth / 20, GraphicsSettings::gCurrentScreenHeight / 20, 1);
+
+	// Set resources to null as we need these resources in the future
+	ID3D11UnorderedAccessView* pNullUAV = NULL;
+	ID3D11ShaderResourceView* pNullSRV = NULL;
+	mpDeviceContext->CSSetUnorderedAccessViews(0, 1, &pNullUAV, 0);
+	mpDeviceContext->CSSetShaderResources(0, 1, &pNullSRV);
 #endif
 }
 
@@ -1089,6 +1077,7 @@ bool Renderer::InitializeResources()
 	reconstruction_VelocityBuffer = std::make_unique<Texture>();
 	reconstruction_TileMaxBuffer = std::make_unique<Texture>();
 	reconstruction_DepthBuffer = std::make_unique<Texture>();
+	reconstruction_NeighbourMaxBuffer = std::make_unique<Texture>();
 
 	// Post proc color and depth buffer 
 	mPostProcColorBuffer->texture =  CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
@@ -1165,6 +1154,10 @@ bool Renderer::InitializeResources()
 	reconstruction_TileMaxBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth / 20, GraphicsSettings::gCurrentScreenHeight / 20, DXGI_FORMAT_R8G8_SINT, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS);
 	reconstruction_TileMaxBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), reconstruction_TileMaxBuffer->texture, DXGI_FORMAT_R8G8_SINT);
 	reconstruction_TileMaxBuffer->uav = CreateSimpleUnorderedAccessView(mpDevice.Get(), reconstruction_TileMaxBuffer->texture, DXGI_FORMAT_R8G8_SINT);
+
+	reconstruction_NeighbourMaxBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth / 20, GraphicsSettings::gCurrentScreenHeight / 20, DXGI_FORMAT_R8G8_SINT, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS);
+	reconstruction_NeighbourMaxBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), reconstruction_NeighbourMaxBuffer->texture, DXGI_FORMAT_R8G8_SINT);
+	reconstruction_NeighbourMaxBuffer->uav = CreateSimpleUnorderedAccessView(mpDevice.Get(), reconstruction_NeighbourMaxBuffer->texture, DXGI_FORMAT_R8G8_SINT);
 
 	reconstruction_DepthBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth / 20, GraphicsSettings::gCurrentScreenHeight / 20, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
 	reconstruction_DepthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), reconstruction_DepthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
@@ -1291,6 +1284,7 @@ bool Renderer::DestroyDirectX()
 	ReleaseTexture(reconstruction_TileMaxBuffer.get());
 	ReleaseTexture(reconstruction_VelocityBuffer.get());
 	ReleaseTexture(reconstruction_DepthBuffer.get());
+	ReleaseTexture(reconstruction_NeighbourMaxBuffer.get());
 
 	mRaster_backcull->Release();
 	mpDepthStencilState->Release();

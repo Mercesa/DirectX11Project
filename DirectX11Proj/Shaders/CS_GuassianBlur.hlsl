@@ -19,9 +19,9 @@ void CSMain(uint3 DTid : SV_DispatchThreadID)
 {
 	int2 currMax = int2(0, 0);
 
-	for (int i = 1; i < 20; ++i)
+	for (int i = 0; i < 20; ++i)
 	{
-		for (int j = 1; j < 20; ++j)
+		for (int j = 0; j < 20; ++j)
 		{
 			currMax = GetMaxVector(currMax, gInputA[DTid.xy * int2(20,20) + int2(i,j)]);
 		}
