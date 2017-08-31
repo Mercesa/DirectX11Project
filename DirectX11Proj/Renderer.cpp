@@ -683,10 +683,10 @@ void Renderer::RenderSceneVelocityPass(std::vector<IObject*>& aObjects)
 	mpDeviceContext->RSSetState(mRaster_backcull);
 
 	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
-	mpDeviceContext->OMSetRenderTargets(1, &reconstruction_VelocityBuffer->rtv, this->mBackBufferTexture->dsv);
+	mpDeviceContext->OMSetRenderTargets(1, &textureRT->rtv, this->mBackBufferTexture->dsv);
 	
 	float color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	mpDeviceContext->ClearRenderTargetView(reconstruction_VelocityBuffer->rtv, color);
+	mpDeviceContext->ClearRenderTargetView(textureRT->rtv, color);
 	mpDeviceContext->ClearDepthStencilView(mBackBufferTexture->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 	// Set the vertex and pixel shaders that will be used to render this triangle.
@@ -1249,10 +1249,6 @@ bool Renderer::InitializeResources()
 
 		gLightMatrixBufferDataPtr->kernelSamples[i] = value;
 	}
-
-
-	
-
 	return true;
 }
 
@@ -1273,7 +1269,6 @@ bool Renderer::DestroyDirectX()
 	ReleaseTexture(gBuffer_normalBuffer.get());
 	ReleaseTexture(gBuffer_specularBuffer.get());
 	ReleaseTexture(gBuffer_depthBuffer.get());
-
 	ReleaseTexture(randomValueTexture.get());
 
 	ReleaseTexture(mAmbientOcclusionTexture.get());

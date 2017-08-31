@@ -103,6 +103,6 @@ float4 PSDeferredLighting(PixelInputType input) : SV_TARGET
 	
 	float shadowImpact = ShadowMappingPCF(lightViewPosition);
 	//return float4(blurVec.xy * 1., 0.0f, 1.0f);
-	return PerformLightingDeferred((float3)position, (float3)normal, result, 1.0f, occlusion) * shadowImpact;
+	return PerformLightingDeferred((float3)position, (float3)normal, result, albedo.w, occlusion) * shadowImpact;
 
 }

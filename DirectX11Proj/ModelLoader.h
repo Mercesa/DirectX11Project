@@ -9,8 +9,15 @@ struct aiNode;
 struct aiScene;
 struct aiMesh;
 
-
 struct RawMeshData;
+
+struct ModelLoadData
+{
+	std::string filepath;
+	bool convertToDDS;
+	bool generateBoundingSphere;
+	bool regenerateAssbin;
+};
 
 class ModelLoader
 {

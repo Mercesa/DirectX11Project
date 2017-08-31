@@ -65,7 +65,7 @@ void PlayerSceneExample::Tick(InputClass* const apInput, float aDT)
 	mpCamera->UpdateViewMatrix();
 	
 	
-	tempT += 3.0f * aDT;
+	tempT += 6.0f * aDT;
 	//std::cout << tempT << std::endl;
 	sphereMove->mPrevWorldMatrix = sphereMove->mWorldMatrix;
 	sphereMove->mWorldMatrix = glm::transpose(glm::translate(glm::mat4(), glm::vec3(sin(tempT) * 4.0f, 3.0f, 1.0f)));
@@ -135,6 +135,8 @@ void PlayerSceneExample::Init()
 
 	this->sphereModelID = mpSkyboxSphere->mpModel.GetID();
 
+
+	tModels = ResourceManager::GetInstance().LoadModels("Models\\Box\\cube.obj", false);
 
 	std::unique_ptr<IObject> sphereObject = std::make_unique<IObject>();
 	sphereObject->mpModel = tModels[0];

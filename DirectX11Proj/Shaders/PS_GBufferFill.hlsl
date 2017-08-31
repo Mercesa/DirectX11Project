@@ -42,6 +42,11 @@ PS_OUT GbufferFillPixelShader(PixelInputType input) : SV_Target
 		o.albedo = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
+	if (hasSpecular)
+	{
+		o.albedo.w = specularTexture.Sample(SampleTypeLinearWrap, input.tex).r;
+	}
+
 	if (hasNormal)
 	{
 		// we put the w value of NormalSampleToWorldSpace to 0 since we are transforming a directio.

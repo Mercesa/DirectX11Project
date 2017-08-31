@@ -86,22 +86,21 @@ float cylinder(float2 X, float2 Y, float2 V)
 
 float4 Reconstruct(float2 texCoord, float2 velocityVec, float2 position)
 {
-
 	float2 newTexCoords = texCoord * float2(screenWidth/20, screenHeight/20);
 	
-	int2 v = velocityTexture[texCoord];
+	int2 v = velocityNeighbourMaxTexture[newTexCoords];
 
 	//return float4(abs(v.x), abs(v.y), 0.0f, 1.0f);
-	if (length(v) <= (0.01f + 0.5f))
+	if (length(v) <= (5.0f))
 	{
-		return albedoTexture.Sample(SamplePointClamp, texCoord);
+		return albedoTexture[position];
 	}	
 
 	//float2 tVelocity = float2(velocityTexture[position].rg);
 	//return float4(tVelocity.x, tVelocity.y, 0.0f, 1.0f);
 
-	float weight = 1.0f / length(velocityTexture[position.rg]);
-	float4 sum = albedoTexture.Sample(SamplePointClamp, texCoord) * weight;
+	float weight = 1.0f / max(length(velocityTexture[position.rg]), 0.01f);
+	float4 sum = albedoTexture[position] * weight;
 
 	float t	 = 0.0f;
 	float2 y = 0.0f;
@@ -116,7 +115,7 @@ float4 Reconstruct(float2 texCoord, float2 velocityVec, float2 position)
 
 	int loopTimes = int(ceil((sampleAmount - 1) / 2.0f));
 	[unroll(6)]
-	for (int i = 0; i < loopTimes; ++i)
+	for (int i = 0; i < 6; ++i)
 	{
 		t = lerp(-1.0f, 1.0f, (i + j + 1.0) / (sampleAmount + 1.0f));
 		
@@ -138,6 +137,7 @@ float4 Reconstruct(float2 texCoord, float2 velocityVec, float2 position)
 		weight += a; sum += a *albedoTexture[y];
 	}
 
+	//weight = max(weight, 1.0f);
 	return sum / weight;
 }
 
@@ -178,6 +178,6 @@ float4 DeferredLightingReconstructPixelShader(PixelInputType input) : SV_TARGET
 	return rec;
 	float shadowImpact = ShadowMappingPCF(lightViewPosition);
 	//return float4(blurVec.xy * 1., 0.0f, 1.0f);
-	return PerformLightingDeferred((float3)position, (float3)normal, rec, 1.0f, occlusion) * shadowImpact;
+	return PerformLightingDeferred((float3)position, (float3)normal, rec, albedo.w, occlusion) * shadowImpact;
 
 }

@@ -154,7 +154,6 @@ private:
 
 	std::unique_ptr<Texture> velocityTexture;
 
-	
 	std::unique_ptr<Texture> reconstruction_VelocityBuffer;
 	std::unique_ptr<Texture> reconstruction_TileMaxBuffer;
 	std::unique_ptr<Texture> reconstruction_NeighbourMaxBuffer;

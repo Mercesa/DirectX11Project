@@ -198,10 +198,11 @@ float4 DoDirectionalLightDeferred(Light light, float3 V, float3 P, float3 N, flo
 	// Put our light direction vector to viewspace
 	L = (float3)mul(float4(L.rgb, 0.0), viewMatrix);
 
+	float3 h = (L + V) / length(L + V);
 	// texture * normal dot product * light colour * attenuation
 	float4 ambientCol = diffTextureColor   *	float4(light.colour.rgb * 0.6f * aOcclusion * 2.0f, 1.0);
 	float4 diffuseCol = diffTextureColor   *	DoDiffuse(light, L, N)		* float4(light.colour.rgb, 1.0f);
-	float4 specularCol = specTextureColor  *	DoSpecular(light, V, L, N)  * float4(light.colour.rgb, 1.0f);
+	float4 specularCol = specTextureColor  *	DoSpecular(light, h, L, N)  * float4(light.colour.rgb, 1.0f);
 
 	float4 combined = ambientCol + diffuseCol;
 
