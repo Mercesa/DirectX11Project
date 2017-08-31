@@ -42,6 +42,7 @@ public:
 
 	VertexShader* const GetVertexShader(const char* aShaderPath);
 	PixelShader* const GetPixelShader(const char* aShaderPath);
+	ComputeShader* const GetComputeShader(const char* aShaderPath);
 
 private:
 	std::vector<ShaderInfo> mShadersInfo;

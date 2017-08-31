@@ -19,6 +19,8 @@
 
 #include <random>
 
+#define USE_MOTIONBLURRECONSTRUCTION 
+
 using namespace DirectX;
 
 static bool renderForward = true;
@@ -74,6 +76,39 @@ void Renderer::CullObjects(std::vector<std::unique_ptr<IObject>>& aObjectsToCull
 	}
 }
 
+void Renderer::RenderTexturesToScreen(Texture* const aTextures)
+{
+	D3D11_VIEWPORT viewport1;
+
+	viewport1.Height = 320;
+	viewport1.Width = 320;
+	viewport1.MaxDepth = 1.0f;
+	viewport1.MinDepth = 0.0f;
+	viewport1.TopLeftX = 0.0f;
+	viewport1.TopLeftY = 0.0f;
+
+	// Get the fullscreen shaders
+	VertexShader*const tFVS = mpShaderManager->GetVertexShader("Shaders\\VS_TextureToScreen.hlsl");
+	PixelShader*const tFPS = mpShaderManager->GetPixelShader("Shaders\\PS_TextureToScreen.hlsl");
+
+
+	mpDeviceContext->RSSetViewports(1, &viewport1);
+	mpDeviceContext->RSSetState(mRaster_cullNone);
+
+	mpDeviceContext->OMSetRenderTargets(1, &this->mBackBufferTexture->rtv, mBackBufferTexture->dsv);
+
+	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+	mpDeviceContext->VSSetShader(tFVS->shader, NULL, 0);
+	mpDeviceContext->PSSetShader(tFPS->shader, NULL, 0);
+
+	mpDeviceContext->PSSetSamplers(0, 1, &mpLinearWrapSampler);
+	mpDeviceContext->IASetInputLayout(tFVS->inputLayout);
+
+	// Set gbuffer resources
+	mpDeviceContext->PSSetShaderResources(0, 1, &aTextures->srv);
+
+	mpDeviceContext->Draw(4, 0);
+}
 
 void Renderer::RenderScene(
 	std::vector<std::unique_ptr<IObject>>& aObjects,
@@ -104,7 +139,7 @@ void Renderer::RenderScene(
 
 	BindStandardConstantBuffers();
 	UpdateFrameConstantBuffers(aLights, aDirectionalLight, apCamera);
-	UpdateGenericConstantBuffer(GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, apCamera.nearZ, apCamera.farZ);
+	UpdateGenericConstantBuffer(GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, apCamera.nearZ, apCamera.farZ, aFrameData);
 
 	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "ConstantBuffersTime");
 
@@ -152,6 +187,8 @@ void Renderer::RenderSceneDeferred(
 	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "LightingPass");
 	RenderSceneLightingPass(aObjects, aSkyboxObject);
 	tProfiler->SetStamp(mpDeviceContext.Get(), mpDevice.Get(), "LightingPass");
+
+	//RenderTexturesToScreen(reconstruction_VelocityBuffer.get());
 }
 
 
@@ -230,13 +267,16 @@ void Renderer::CreateConstantBuffers()
 }
 
 
-void Renderer::UpdateGenericConstantBuffer(float aScreenWidth, float aScreenHeight, float nearPlaneDistance, float farPlaneDistance)
+void Renderer::UpdateGenericConstantBuffer(float aScreenWidth, float aScreenHeight, float nearPlaneDistance, float farPlaneDistance, const FrameData* const aFrameData)
 {
 	gGenericAttributesDataPtr->screenWidth = aScreenWidth;
 	gGenericAttributesDataPtr->screenHeight = aScreenHeight;
 	gGenericAttributesDataPtr->nearPlaneDistance = nearPlaneDistance;
 	gGenericAttributesDataPtr->farPlaneDistance = farPlaneDistance;
 	
+	gGenericAttributesDataPtr->deltaTime = aFrameData->deltaTime;
+	gGenericAttributesDataPtr->totalApplicationTime = aFrameData->totalTime;
+	gGenericAttributesDataPtr->framerate = aFrameData->framerate;
 
 	mpGenericAttributesBufferCB->UpdateBuffer((void*)gGenericAttributesDataPtr.get(), mpDeviceContext.Get());
 }
@@ -501,7 +541,13 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 {
 	// Get the fullscreen shaders
 	VertexShader*const tFVS = mpShaderManager->GetVertexShader("Shaders\\VS_DeferredLighting.hlsl");
-	PixelShader*const tFPS = mpShaderManager->GetPixelShader("Shaders\\PS_DeferredLighting.hlsl");
+	PixelShader* tFPS = nullptr;
+
+#ifdef USE_MOTIONBLURRECONSTRUCTION
+	tFPS = mpShaderManager->GetPixelShader("Shaders\\PS_DeferredLightingReconstruction.hlsl");
+#else
+	tFPS = mpShaderManager->GetPixelShader("Shaders\\PS_DeferredLighting.hlsl");
+#endif
 
 
 	mpDeviceContext->RSSetViewports(1, &mViewport);
@@ -520,7 +566,7 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 	mpDeviceContext->PSSetSamplers(0, 1, &mpPointClampSampler);
 	mpDeviceContext->PSSetSamplers(1, 1, &mpPointWrapSampler);
 
-	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	mpDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 	mpDeviceContext->VSSetShader(tFVS->shader, NULL, 0);
 	mpDeviceContext->PSSetShader(tFPS->shader, NULL, 0);
 
@@ -532,8 +578,16 @@ void Renderer::RenderSceneLightingPass(std::vector<std::unique_ptr<IObject>>& aO
 	mpDeviceContext->PSSetShaderResources(2, 1, &gBuffer_normalBuffer->srv);
 	mpDeviceContext->PSSetShaderResources(3, 1, &mAmbientOcclusionTexture->srv);
 	mpDeviceContext->PSSetShaderResources(4, 1, &shadowMap01->resource->srv);
-	mpDeviceContext->PSSetShaderResources(5, 1, &velocityTexture->srv);
+	
 
+	Texture* velocityTextureToUse = nullptr;
+#ifdef USE_MOTIONBLURRECONSTRUCTION
+	velocityTextureToUse = reconstruction_VelocityBuffer.get();
+#else
+	velocityTextureToUse = velocityTexture.get();
+#endif
+	mpDeviceContext->PSSetShaderResources(5, 1, &velocityTextureToUse->srv);
+	mpDeviceContext->PSSetShaderResources(6, 1, &reconstruction_NeighbourMaxBuffer->srv);
 
 	mpDeviceContext->Draw(4, 0);
 }
@@ -570,7 +624,6 @@ void Renderer::BindStandardConstantBuffers()
 	tBuff = mpGenericAttributesBufferCB->GetBuffer();
 	mpDeviceContext->VSSetConstantBuffers(6, 1, &tBuff);
 	mpDeviceContext->PSSetConstantBuffers(6, 1, &tBuff);
-
 }
 
 
@@ -606,21 +659,36 @@ void Renderer::RenderSceneDepthPrePass(std::vector<std::unique_ptr<IObject>>& aO
 	}
 }
 
+
 void Renderer::RenderSceneVelocityPass(std::vector<IObject*>& aObjects)
 {
-	VertexShader*const tVS = mpShaderManager->GetVertexShader("Shaders\\VS_VelocityBuffer.hlsl");
-	PixelShader* const tPS = mpShaderManager->GetPixelShader("Shaders\\PS_VelocityBuffer.hlsl");
+
+	VertexShader* tVS = nullptr; 
+	PixelShader* tPS = nullptr; 
+	Texture* textureRT = nullptr;
+
+	// Standard shader
+	tVS = mpShaderManager->GetVertexShader("Shaders\\VS_VelocityBuffer.hlsl");
+	
+	// Use a different shader when using motion blur reconstruction
+#ifdef USE_MOTIONBLURRECONSTRUCTION
+	tPS = mpShaderManager->GetPixelShader("Shaders\\PS_VelocityBufferReconstruction.hlsl");
+	textureRT = reconstruction_VelocityBuffer.get();
+#else
+	tPS = mpShaderManager->GetPixelShader("Shaders\\PS_VelocityBuffer.hlsl");
+	textureRT = velocityTexture.get();
+#endif
 
 	mpDeviceContext->RSSetViewports(1, &mViewport);
 	mpDeviceContext->RSSetState(mRaster_backcull);
 
 	mpDeviceContext->OMSetDepthStencilState(mpDepthStencilState, 1);
-	mpDeviceContext->OMSetRenderTargets(1, &this->velocityTexture->rtv, mBackBufferTexture->dsv);
-
+	mpDeviceContext->OMSetRenderTargets(1, &textureRT->rtv, this->mBackBufferTexture->dsv);
+	
+	float color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	mpDeviceContext->ClearRenderTargetView(textureRT->rtv, color);
 	mpDeviceContext->ClearDepthStencilView(mBackBufferTexture->dsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-	float color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	mpDeviceContext->ClearRenderTargetView(this->velocityTexture->rtv, color);
 	// Set the vertex and pixel shaders that will be used to render this triangle.
 	mpDeviceContext->VSSetShader(tVS->shader, NULL, 0);
 	mpDeviceContext->PSSetShader(tPS->shader, NULL, 0);
@@ -634,6 +702,38 @@ void Renderer::RenderSceneVelocityPass(std::vector<IObject*>& aObjects)
 		RenderObject(aObjects[i]);
 	}
 
+
+	// Tilemax and neighbour max for our reconstruction algorithm
+#ifdef USE_MOTIONBLURRECONSTRUCTION
+
+	ComputeShader* const tCS1 = mpShaderManager->GetComputeShader("Shaders\\CS_ReconstructionVelocityTileMax.hlsl");
+
+	// The reconstruction tilemax pass 
+	mpDeviceContext->OMSetRenderTargets(0, nullptr, nullptr);
+
+	mpDeviceContext->CSSetShader(tCS1->shader, NULL, 0);
+	mpDeviceContext->CSSetShaderResources(0, 1, &reconstruction_VelocityBuffer->srv);
+	mpDeviceContext->CSSetUnorderedAccessViews(0, 1, &reconstruction_TileMaxBuffer->uav, 0);
+
+	// Dispatch a workgroup with the x*y amount of tiles, every dispatch group runs on one pixel
+	mpDeviceContext->Dispatch(GraphicsSettings::gCurrentScreenWidth / 20, GraphicsSettings::gCurrentScreenHeight / 20, 1);
+
+
+	// The reconstruction neighbour max pass
+	ComputeShader* const tCS2 = mpShaderManager->GetComputeShader("Shaders\\CS_ReconstructionVelocityNeighbourMax.hlsl");
+	mpDeviceContext->CSSetShader(tCS2->shader, NULL, 0);
+
+	mpDeviceContext->CSSetUnorderedAccessViews(0, 1, &reconstruction_NeighbourMaxBuffer->uav, 0);
+	mpDeviceContext->CSSetShaderResources(0, 1, &reconstruction_TileMaxBuffer->srv);
+
+	mpDeviceContext->Dispatch(GraphicsSettings::gCurrentScreenWidth / 20, GraphicsSettings::gCurrentScreenHeight / 20, 1);
+
+	// Set resources to null as we need these resources in the future
+	ID3D11UnorderedAccessView* pNullUAV = NULL;
+	ID3D11ShaderResourceView* pNullSRV = NULL;
+	mpDeviceContext->CSSetUnorderedAccessViews(0, 1, &pNullUAV, 0);
+	mpDeviceContext->CSSetShaderResources(0, 1, &pNullSRV);
+#endif
 }
 
 
@@ -970,11 +1070,14 @@ bool Renderer::InitializeResources()
 
 	mAmbientOcclusionTexture = std::make_unique<Texture>();
 	mAmbientOcclusionBufferTexture = std::make_unique<Texture>();
-
+	
 	velocityTexture = std::make_unique<Texture>();
 	
 	// Resources for motion blur deconstructing technique
 	reconstruction_VelocityBuffer = std::make_unique<Texture>();
+	reconstruction_TileMaxBuffer = std::make_unique<Texture>();
+	reconstruction_DepthBuffer = std::make_unique<Texture>();
+	reconstruction_NeighbourMaxBuffer = std::make_unique<Texture>();
 
 	// Post proc color and depth buffer 
 	mPostProcColorBuffer->texture =  CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
@@ -1044,12 +1147,20 @@ bool Renderer::InitializeResources()
 
 	// BUFFERS FOR RECONSTRUCTION TECHNIQUE
 	// Texture used to record velocity values into buffer
-	velocityTexture->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R8G8_UINT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
-	velocityTexture->srv = CreateSimpleShaderResourceView(mpDevice.Get(), velocityTexture->texture, DXGI_FORMAT_R8G8_UINT);
-	velocityTexture->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), velocityTexture->texture, DXGI_FORMAT_R8G8_UINT);
+	reconstruction_VelocityBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth, GraphicsSettings::gCurrentScreenHeight, DXGI_FORMAT_R8G8_SINT, D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE);
+	reconstruction_VelocityBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), reconstruction_VelocityBuffer->texture, DXGI_FORMAT_R8G8_SINT);
+	reconstruction_VelocityBuffer->rtv = CreateSimpleRenderTargetView(mpDevice.Get(), reconstruction_VelocityBuffer->texture, DXGI_FORMAT_R8G8_SINT);
 
+	reconstruction_TileMaxBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth / 20, GraphicsSettings::gCurrentScreenHeight / 20, DXGI_FORMAT_R8G8_SINT, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS);
+	reconstruction_TileMaxBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), reconstruction_TileMaxBuffer->texture, DXGI_FORMAT_R8G8_SINT);
+	reconstruction_TileMaxBuffer->uav = CreateSimpleUnorderedAccessView(mpDevice.Get(), reconstruction_TileMaxBuffer->texture, DXGI_FORMAT_R8G8_SINT);
 
+	reconstruction_NeighbourMaxBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth / 20, GraphicsSettings::gCurrentScreenHeight / 20, DXGI_FORMAT_R8G8_SINT, D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS);
+	reconstruction_NeighbourMaxBuffer->srv = CreateSimpleShaderResourceView(mpDevice.Get(), reconstruction_NeighbourMaxBuffer->texture, DXGI_FORMAT_R8G8_SINT);
+	reconstruction_NeighbourMaxBuffer->uav = CreateSimpleUnorderedAccessView(mpDevice.Get(), reconstruction_NeighbourMaxBuffer->texture, DXGI_FORMAT_R8G8_SINT);
 
+	reconstruction_DepthBuffer->texture = CreateSimpleTexture2D(mpDevice.Get(), GraphicsSettings::gCurrentScreenWidth / 20, GraphicsSettings::gCurrentScreenHeight / 20, DXGI_FORMAT_D24_UNORM_S8_UINT, D3D11_BIND_DEPTH_STENCIL);
+	reconstruction_DepthBuffer->dsv = CreateSimpleDepthstencilView(mpDevice.Get(), reconstruction_DepthBuffer->texture, DXGI_FORMAT_D24_UNORM_S8_UINT);
 	std::uniform_real_distribution<float> randomFloats(0.0f, 1.0f);
 	std::default_random_engine generator;
 	
@@ -1138,7 +1249,6 @@ bool Renderer::InitializeResources()
 
 		gLightMatrixBufferDataPtr->kernelSamples[i] = value;
 	}
-
 	return true;
 }
 
@@ -1159,13 +1269,17 @@ bool Renderer::DestroyDirectX()
 	ReleaseTexture(gBuffer_normalBuffer.get());
 	ReleaseTexture(gBuffer_specularBuffer.get());
 	ReleaseTexture(gBuffer_depthBuffer.get());
-
 	ReleaseTexture(randomValueTexture.get());
 
 	ReleaseTexture(mAmbientOcclusionTexture.get());
 	ReleaseTexture(mAmbientOcclusionBufferTexture.get());
 
 	ReleaseTexture(velocityTexture.get());
+
+	ReleaseTexture(reconstruction_TileMaxBuffer.get());
+	ReleaseTexture(reconstruction_VelocityBuffer.get());
+	ReleaseTexture(reconstruction_DepthBuffer.get());
+	ReleaseTexture(reconstruction_NeighbourMaxBuffer.get());
 
 	mRaster_backcull->Release();
 	mpDepthStencilState->Release();

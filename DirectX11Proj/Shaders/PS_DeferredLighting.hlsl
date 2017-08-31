@@ -70,12 +70,6 @@ inline float ShadowMappingPCF(float4 aLightviewPosition)
 
 float4 PSDeferredLighting(PixelInputType input) : SV_TARGET
 { 
-	// Loads a texture with the x and y screen position
-	//float4 albedo = albedoTexture.Load(int3(quadIn.position.xy, 0));
-	//float3 position = (float3)positionTexture.Load(int3(quadIn.position.xy, 0));
-	//float3 normal = (float3)normalTexture.Load(int3(quadIn.position.xy, 0));
-	//float occlusion = occlusionTexture.Load(int3(quadIn.position.xy, 0)).r;
-
 	float2 texCoord = input.position / float2(screenWidth, screenHeight);
 
 	float4 albedo = albedoTexture.Sample(SamplePointClamp, texCoord);
@@ -89,21 +83,9 @@ float4 PSDeferredLighting(PixelInputType input) : SV_TARGET
 	float4 worldSpacePosition = mul(float4(position.xyz, 1.0f), viewMatrixInversed);
 
 
-
-	// Next code is for motion blur
-	// Calculate the difference between screen space positions
-	
-	// Transform world poisition with previous camera projection/view matrix
-	// Project to screen, and calculate difference between 
-	//float4 previous = mul(worldSpacePosition, prevProjViewMatrix);
-	//previous.x /= previous.w;
-	//previous.y /= -previous.w;
-	//
-	//previous.xy = previous.xy * 0.5f + 0.5f;
-	//
-	//float2 blurVec = (previous.xy - texCoord) *2.0f;
-
-	float2 blurVec = float2(velocityTexture.Sample(SamplePointClamp, texCoord).rg) * 2.0f;
+	// Motion blur
+	float velocityScale = framerate / 60.0f;
+	float2 blurVec = float2(velocityTexture.Sample(SamplePointClamp, texCoord).rg) * velocityScale;
 	float4 result = albedoTexture.Sample(SamplePointClamp, texCoord);
 
 	int amountOfSamples = 6;
@@ -114,13 +96,13 @@ float4 PSDeferredLighting(PixelInputType input) : SV_TARGET
 	}
 
 	result /= float(amountOfSamples);
+	
+	
 	// Transform the world space position to light projection space
 	float4 lightViewPosition = mul(mul(float4(worldSpacePosition.xyz, 1.0f), lightViewMatrix), lightProjectionMatrix);
-
-
 	
 	float shadowImpact = ShadowMappingPCF(lightViewPosition);
 	//return float4(blurVec.xy * 1., 0.0f, 1.0f);
-	return PerformLightingDeferred((float3)position, (float3)normal, albedo, 1.0f, occlusion) * shadowImpact;
+	return PerformLightingDeferred((float3)position, (float3)normal, result, albedo.w, occlusion) * shadowImpact;
 
 }

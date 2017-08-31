@@ -69,6 +69,18 @@ bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 
 	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_DeferredLightingVolumes.hlsl", "VSDeferredLightVolumes", "vs_5_0", EVERTEX));
 
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_TextureToScreen.hlsl", "TextureToScreenVertexShader", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_TextureToScreen.hlsl", "TextureToScreenPixelShader", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_VelocityBufferReconstruction.hlsl", "VelocityBufferReconstructionPixelShader", "ps_5_0", EPIXEL));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_VelocityBufferTileMax.hlsl", "VelocityBufferReconstructionPixelShader", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_DeferredLightingReconstruction.hlsl", "DeferredLightingReconstructPixelShader", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\CS_GuassianBlur.hlsl", "CSMain", "cs_5_0", ECOMPUTE));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\CS_ReconstructionVelocityTileMax.hlsl", "CSMain", "cs_5_0", ECOMPUTE));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\CS_ReconstructionVelocityNeighbourMax.hlsl", "CSMain", "cs_5_0", ECOMPUTE));
+
 
 	LOG(INFO) << "ShaderManager: Finished initializing all shaders";
 
@@ -115,6 +127,24 @@ PixelShader* const d3dShaderManager::GetPixelShader(const char* aShaderPath)
 	else
 	{
 		LOG(WARNING) << "Pixel Shader - " << aShaderPath << " - not found in currently loaded shaders";
+		assert(true);
+		return nullptr;
+	}
+}
+
+
+ComputeShader* const d3dShaderManager::GetComputeShader(const char* aShaderPath)
+{
+	auto it = mComputeShaders.find(aShaderPath);
+
+	if (it != mComputeShaders.end())
+	{
+		return it->second.get();
+	}
+
+	else
+	{
+		LOG(WARNING) << "Compute Shader - " << aShaderPath << " - not found in currently loaded shaders";
 		assert(true);
 		return nullptr;
 	}
@@ -196,7 +226,7 @@ bool LoadPixelShader(ID3D11Device* const apDevice, ShaderInfo& aInfo, PixelShade
 	return true;
 }
 
-bool LoadPixelShader(ID3D11Device* const apDevice, ShaderInfo& aInfo, ComputeShader* const aPixelShader)
+bool LoadComputeShader(ID3D11Device* const apDevice, ShaderInfo& aInfo, ComputeShader* const aComputeShader)
 {
 	HRESULT result;
 
@@ -205,7 +235,7 @@ bool LoadPixelShader(ID3D11Device* const apDevice, ShaderInfo& aInfo, ComputeSha
 	ID3D10Blob* tBlobRef = nullptr;
 	LoadShaderWithErrorChecking(tWstring, (LPCSTR)aInfo.mEntryPoint, (LPCSTR)aInfo.mShaderProfile, tBlobRef);
 
-	result = apDevice->CreateComputeShader(tBlobRef->GetBufferPointer(), tBlobRef->GetBufferSize(), NULL, &aPixelShader->shader);
+	result = apDevice->CreateComputeShader(tBlobRef->GetBufferPointer(), tBlobRef->GetBufferSize(), NULL, &aComputeShader->shader);
 
 	if (FAILED(result))
 	{
@@ -270,13 +300,12 @@ bool d3dShaderManager::LoadShaders(ID3D11Device* const apDevice)
 			}
 		}
 
-
 		else if (e.mShaderType == ECOMPUTE)
 		{
-			auto it = mPixelShaders.find(e.mFilePath);
+			auto it = mComputeShaders.find(e.mFilePath);
 
 			// If the shader exists, continue
-			if (it != mPixelShaders.end())
+			if (it != mComputeShaders.end())
 			{
 				continue;
 			}
@@ -285,7 +314,7 @@ bool d3dShaderManager::LoadShaders(ID3D11Device* const apDevice)
 			{
 				std::unique_ptr<ComputeShader> tpShaderCS = std::make_unique<ComputeShader>();
 
-				if (!LoadPixelShader(apDevice, e, tpShaderCS.get()))
+				if (!LoadComputeShader(apDevice, e, tpShaderCS.get()))
 				{
 					return false;
 				}

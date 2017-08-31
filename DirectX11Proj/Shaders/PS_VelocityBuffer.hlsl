@@ -1,6 +1,5 @@
 #include "Lighting.hlsl"
 
-
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
@@ -8,7 +7,6 @@ struct PixelInputType
 	float4 positionPrev : POSITIONPREV;
 	
 };
-
 
 float2 VelocityPixelShader(PixelInputType input) : SV_TARGET
 {
