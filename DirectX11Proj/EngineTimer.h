@@ -10,8 +10,18 @@ public:
 
 	void Start();
 	void Update();
-	float_t GetDeltaTime();
-	float_t GetTotalTime();
+	double_t GetDeltaTime();
+	double_t GetTotalTime();
+
+private:
+	// Start and end point of timing
+	std::chrono::time_point<std::chrono::system_clock> start, end;
+
+	double totalTime;
+	double deltaTime;
+
+	
+
 };
 
 

@@ -12,7 +12,6 @@ struct VertexInputType
     float4 position : POSITION;
     float2 uv : TEXCOORD0;
 	float3 normal : NORMAL;
-	float3 bitang : BITANGENT;
 	float3 tangent : TANGENT;
 };
 
@@ -29,21 +28,15 @@ struct PixelInputType
 PixelInputType TextureVertexShader(VertexInputType input)
 {
     PixelInputType output;
-    
+	output.position.w = 1.0f;
 
-	// Change the position vector to be 4 units for proper matrix calculations.
-    input.position.w = 1.0f;
-
-	// Calculate the position of the vertex against the world, view, and projection matrices.
-    output.position = mul(input.position, worldMatrix);
-	output.fragPos = output.position;
+	output.position = mul(input.position, viewMatrix);
+	output.position = mul(input.position, projectionMatrix);
 	
-	output.norm = mul(input.normal, (float3x3)worldMatrix);
-	output.tang = mul(input.tangent, (float3x3)worldMatrix);
-    output.position = mul(output.position, viewMatrix);
-    output.position = mul(output.position, projectionMatrix);
-        
 	output.uv = input.uv;
+	output.norm = input.normal;
+	output.fragPos = input.position;
+	output.tang = input.tangent;
 
 
     return output;

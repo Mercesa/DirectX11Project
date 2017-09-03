@@ -6,15 +6,17 @@ struct VertexInputType
 	float4 position : Position;
 	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL;
+	float3 tangent : TANGENT;
 };
 
 struct PixelInputType
 {
 	float4 position : SV_POSITION;
-	float2 tex : TEXCOORD0;
-	float3 normal : NORMAL;
 	float4 lightViewPosition : TEXCOORD1;
+	float3 normal : NORMAL;
 	float3 fragPos : FRAGPOSITION;
+	float3 tang : TANGENT;
+	float2 tex : TEXCOORD0;
 };
 
 PixelInputType ShadowVertexShader(VertexInputType input)
@@ -27,22 +29,23 @@ PixelInputType ShadowVertexShader(VertexInputType input)
 
 	// Calculate the position of the vertex against the world, view, and projection matrices.
 	output.position = mul(input.position, worldMatrix);
-
 	output.fragPos = output.position;
 
-	output.position = mul(output.position, viewMatrix);
-	output.position = mul(output.position, projectionMatrix);
 
 	// Calculate the position of the vertice as viewed by the light source.
-	output.lightViewPosition = mul(input.position, worldMatrix);
-	output.lightViewPosition = mul(output.lightViewPosition, lightViewMatrix);
-	output.lightViewPosition = mul(output.lightViewPosition, lightProjectionMatrix);
+	output.lightViewPosition = output.position;
+	output.lightViewPosition = mul(output.lightViewPosition, lightProjectionViewMatrix);
 
-	// Store the texture coordinates for the pixel shader.
-	output.tex = input.tex;
+	output.position = mul(output.position, projViewMatrix);
+
 
 	output.normal = mul(input.normal, (float3x3)worldMatrix);
 	output.normal = normalize(output.normal);
+	
+	output.tang = mul(input.tangent, (float3x3)worldMatrix);
+
+	// Store the texture coordinates for the pixel shader.
+	output.tex = input.tex;
 
 	return output;
 }

@@ -5,19 +5,30 @@
 #include "easylogging++.h"
 
 #include "ShaderHelperFunctions.h"
-#include "d3dShaderVS.h"
-#include "d3dShaderPS.h"
 
 
-d3dShaderManager::d3dShaderManager()
+d3dShaderManager::d3dShaderManager(){}
+
+d3dShaderManager::~d3dShaderManager(){}
+
+
+void d3dShaderManager::ReleaseResources()
 {
+	for (auto& e : mVertexShaders)
+	{
+		ReleaseVertexShader(e.second.get());
+	}
+
+	for (auto& e : mPixelShaders)
+	{
+		ReleasePixelShader(e.second.get());
+	}
+
+	for (auto& e : mComputeShaders)
+	{
+		ReleaseComputeShader(e.second.get());
+	}
 }
-
-
-d3dShaderManager::~d3dShaderManager()
-{
-}
-
 
 bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 {
@@ -32,7 +43,43 @@ bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_shadow.hlsl", "ShadowPixelShader", "ps_5_0", EPIXEL));
 
 	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_depth.hlsl", "DepthVertexShader", "vs_5_0", EVERTEX));
-	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_depth.hlsl", "DepthPixelShader", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\fullScreenQuad_VS.hlsl", "VertShader", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\fullScreenQuad_PS.hlsl", "PixShader", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_GBufferFill.hlsl", "GBufferFillVertexShader", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_GBufferFill.hlsl", "GbufferFillPixelShader", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_DeferredLighting.hlsl", "VSDeferredLighting", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_DeferredLighting.hlsl", "PSDeferredLighting", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_SSAO.hlsl", "VSDeferredLighting", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_SSAO.hlsl", "PSDeferredLighting", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_Blur.hlsl", "VSDeferredLighting", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_Blur.hlsl", "PSDeferredLighting", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\CS_GuassianBlur.hlsl", "CSMain", "cs_5_0", ECOMPUTE));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_Skybox.hlsl", "SkyboxVertexShader", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_Skybox.hlsl", "SkyboxPixelShader", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_VelocityBuffer.hlsl", "VelocityVertexShader", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_VelocityBuffer.hlsl", "VelocityPixelShader", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_DeferredLightingVolumes.hlsl", "VSDeferredLightVolumes", "vs_5_0", EVERTEX));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\VS_TextureToScreen.hlsl", "TextureToScreenVertexShader", "vs_5_0", EVERTEX));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_TextureToScreen.hlsl", "TextureToScreenPixelShader", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_VelocityBufferReconstruction.hlsl", "VelocityBufferReconstructionPixelShader", "ps_5_0", EPIXEL));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_VelocityBufferTileMax.hlsl", "VelocityBufferReconstructionPixelShader", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\PS_DeferredLightingReconstruction.hlsl", "DeferredLightingReconstructPixelShader", "ps_5_0", EPIXEL));
+
+	mShadersInfo.push_back(ShaderInfo("Shaders\\CS_GuassianBlur.hlsl", "CSMain", "cs_5_0", ECOMPUTE));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\CS_ReconstructionVelocityTileMax.hlsl", "CSMain", "cs_5_0", ECOMPUTE));
+	mShadersInfo.push_back(ShaderInfo("Shaders\\CS_ReconstructionVelocityNeighbourMax.hlsl", "CSMain", "cs_5_0", ECOMPUTE));
 
 
 	LOG(INFO) << "ShaderManager: Finished initializing all shaders";
@@ -50,7 +97,7 @@ bool d3dShaderManager::InitializeShaders(ID3D11Device* const apDevice)
 }
 
 
-d3dShaderVS* const d3dShaderManager::GetVertexShader(const char* aShaderPath)
+VertexShader* const d3dShaderManager::GetVertexShader(const char* aShaderPath)
 {
 	auto it = mVertexShaders.find(aShaderPath);
 	
@@ -68,7 +115,7 @@ d3dShaderVS* const d3dShaderManager::GetVertexShader(const char* aShaderPath)
 }
 
 
-d3dShaderPS* const d3dShaderManager::GetPixelShader(const char* aShaderPath)
+PixelShader* const d3dShaderManager::GetPixelShader(const char* aShaderPath)
 {
 	auto it = mPixelShaders.find(aShaderPath);
 	
@@ -86,10 +133,124 @@ d3dShaderPS* const d3dShaderManager::GetPixelShader(const char* aShaderPath)
 }
 
 
-bool d3dShaderManager::LoadShaders(ID3D11Device* const apDevice)
+ComputeShader* const d3dShaderManager::GetComputeShader(const char* aShaderPath)
+{
+	auto it = mComputeShaders.find(aShaderPath);
+
+	if (it != mComputeShaders.end())
+	{
+		return it->second.get();
+	}
+
+	else
+	{
+		LOG(WARNING) << "Compute Shader - " << aShaderPath << " - not found in currently loaded shaders";
+		assert(true);
+		return nullptr;
+	}
+}
+
+inline wchar_t *convertCharArrayToLPCWSTR(const char* charArray)
+{
+	wchar_t* wString = new wchar_t[4096];
+	MultiByteToWideChar(CP_ACP, 0, charArray, -1, wString, 4096);
+	return wString;
+}
+
+#include "ShaderHelperFunctions.h"
+
+
+bool LoadVertexShader(ID3D11Device* const apDevice, ShaderInfo& aInfo, VertexShader* const aVertexShader)
+{
+
+	D3D11_INPUT_ELEMENT_DESC polygonLayout[5];
+	// Fill array with this function
+	CreateVertexbufferLayoutDefault(polygonLayout);
+
+	HRESULT result;
+
+
+	wchar_t* tWstring = convertCharArrayToLPCWSTR(aInfo.mFilePath);
+
+	ID3D10Blob* tBlobRef = nullptr;
+	LoadShaderWithErrorChecking(tWstring, (LPCSTR)aInfo.mEntryPoint, (LPCSTR)aInfo.mShaderProfile, tBlobRef);
+
+	result = apDevice->CreateVertexShader(tBlobRef->GetBufferPointer(), tBlobRef->GetBufferSize(), NULL, &aVertexShader->shader);
+
+	if (FAILED(result))
+	{
+		LOG(WARNING) << "Shader: " << aInfo.mFilePath << " failed to load";
+		return false;
+	}
+
+
+	// Get a count of the elements in the layout.
+	uint32_t tNumElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
+
+	// Create the vertex input layout.
+	result = apDevice->CreateInputLayout(polygonLayout, tNumElements, tBlobRef->GetBufferPointer(),
+		tBlobRef->GetBufferSize(), &aVertexShader->inputLayout);
+
+	if (FAILED(result))
+	{
+		LOG(WARNING) << "Shader: " << aInfo.mFilePath << " input layout failed to create";
+		return false;
+	}
+
+
+	delete[] tWstring;
+
+	return true;
+
+}
+
+bool LoadPixelShader(ID3D11Device* const apDevice, ShaderInfo& aInfo, PixelShader* const aPixelShader)
 {
 	HRESULT result;
 
+	wchar_t* tWstring = convertCharArrayToLPCWSTR(aInfo.mFilePath);
+
+	ID3D10Blob* tBlobRef = nullptr;
+	LoadShaderWithErrorChecking(tWstring, (LPCSTR)aInfo.mEntryPoint, (LPCSTR)aInfo.mShaderProfile, tBlobRef);
+
+	result = apDevice->CreatePixelShader(tBlobRef->GetBufferPointer(), tBlobRef->GetBufferSize(), NULL, &aPixelShader->shader);
+
+	if (FAILED(result))
+	{
+		LOG(WARNING) << "Shader: " << aInfo.mFilePath << " failed to load";
+		return false;
+	}
+
+	delete[] tWstring;
+
+	return true;
+}
+
+bool LoadComputeShader(ID3D11Device* const apDevice, ShaderInfo& aInfo, ComputeShader* const aComputeShader)
+{
+	HRESULT result;
+
+	wchar_t* tWstring = convertCharArrayToLPCWSTR(aInfo.mFilePath);
+
+	ID3D10Blob* tBlobRef = nullptr;
+	LoadShaderWithErrorChecking(tWstring, (LPCSTR)aInfo.mEntryPoint, (LPCSTR)aInfo.mShaderProfile, tBlobRef);
+
+	result = apDevice->CreateComputeShader(tBlobRef->GetBufferPointer(), tBlobRef->GetBufferSize(), NULL, &aComputeShader->shader);
+
+	if (FAILED(result))
+	{
+		LOG(WARNING) << "Shader: " << aInfo.mFilePath << " failed to load";
+		return false;
+	}
+
+	delete[] tWstring;
+
+	return true;
+}
+
+
+bool d3dShaderManager::LoadShaders(ID3D11Device* const apDevice)
+{
 	for (auto& e : mShadersInfo)
 	{
 		if (e.mShaderType == EVERTEX)
@@ -104,9 +265,9 @@ bool d3dShaderManager::LoadShaders(ID3D11Device* const apDevice)
 
 			else
 			{
-				std::unique_ptr<d3dShaderVS> tpShaderVS = std::make_unique<d3dShaderVS>();
+				std::unique_ptr<VertexShader> tpShaderVS = std::make_unique<VertexShader>();
 
-				if (!tpShaderVS->LoadVertexShader(apDevice, e))
+				if (!LoadVertexShader(apDevice, e, tpShaderVS.get()))
 				{
 					return false;
 				}
@@ -128,14 +289,37 @@ bool d3dShaderManager::LoadShaders(ID3D11Device* const apDevice)
 
 			else
 			{
-				std::unique_ptr<d3dShaderPS> tpShaderPS = std::make_unique<d3dShaderPS>();
+				std::unique_ptr<PixelShader> tpShaderPS = std::make_unique<PixelShader>();
 
-				if (!tpShaderPS->LoadPixelShader(apDevice, e))
+				if (!LoadPixelShader(apDevice, e, tpShaderPS.get()))
 				{
 					return false;
 				}
 
 				this->mPixelShaders[e.mFilePath] = std::move(tpShaderPS);
+			}
+		}
+
+		else if (e.mShaderType == ECOMPUTE)
+		{
+			auto it = mComputeShaders.find(e.mFilePath);
+
+			// If the shader exists, continue
+			if (it != mComputeShaders.end())
+			{
+				continue;
+			}
+
+			else
+			{
+				std::unique_ptr<ComputeShader> tpShaderCS = std::make_unique<ComputeShader>();
+
+				if (!LoadComputeShader(apDevice, e, tpShaderCS.get()))
+				{
+					return false;
+				}
+
+				this->mComputeShaders[e.mFilePath] = std::move(tpShaderCS);
 			}
 		}
 	}

@@ -17,10 +17,16 @@ d3dConstantBuffer::d3dConstantBuffer(int aSize, void* aData, ID3D11Device* const
 	d.SysMemPitch = 0;
 	d.SysMemSlicePitch = 0;
 
-	// Create constantbuffer
-	HRESULT hr;
-	aDevice->CreateBuffer(&CD3D11_BUFFER_DESC(aSize	, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE), &d, &mpBuffer);
+	
+	// Create buffer with constant buffer tag
+	
+	// Trying to find the amount of padding based on the allocation size
+	// https://en.wikipedia.org/wiki/Data_structure_alignment
+	int32_t padding = (16 - (aSize % 16)) % 16;
+	int32_t newSize = aSize + padding;
 
+	aDevice->CreateBuffer(&CD3D11_BUFFER_DESC(newSize, D3D11_BIND_CONSTANT_BUFFER, D3D11_USAGE_DYNAMIC, D3D11_CPU_ACCESS_WRITE), &d, &mpBuffer);
+	
 	delete[] dd;
 }
 

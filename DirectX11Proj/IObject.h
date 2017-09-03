@@ -1,6 +1,10 @@
 #pragma once
 
-#include "modelclass.h"
+#include "d3d11HelperFile.h"
+
+#include <glm\gtx\common.hpp>
+#include <glm\gtc\matrix_transform.hpp>
+#include <glm\common.hpp>
 
 class IObject
 {
@@ -8,23 +12,30 @@ public:
 	IObject();
 	virtual ~IObject();
 
-	virtual void OnDestroy() = 0;
-	virtual void OnInit() = 0;
-	virtual void Tick() = 0;
+	virtual void OnDestroy(){}
+	virtual void OnInit(){}
+	virtual void Tick(){}
 	
 	bool GetActive() { return mIsActive; }
 	bool GetCastShadow() { return mCastShadow; }
 	bool GetHasBeenInitialized() { return mHasBeenInitialized; }
 
 
-	ModelClass* mpModel;
-	XMFLOAT4X4  mWorldMatrix;
+	glm::mat4x4 mWorldMatrix;
+	glm::mat4x4 mPrevWorldMatrix;
+	glm::vec4 mSpherePosition;
+
+	ModelID mpModel;
+	Material* mpMaterial;
+
+	
+
+	bool mCastShadow = true;
 
 protected:
 	// premature initialization just so I dont forget in general
 	bool mIsActive = false;
-	bool mCastShadow = false;
 	bool mHasBeenInitialized = false;
-
+		
 };
 

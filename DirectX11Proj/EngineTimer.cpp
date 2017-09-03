@@ -4,15 +4,15 @@
 #include <chrono>
 #include <ctime>
 
-std::chrono::time_point<std::chrono::system_clock> start, end;
 
 
-static double totalTime = 0.0f;
-static double deltaTime = 0.0f;
 
 
-EngineTimer::EngineTimer()
+
+EngineTimer::EngineTimer() : totalTime(double_t(0.0f)), deltaTime(0.0f)
 {
+	start = std::chrono::system_clock::now();
+	end = std::chrono::system_clock::now();
 }
 
 
@@ -26,26 +26,25 @@ void EngineTimer::Start()
 	start = std::chrono::system_clock::now();
 }
 
-
 void EngineTimer::Update()
 {
 	std::chrono::duration<double> elapsed_seconds = start - end;
 
 	end = start;
-	start = std::chrono::system_clock::now();
 
-	totalTime += elapsed_seconds.count();
-	deltaTime = elapsed_seconds.count();
+	totalTime += (double_t)elapsed_seconds.count();
+	deltaTime = (double_t)elapsed_seconds.count();
+	start = std::chrono::system_clock::now();
 }
 
 
-float_t EngineTimer::GetDeltaTime()
+double_t EngineTimer::GetDeltaTime()
 {
 	return deltaTime;
 }
 
 
-float_t EngineTimer::GetTotalTime()
+double_t EngineTimer::GetTotalTime()
 {
 	return totalTime;
 }
